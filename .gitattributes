@@ -1,0 +1,2 @@
+# CSV follows RFC 4180 line endings; CR before LF is intentional.
+data/*.csv whitespace=cr-at-eol
