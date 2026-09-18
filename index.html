@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="DendriScale: measured compression–quality Pareto fronts for dendritic networks, quantization and hybrid language models."><title>DendriScale · Compression–quality explorer</title><link rel="stylesheet" href="styles.css"><link rel="icon" href="favicon.svg" type="image/svg+xml"></head><body><a class="skip" href="#explorer">Skip to explorer</a><main>
+<nav><a class="brand" href="./">DendriScale</a><div><a href="METHODS.md">Methods</a> · <a href="https://github.com/houman1359/DendriScale">GitHub</a></div></nav>
+<p class="eyebrow">DENDRITIC NETWORK COMPRESSION · OPEN EXPERIMENT RECORD</p><h1>How small can a capable model be?</h1><p class="muted" id="updated">Loading snapshot…</p><p id="loadError" class="notice" role="alert" hidden></p><noscript><p>This interactive explorer needs JavaScript. Aggregate CSV and JSON downloads are available below.</p></noscript><div class="card latest"><b>Latest measured result</b><p id="latest">Loading…</p><p class="small">Ongoing research. Development gates, local fidelity and whole-model reasoning are different measurements. No SOTA claim or reserved-final certification is implied.</p></div>
+<p class="muted">Find the smallest model that meets your performance tolerance. The original teacher is a reference; beating its score is not required. The default size axis is the percentage of the <b>complete original model’s bytes retained</b>: 100% means the original size; 25% means 4× smaller.</p>
+<div id="stats" class="stats"></div>
+<div class="card" id="explorer"><div class="controls">
+<label>Original model<select id="model"></select></label>
+<label>Comparison set<select id="level"><option value="curated">Curated capability cohorts</option><option value="local">Sealed local fitting endpoints</option><option value="registry-reported">All joinable registry observations</option></select></label>
+<label>Benchmark and size axis<select id="panel"></select></label>
+<label>Unique training positions<select id="dose"></select></label>
+<label class="check"><input id="teacher" type="checkbox" checked>Include teacher reference</label>
+<label class="check"><input id="onlyfront" type="checkbox">Frontier points only</label>
+<button id="export">Export this SVG</button>
+</div>
+<p id="panelNote" class="notice"></p>
+<svg id="plot" viewBox="0 0 1100 540" role="img" aria-label="Compression–quality scatter plot"></svg>
+<div id="methodLegend" class="legend"></div><p class="small muted">Color identifies the method. A dark outline and dashed line identify observed Pareto points.</p>
+<p class="muted small">A point is non-dominated when no measured alternative in this exact panel is both cheaper and at least as good, with one strict improvement. This does not establish statistical dominance or override a failed quality gate. Exact ties are retained. Local fidelity panels are not capability results.</p>
+</div>
+<div class="card"><h2>Points in this comparison</h2><div class="scroll"><table><thead><tr><th>Candidate</th><th>Method</th><th id="xhead">Size</th><th id="yhead">Quality</th><th>Full model retained</th><th>Full model saved</th><th>Unique positions</th><th>Original status</th><th>Observed frontier</th></tr></thead><tbody id="points"></tbody></table></div>
+<h2>Selected point</h2><div id="detail" class="muted">Select a point or candidate to inspect its size accounting, conditions and evidence.</div></div>
+<div class="card"><h2>Coverage of the complete experiment register</h2>
+<p class="muted">Every registered experiment remains here, including failed, pending and unjoinable records. “Registry pairs” counts conservative matches within that experiment; curated and local views can additionally use explicit source mappings. Missing fields are not zero values.</p>
+<label>Search experiments<input id="search" placeholder="Model, experiment, missing measurement…"></label><p id="coverageCount" class="small"></p>
+<div class="scroll"><table><thead><tr><th>Experiment</th><th>Model</th><th>Execution</th><th>Metrics</th><th>Registry pairs</th><th>Coverage / next action</th></tr></thead><tbody id="coverage"></tbody></table></div></div>
+<p class="small muted">Aggregate downloads: <a href="data/observations.csv">normalized observations</a> · <a href="data/metrics.csv">every recorded metric</a> · <a href="data/coverage.csv">coverage ledger</a> · <a href="data/snapshot.json">fronts and provenance</a>. Whole-model percentages use registered bytes at the recorded precision and include quantization and connectivity costs. They are not percentages of active parameters. Local layer fits have no measured whole-model percentage. Size axes preserve their scope and current precision. Registered bytes exclude unregistered workspaces; checkpoint bytes are not resident memory.</p>
+</main><footer><p>Public measurements from the DendriScale research program. Model weights, training corpora and per-item benchmark traces are not distributed here. See <a href="METHODS.md">methods and limitations</a>.</p></footer><script src="app.js" defer></script></body></html>

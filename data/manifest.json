@@ -1,0 +1,9 @@
+{
+  "schema": "dendriscale/manifest-v1",
+  "sha256": {
+    "coverage.csv": "0b65889116df6730d1184dbb8568f2f3269dd6bfb3b7b70f212ebc2fc4d8701b",
+    "metrics.csv": "26c9904715195eab0f15a2c4490efaa8842240834cee531ad7e1925a5c78d6f1",
+    "observations.csv": "cd3c0ba076b80d770fbe3431a2205aa7a3280ebaa10ca793a10d11f4bee8f832",
+    "snapshot.json": "a59c68d8f8981f30ce135f088370bd2c051b24d3424977b5aac219c106597d34"
+  }
+}
