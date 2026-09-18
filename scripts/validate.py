@@ -76,5 +76,33 @@ class PublicContract(unittest.TestCase):
         for name,sha in manifest['sha256'].items():
             self.assertEqual(hashlib.sha256((ROOT/'data'/name).read_bytes()).hexdigest(),sha)
 
+    def test_complete_wave_and_candidate_register(self):
+        expected={'warm_I10M_fit_bf16_delete17','warm_I10M_recovered_bf16_delete17',
+            'warm_I100M_recovered_bf16_delete17','warm_I100M_recovered_int8_delete17',
+            'warm_I100M_recovered_int4_delete17','warm_noI10M_recovered_int8_delete17',
+            'delete16_17','delete16_48'}
+        self.assertTrue(expected.issubset({x['arm'] for x in DATA['highlights']}))
+        rows=DATA['candidates']
+        self.assertEqual(len(rows),DATA['summary']['candidate_cohort_records'])
+        self.assertEqual(len({r['id'] for r in rows}),len(rows))
+        self.assertTrue(any(r['failed_gates'] for r in rows))
+        for arm in expected:
+            points=[p for panel in DATA['panels'] for p in panel['points'] if p['id']=='native_wave_'+arm+'__GSM correct / 1024']
+            self.assertTrue(points,arm)
+            if arm.startswith('delete'):
+                self.assertTrue(all(p['method_style']['key']=='control' for p in points))
+        for r in rows:
+            if r['source_level']=='pending':
+                self.assertFalse(r['measurements']);self.assertIsNone(r['panel_id'])
+        with (ROOT/'data/candidates.csv').open() as f:self.assertEqual(len(list(csv.DictReader(f))),len(rows))
+
+    def test_only_aggregate_uncertainty_is_public(self):
+        forbidden={'paired_item_differences','paired_delta_by_window','records'}
+        def keys(value):
+            if isinstance(value,dict):return set(value).union(*(keys(v) for v in value.values()))
+            if isinstance(value,list):return set().union(*(keys(v) for v in value))
+            return set()
+        self.assertFalse(keys(DATA)&forbidden)
+
 
 if __name__=='__main__':unittest.main(verbosity=2)

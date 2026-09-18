@@ -6,16 +6,18 @@
 <div id="stats" class="stats"></div>
 <div class="card" id="explorer"><div class="controls">
 <label>Original model<select id="model"></select></label>
-<label>Comparison set<select id="level"><option value="curated">Curated capability cohorts</option><option value="local">Sealed local fitting endpoints</option><option value="registry-reported">All joinable registry observations</option></select></label>
+<label>Comparison set<select id="level"><option value="curated">Matched capability cohorts · all outcomes</option><option value="local">Sealed local fitting endpoints</option><option value="registry-reported">All joinable registry observations</option></select></label>
 <label>Benchmark and size axis<select id="panel"></select></label>
 <label>Unique training positions<select id="dose"></select></label>
 <label>Compression method<select id="method"></select></label>
+<label>Benchmark verdict<select id="gate"><option value="all">All outcomes, including failed gates</option><option value="failed">Failed or stopped</option><option value="passed">Passed</option><option value="other">Pending, local or unclassified</option></select></label>
 <label class="check"><input id="teacher" type="checkbox" checked>Include teacher reference</label>
 <label class="check"><input id="onlyfront" type="checkbox">Frontier points only</label>
 <label class="check"><input id="monochrome" type="checkbox">Monochrome (shapes only)</label>
 <button id="export">Export this SVG</button>
 </div>
 <p id="panelNote" class="notice"></p>
+<p class="small"><b>All measured outcomes are shown by default.</b> A failed gate does not remove a model from this plot or the candidate register. Frontier-only and verdict filters are optional.</p>
 <div id="methodLegend" class="legend" aria-label="Compression method symbols"></div>
 <p class="small muted">Each method has a different shape and color, repeated in the table. An outer ring and dashed line identify observed Pareto points. Use the method filter to separate overlapping points.</p>
 <p class="mobile-hint small">Scroll the plot horizontally to see it at full size.</p>
@@ -24,6 +26,11 @@
 </div>
 <div class="card"><h2>Points in this comparison</h2><div class="scroll"><table><thead><tr><th>Candidate</th><th>Method</th><th id="xhead">Size</th><th id="yhead">Quality</th><th>Full model retained</th><th>Full model saved</th><th>Unique positions</th><th>Original status</th><th>Observed frontier</th></tr></thead><tbody id="points"></tbody></table></div>
 <h2>Selected point</h2><div id="detail" class="muted">Select a point or candidate to inspect its size accounting, conditions and evidence.</div></div>
+<div class="card" id="candidate-register"><h2>All recorded candidate / cohort comparisons</h2>
+<p class="muted">Passing, failed, dominated and near-target candidates stay in the record. A candidate can have separate rows for incompatible cohorts or measurement scopes. Reload-qualified models awaiting capability scores are listed without invented scores.</p>
+<div class="controls"><label>Find a candidate<input id="candidateSearch" placeholder="Model, method, layer, benchmark…"></label><label>Candidate verdict<select id="candidateGate"><option value="all">All outcomes</option><option value="failed">Failed or stopped</option><option value="passed">Passed</option><option value="other">Pending, local or unclassified</option></select></label></div>
+<p id="candidateCount" class="small"></p><div class="scroll"><table><thead><tr><th>Candidate</th><th>Model / scope</th><th>Recorded sizes</th><th>Benchmarks</th><th>Verdict / failed gates</th></tr></thead><tbody id="candidates"></tbody></table></div>
+<p class="small"><a href="data/candidates.csv">Download every candidate/cohort record</a>. Records lacking a reliable size–score match remain in the complete experiment register below.</p></div>
 <div class="card"><h2>Coverage of the complete experiment register</h2>
 <p class="muted">Every registered experiment remains here, including failed, pending and unjoinable records. “Registry pairs” counts conservative matches within that experiment; curated and local views can additionally use explicit source mappings. Missing fields are not zero values.</p>
 <label>Search experiments<input id="search" placeholder="Model, experiment, missing measurement…"></label><p id="coverageCount" class="small"></p>

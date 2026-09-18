@@ -52,7 +52,7 @@ both smaller and at least as good, with one strict improvement. Exact ties
 remain. Each method has a distinct shape and high-contrast color, repeated in
 the legend and table. The monochrome option preserves all shape distinctions.
 Outer rings identify point-estimate Pareto membership, independently of method.
-Filtering by dose, method or teacher inclusion recomputes the displayed front
+Filtering by dose, method, verdict or teacher inclusion recomputes the displayed front
 for that subset. SVG downloads include the method symbols and legend.
 
 A Pareto point can fail the full capability gates. The front does not imply
@@ -62,6 +62,14 @@ construction seed; small differences require replication. Development selection
 and calibration choices also limit generalization.
 
 ## Current interpretation
+
+Eight complete models from the latest composition wave are now included,
+regardless of gate outcome. Physical deletion of FFNs16+17 scores908/1,024GSM
+and5,262/6,144MC at3.8627×; it fails GSM. The100M BF16 native-cell-plus-deletion
+model scores913/5,262 at3.7876× and narrowly passes, but its paired GSM gain
+over double deletion is only+5 items,95% interval[−13,+22]. This does not
+establish a native capability advantage. Neither a failed gate nor a dominated
+point causes an otherwise valid measurement to disappear from the record.
 
 The new 3.810× INT8 native-cell-plus-deletion model scores 910/1,024 GSM and
 5,262/6,144 MC against the original teacher's 948 and 5,292. It fails GSM alone:
@@ -83,5 +91,12 @@ local fits nor total hybrid compression alone settle the second question.
 Every experiment in the exported register is listed, including records without
 a joinable size–quality pair. Coverage is complete at the register level; it is
 not yet a complete artifact-level normalization of all historical runs.
+The separate candidate register groups cost and benchmark observations within
+their original cohort. The same physical model can have separate records in
+different cohorts or scopes; the row count is not a unique-checkpoint count.
+Reload-qualified models without completed capability scores appear as pending
+in that register, with no invented score or Pareto coordinate. All outcomes are
+visible by default, including dominated and failed-gate points. The verdict and
+frontier-only filters are optional views, never admission rules for the archive.
 Public SHA-256 references bind the aggregate points to archived evidence.
 Raw model artifacts and per-item data are not included in this website.

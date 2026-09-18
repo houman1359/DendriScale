@@ -35,6 +35,8 @@ public-data contract, and the newly reported failed-gate result.
 - Local fitting results, including active weights and connectivity costs.
 - Separate panels for models, teacher/evaluation cohorts, benchmarks and doses.
 - Failed and near-target candidates, alongside successful controls.
+- A searchable candidate/cohort register, including dominated points and
+  qualified artifacts awaiting capability; all outcomes appear by default.
 - A complete experiment-coverage ledger, including missing and pending results.
 - Downloadable aggregate CSV/JSON and exportable SVG plots.
 - Distinct marker shapes, larger high-contrast symbols, a method filter and a
@@ -53,7 +55,7 @@ choose **Settings → Pages → Deploy from a branch → main → / (root)**.
 The included validation workflow checks each push and pull request. Once Pages
 is enabled, pushes to `main` update the website automatically.
 
-Update all four files in `data/` together from a verified aggregate export.
+Update the aggregate files and hash manifest in `data/` together from a verified export.
 Keep the original gate verdicts, provenance hashes and snapshot timestamp.
 Run validation and inspect the page before committing. Do not copy private
 research directories or their Git history into this repository.
