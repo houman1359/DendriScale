@@ -49,9 +49,11 @@ results should not be interpreted as a validated reasoning frontier.
 
 A point is non-dominated if no measured alternative in the exact panel is
 both smaller and at least as good, with one strict improvement. Exact ties
-remain. Colors identify methods; outlines identify point-estimate Pareto
-membership. Filtering by dose or teacher inclusion recomputes the displayed
-front for that subset.
+remain. Each method has a distinct shape and high-contrast color, repeated in
+the legend and table. The monochrome option preserves all shape distinctions.
+Outer rings identify point-estimate Pareto membership, independently of method.
+Filtering by dose, method or teacher inclusion recomputes the displayed front
+for that subset. SVG downloads include the method symbols and legend.
 
 A Pareto point can fail the full capability gates. The front does not imply
 statistical dominance, replication, a latency advantage, a SOTA result or

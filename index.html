@@ -9,13 +9,17 @@
 <label>Comparison set<select id="level"><option value="curated">Curated capability cohorts</option><option value="local">Sealed local fitting endpoints</option><option value="registry-reported">All joinable registry observations</option></select></label>
 <label>Benchmark and size axis<select id="panel"></select></label>
 <label>Unique training positions<select id="dose"></select></label>
+<label>Compression method<select id="method"></select></label>
 <label class="check"><input id="teacher" type="checkbox" checked>Include teacher reference</label>
 <label class="check"><input id="onlyfront" type="checkbox">Frontier points only</label>
+<label class="check"><input id="monochrome" type="checkbox">Monochrome (shapes only)</label>
 <button id="export">Export this SVG</button>
 </div>
 <p id="panelNote" class="notice"></p>
-<svg id="plot" viewBox="0 0 1100 540" role="img" aria-label="Compression–quality scatter plot"></svg>
-<div id="methodLegend" class="legend"></div><p class="small muted">Color identifies the method. A dark outline and dashed line identify observed Pareto points.</p>
+<div id="methodLegend" class="legend" aria-label="Compression method symbols"></div>
+<p class="small muted">Each method has a different shape and color, repeated in the table. An outer ring and dashed line identify observed Pareto points. Use the method filter to separate overlapping points.</p>
+<p class="mobile-hint small">Scroll the plot horizontally to see it at full size.</p>
+<div class="plot-scroll"><svg id="plot" viewBox="0 0 1100 540" role="group" aria-label="Interactive compression–quality scatter plot"></svg></div>
 <p class="muted small">A point is non-dominated when no measured alternative in this exact panel is both cheaper and at least as good, with one strict improvement. This does not establish statistical dominance or override a failed quality gate. Exact ties are retained. Local fidelity panels are not capability results.</p>
 </div>
 <div class="card"><h2>Points in this comparison</h2><div class="scroll"><table><thead><tr><th>Candidate</th><th>Method</th><th id="xhead">Size</th><th id="yhead">Quality</th><th>Full model retained</th><th>Full model saved</th><th>Unique positions</th><th>Original status</th><th>Observed frontier</th></tr></thead><tbody id="points"></tbody></table></div>

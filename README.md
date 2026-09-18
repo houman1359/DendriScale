@@ -37,6 +37,8 @@ public-data contract, and the newly reported failed-gate result.
 - Failed and near-target candidates, alongside successful controls.
 - A complete experiment-coverage ledger, including missing and pending results.
 - Downloadable aggregate CSV/JSON and exportable SVG plots.
+- Distinct marker shapes, larger high-contrast symbols, a method filter and a
+  remembered monochrome option; color is never the only method identifier.
 
 The snapshot is a dated export, not a live job monitor. The public data contain
 aggregate measurements and source hashes; they omit internal filesystem paths,
