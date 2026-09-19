@@ -63,13 +63,22 @@ and calibration choices also limit generalization.
 
 ## Current interpretation
 
-Eight complete models from the latest composition wave are now included,
+All twelve complete models from the latest composition wave are now included,
 regardless of gate outcome. Physical deletion of FFNs16+17 scores908/1,024GSM
 and5,262/6,144MC at3.8627×; it fails GSM. The100M BF16 native-cell-plus-deletion
 model scores913/5,262 at3.7876× and narrowly passes, but its paired GSM gain
 over double deletion is only+5 items,95% interval[−13,+22]. This does not
 establish a native capability advantage. Neither a failed gate nor a dominated
 point causes an otherwise valid measurement to disappear from the record.
+
+The four newly completed two-cell models replace FFNs16 and48. The25%-value
+pair scores891GSM with INT8 and898 with INT4; the12.5%-value pair scores883
+in either format. Their whole-model factors are3.758×,3.781×,3.805× and3.817×,
+respectively. All fail GSM while passing the other four development gates.
+None establishes a paired GSM gain over deleting the same two FFNs
+(881correct): even the largest point gain,+17,has95% interval[−4,+37].
+The joint/sequential recovery and attention descendants retain their separate
+pending full-battery status; their scores are not inherited from these models.
 
 The new 3.810× INT8 native-cell-plus-deletion model scores 910/1,024 GSM and
 5,262/6,144 MC against the original teacher's 948 and 5,292. It fails GSM alone:

@@ -80,7 +80,8 @@ class PublicContract(unittest.TestCase):
         expected={'warm_I10M_fit_bf16_delete17','warm_I10M_recovered_bf16_delete17',
             'warm_I100M_recovered_bf16_delete17','warm_I100M_recovered_int8_delete17',
             'warm_I100M_recovered_int4_delete17','warm_noI10M_recovered_int8_delete17',
-            'delete16_17','delete16_48'}
+            'delete16_17','delete16_48','pair16_48_neurons25_int8','pair16_48_neurons25_int4',
+            'pair16_48_neurons12p5_int8','pair16_48_neurons12p5_int4'}
         self.assertTrue(expected.issubset({x['arm'] for x in DATA['highlights']}))
         rows=DATA['candidates']
         self.assertEqual(len(rows),DATA['summary']['candidate_cohort_records'])
