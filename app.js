@@ -7,7 +7,13 @@ if (!response.ok) throw new Error('Snapshot could not be loaded');
 const DATA=await response.json(),byId=id=>document.getElementById(id);
 byId('updated').textContent='Snapshot: '+new Date(DATA.updated_at_utc).toLocaleString(undefined,{timeZoneName:'short'});
 const latest=DATA.highlights[0];
-if(latest) byId('latest').textContent='Latest complete battery: '+latest.arm+' · '+latest.factor.toFixed(3)+'× whole-model compression; GSM '+latest.GSM+'/1,024 and MC '+latest.MC+'/6,144. '+(latest.passes?'Passes all five development gates.':'Fails full development gates. GSM upper loss: '+(100*latest.gsm_upper_loss).toFixed(2)+' percentage points; limit: 5.')+' All '+DATA.highlights.length+' full-battery additions remain visible, including failures.';
+if(latest) {
+  const gateNames={gsm:'GSM',mc:'Multiple choice',c4:'C4',copy512:'Copy 512',copy2048:'Copy 2048'};
+  const failed=latest.failed_gates||[];
+  const verdict=latest.passes?'Passes all five development gates.':'Fails full development gates'+(failed.length?': '+failed.map(k=>gateNames[k]||k).join(', '):'')+'.';
+  const gsmDetail=failed.includes('gsm')?' GSM upper loss: '+(100*latest.gsm_upper_loss).toFixed(2)+' percentage points; limit: 5.':'';
+  byId('latest').textContent='Latest complete battery: '+latest.arm+' · '+latest.factor.toFixed(3)+'× whole-model compression; GSM '+latest.GSM+'/1,024 and MC '+latest.MC+'/6,144. '+verdict+gsmDetail+' All '+DATA.highlights.length+' full-battery additions remain visible, including failures.';
+}
 const svgNS='http://www.w3.org/2000/svg';
 // Presentation is independent of archived measurements and method classifications.
 const METHOD_STYLES={
