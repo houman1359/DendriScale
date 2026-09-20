@@ -109,7 +109,7 @@ function selectPanels(){let ps=DATA.panels.filter(p=>p.model===byId('model').val
  opts(byId('panel'),ps.map(p=>[p.id,p.ylabel+' · '+p.xlabel+(p.source_level==='registry-reported'?' · '+p.cohort:'')]));selectDose();}
 function current(){return DATA.panels.find(p=>p.id===byId('panel').value);}
 function selectDose(){const p=current();if(!p)return;const chosen=byId('method').value;opts(byId('method'),[['all','All methods'],...visibleMethodKeys(p.points).map(key=>[key,methodStyle(key).shapeLabel+' · '+methodLabel(key)])]);if([...byId('method').options].some(o=>o.value===chosen))byId('method').value=chosen;const doses=[...new Set(p.points.map(x=>x.dose).filter(x=>x!==null))].sort((a,b)=>a-b);opts(byId('dose'),[['all','All recorded doses'],...doses.map(x=>[String(x),num(x)])]);byId('dose').disabled=!doses.length;draw();}
-function detail(v,p){byId('detail').textContent=JSON.stringify({candidate:v.label,method:methodLabel(methodKey(v)),marker_shape:methodStyle(methodKey(v)).shapeLabel,model:v.model,benchmark:p.ylabel,quality:v.y,size_axis:p.xlabel,size:v.x,size_unit:p.xunit,unique_positions:v.dose,presentations:v.presentations,resources:v.resources,whole_model_size:v.whole_model_size||"Not measured for this local or unmatched artifact",original_status:v.gate_status,conditions:v.conditions,limitations:v.limitations,uncertainty:v.uncertainty,full_gate_checks:v.full_gate_checks,source_hashes:v.source_hashes},null,2);}
+function detail(v,p){byId('detail').textContent=JSON.stringify({candidate:v.label,method:methodLabel(methodKey(v)),marker_shape:methodStyle(methodKey(v)).shapeLabel,model:v.model,benchmark:p.ylabel,quality:v.y,size_axis:p.xlabel,size:v.x,size_unit:p.xunit,unique_positions:v.dose,presentations:v.presentations,resources:v.resources,estimated_H100_weight_fit_count:window.DendriScaleMemory.estimate(v.whole_model_size?.registered_bytes),memory_estimate_assumptions:window.DendriScaleMemory.description(),whole_model_size:v.whole_model_size||"Not measured for this local or unmatched artifact",original_status:v.gate_status,conditions:v.conditions,limitations:v.limitations,uncertainty:v.uncertainty,full_gate_checks:v.full_gate_checks,source_hashes:v.source_hashes},null,2);}
 function draw(){const p=current(),svg=byId('plot');svg.replaceChildren();byId('points').replaceChildren();if(!p)return;
  let ps=p.points.filter(v=>(byId('dose').value==='all'||String(v.dose)===byId('dose').value)&&(byId('teacher').checked||v.label!=='Teacher reference')&&(byId('method').value==='all'||methodKey(v)===byId('method').value)&&matchesOutcome(v,byId('gate').value));
  const fp=nondominated(ps,p),ids=new Set(fp.map(v=>v.id));if(byId('onlyfront').checked)ps=fp;
@@ -122,6 +122,7 @@ function draw(){const p=current(),svg=byId('plot');svg.replaceChildren();byId('p
  let dx=xmax-xmin,dy=ymax-ymin;if(!dx)dx=Math.max(Math.abs(xmax)*.03,1);if(!dy)dy=Math.max(Math.abs(ymax)*.03,.01);
  xmin=Math.max(0,xmin-dx*.08);xmax+=dx*.08;ymin-=dy*.12;ymax+=dy*.12;
  const X=v=>L+(v-xmin)/(xmax-xmin)*(W-L-R),Y=v=>H-B-(v-ymin)/(ymax-ymin)*(H-T-B);
+ window.DendriScaleMemory.panel(svg,p,ps,{left:L,right:W-R,top:T,height:H-T-B,X});
  for(let i=0;i<=5;i++){let x=xmin+(xmax-xmin)*i/5,y=ymin+(ymax-ymin)*i/5;
   svg.append(se('line',{x1:X(x),y1:T,x2:X(x),y2:H-B,stroke:'#e1e7ee'}),se('text',{x:X(x),y:H-B+26,'text-anchor':'middle','font-size':12,fill:'#526577'},cost(p,x)));
   svg.append(se('line',{x1:L,y1:Y(y),x2:W-R,y2:Y(y),stroke:'#e1e7ee'}),se('text',{x:L-12,y:Y(y)+4,'text-anchor':'end','font-size':12,fill:'#526577'},num(y)));}
@@ -159,17 +160,21 @@ byId('model').addEventListener('change',selectPanels);byId('level').addEventList
 byId('candidateSearch').addEventListener('input',candidateRegister);byId('candidateGate').addEventListener('change',candidateRegister);
 byId('monochrome').addEventListener('change',()=>{try{localStorage.setItem('dendriscale-monochrome',String(byId('monochrome').checked));}catch(_){}});
 byId('export').addEventListener('click',()=>{const copy=byId('plot').cloneNode(true);
- const keys=[...byId('methodLegend').children].map(item=>item.dataset.method),height=610+keys.length*32;
+ const keys=[...byId('methodLegend').children].map(item=>item.dataset.method),height=705+keys.length*32;
  copy.setAttribute('viewBox',`0 0 1100 ${height}`);copy.setAttribute('width','1100');copy.setAttribute('height',String(height));
  copy.insertBefore(se('rect',{x:0,y:0,width:1100,height,fill:'white'}),copy.firstChild);
  copy.append(se('text',{x:95,y:565,fill:'#151515','font-size':15,'font-family':'sans-serif'},'Method = shape + color. Outer ring / dashed line = observed Pareto front.'));
  for(const [i,key] of keys.entries()){copy.append(shapeMark(key,108,592+i*32),se('text',{x:132,y:597+i*32,fill:'#151515','font-size':15,'font-family':'sans-serif'},methodStyle(key).shapeLabel+' · '+methodLabel(key)));}
+window.DendriScaleMemory.legend(copy,95,height-55);
+copy.append(se('text',{x:95,y:height-32,fill:'#475361','font-size':12,'font-family':'sans-serif'},byId('gpuBands').checked?'H100 bands: weight-storage estimates, not measured run requirements. Capacity '+byId('gpuCapacity').value+' GB; reserve '+byId('gpuReserve').value+' GB/card.':'Memory bands disabled.'));
 copy.setAttribute('xmlns',svgNS);const blob=new Blob([new XMLSerializer().serializeToString(copy)],{type:'image/svg+xml'}),url=URL.createObjectURL(blob),a=el('a');a.href=url;a.download=(current()?.id||'pareto')+'.svg';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);});
 const params=new URLSearchParams(location.search);
 for(const id of ['model','level']) if(params.has(id)&&[...byId(id).options].some(o=>o.value===params.get(id))) byId(id).value=params.get(id);
 selectPanels();
 if(params.has('panel')&&[...byId('panel').options].some(o=>o.value===params.get('panel'))){byId('panel').value=params.get('panel');selectDose();}
 coverage();candidateRegister();comparisonTable();
+window.DendriScaleMemory.init(draw);
+window.DendriScaleOverview(DATA,{el,se,methodIcon,shapeMark,outcome,openComparison});
 byId('comparisonCohort').addEventListener('change',comparisonTable);byId('comparisonGate').addEventListener('change',comparisonTable);byId('monochrome').addEventListener('change',comparisonTable);
 for(const id of ['model','level','panel']) byId(id).addEventListener('change',()=>{const q=new URLSearchParams();for(const key of ['model','level','panel'])q.set(key,byId(key).value);history.replaceState(null,'','?'+q.toString());});
 byId('loadError').hidden=true;
