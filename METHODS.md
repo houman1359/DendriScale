@@ -123,8 +123,10 @@ The September 20 independent four-FFN bank (sites 16–19, INT4 native values) c
 
 ## Additional all-model plot
 
-The original matched plots remain the default. The additional benchmark selector pools recorded models on an absolute whole-model registered-byte axis, displayed in decimal GB. Percentage-axis duplicates are collapsed; failed and dominated outcomes remain included. Local cell costs and unspecified file/resident sizes are not promoted to whole-model bytes.
+The original matched plots remain the default. The additional benchmark selector pools recorded models on an absolute whole-model registered-byte axis, displayed in decimal GB. Percentage-axis duplicates are collapsed; failed and dominated outcomes remain available. Local cell costs and unspecified file/resident sizes are not promoted to whole-model bytes.
 
 Counts are converted to accuracy percentages only with sample sizes explicitly recorded in benchmark/cohort metadata or an unambiguous count in the same experiment and benchmark family. Unresolved counts retain a separate raw-count view. Ratios and nats/token retain their definitions. The pooled display is descriptive: it does not aggregate item-level datasets, alter gates or construct a pooled Pareto frontier across protocols. Exact cohorts and original scores remain in the point details and table.
 
 In the pooled plot, original models have distinct colors and short text labels, while marker shapes identify compression methods. Model labels are enabled by default and remain visible in monochrome. The model legend can highlight a model while retaining all points; the existing Models selector isolates it. SVG exports include both legends and any active highlight. Original matched plots keep their existing styling.
+
+At the user's request, the pooled view defaults to hiding percentage scores below 10%, independently of gate verdict. The minimum is adjustable; “Show near-zero results” restores every measured point for the selection. Ratios, losses and counts without a known denominator are unaffected. The on-page count and SVG export disclose the filter and hidden count. This is a display preference, not a quality gate or deletion of evidence: the matched views, full register and downloads retain all records.

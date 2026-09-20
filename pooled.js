@@ -67,7 +67,7 @@ window.DendriScalePooled = function(DATA,{el,se,shapeMark,methodIcon,methodLabel
  function applyHighlight(){
   for(const node of byId('pooledPlot').querySelectorAll('[data-model]'))node.style.opacity=highlighted&&node.dataset.model!==highlighted?'0.12':'1';
   for(const node of byId('pooledModelLegend').querySelectorAll('button'))node.setAttribute('aria-pressed',String((node.dataset.model||null)===highlighted));
-  byId('pooledHighlight').textContent=highlighted?'Highlighted: '+modelStyles.get(highlighted).name+'. Other models are dimmed; all points remain plotted.':'';
+  byId('pooledHighlight').textContent=highlighted?'Highlighted: '+modelStyles.get(highlighted).name+'. Other models are dimmed; points matching the filters remain plotted.':'';
  }
  function modelLegend(points){
   const container=byId('pooledModelLegend');container.replaceChildren();
@@ -88,14 +88,25 @@ window.DendriScalePooled = function(DATA,{el,se,shapeMark,methodIcon,methodLabel
    original_status:row.gate_status,conditions:row.conditions,limitations:row.limitations,source_hashes:row.source_hashes},null,2);
   byId('pooledDetails').open=true;byId('pooledOpen').hidden=false;byId('pooledOpen').onclick=()=>openComparison(row);
  }
- function draw(){
+ function selection(){
   const selectedModel=byId('pooledModel').value;
-  const ps=rows.filter(r=>r.benchmark===byId('pooledBenchmark').value&&(selectedModel==='all'||r.modelKey===selectedModel));
+  const all=rows.filter(r=>r.benchmark===byId('pooledBenchmark').value&&(selectedModel==='all'||r.modelKey===selectedModel));
+  const entered=byId('pooledMinimum').valueAsNumber,minimum=Number.isFinite(entered)?Math.min(100,Math.max(0,entered)):10;
+  const percent=all.length>0&&all.every(r=>r.displayUnit==='%'),filtered=percent&&!byId('pooledShowLow').checked;
+  return {all,minimum,percent,filtered,ps:filtered?all.filter(r=>r.displayY>=minimum):all};
+ }
+ function filterDescription({all,ps,minimum,filtered}){
+  return filtered?(all.length-ps.length)+' below '+minimum+'% hidden.':'No score filter applied.';
+ }
+ function draw(){
+  const state=selection(),{all,ps,minimum,percent}=state;
+  byId('pooledMinimum').value=minimum;byId('pooledMinimum').disabled=!percent||byId('pooledShowLow').checked;
+  byId('pooledShowLow').disabled=!percent;
   const svg=byId('pooledPlot');svg.replaceChildren();byId('pooledRows').replaceChildren();byId('pooledLegend').replaceChildren();
   modelLegend(ps);
-  const modelCount=new Set(ps.map(r=>r.modelKey)).size,unit=ps[0]?.displayUnit||'';
-  byId('pooledCount').textContent=ps.length+' recorded points across '+modelCount+' models. All outcomes included. X = complete-model registered GB (10⁹ bytes).';
-  if(!ps.length){applyHighlight();svg.append(se('text',{x:80,y:90},'No recorded whole-model sizes for this selection.'));return;}
+  const modelCount=new Set(ps.map(r=>r.modelKey)).size,unit=all[0]?.displayUnit||'';
+  byId('pooledCount').textContent='Showing '+ps.length+' of '+all.length+' recorded points across '+modelCount+' models. '+filterDescription(state)+' X = complete-model registered GB (10⁹ bytes).';
+  if(!ps.length){applyHighlight();svg.append(se('text',{x:80,y:90},all.length?'No scores meet the minimum. Lower it or enable Show near-zero results.':'No recorded whole-model sizes for this selection.'));return;}
   const W=1100,H=540,L=100,R=30,T=30,B=75,log=byId('pooledLog').checked;
   const xmin=log?Math.min(...ps.map(r=>r.gb))*.85:0,xmax=Math.max(...ps.map(r=>r.gb))*1.08;
   let ymin=Math.min(...ps.map(r=>r.displayY)),ymax=Math.max(...ps.map(r=>r.displayY));const delta=ymax-ymin||Math.max(Math.abs(ymax)*.1,.01);
@@ -123,16 +134,17 @@ window.DendriScalePooled = function(DATA,{el,se,shapeMark,methodIcon,methodLabel
    tr.append(td,el('td',modelName(r.model)),el('td',r.gb.toFixed(3)),el('td',r.displayY.toFixed(3)+' '+unit),el('td',r.denominator?.n||'See protocol'),el('td',r.gate_status),el('td',r.cohort));byId('pooledRows').append(tr);
   }
  }
- for(const id of ['pooledBenchmark','pooledModel','pooledLog','pooledLabels'])byId(id).addEventListener('change',draw);
+ for(const id of ['pooledBenchmark','pooledModel','pooledMinimum','pooledShowLow','pooledLog','pooledLabels'])byId(id).addEventListener('change',draw);
  byId('monochrome').addEventListener('change',draw);
  byId('pooledExport').addEventListener('click',()=>{
-  const copy=byId('pooledPlot').cloneNode(true),ps=rows.filter(r=>r.benchmark===byId('pooledBenchmark').value&&(byId('pooledModel').value==='all'||r.modelKey===byId('pooledModel').value)),keys=[...new Set(ps.map(r=>r.method))],visibleModels=[...new Set(ps.map(r=>r.modelKey))],height=640+(keys.length+visibleModels.length)*30;
+  const state=selection(),{ps}=state,copy=byId('pooledPlot').cloneNode(true),keys=[...new Set(ps.map(r=>r.method))],visibleModels=[...new Set(ps.map(r=>r.modelKey))],height=665+(keys.length+visibleModels.length)*30;
   copy.setAttribute('viewBox',`0 0 1100 ${height}`);copy.setAttribute('width',1100);copy.setAttribute('height',height);copy.setAttribute('xmlns','http://www.w3.org/2000/svg');copy.insertBefore(se('rect',{width:1100,height,fill:'white'}),copy.firstChild);
   copy.append(se('text',{x:100,y:563,'font-size':12},'All-model observations. Sample sizes and protocols vary; cohort details remain in the result table.'));
   copy.append(se('text',{x:100,y:583,'font-size':13},'Shape = compression method; color and label = original model.'));
-  for(const [i,key] of keys.entries())copy.append(recolor(shapeMark(key,111,609+i*30),'#595959'),se('text',{x:132,y:613+i*30,'font-size':13},methodLabel(key)));
+  copy.append(se('text',{x:100,y:603,'font-size':12},'Showing '+ps.length+' of '+state.all.length+' recorded points. '+filterDescription(state)));
+  for(const [i,key] of keys.entries())copy.append(recolor(shapeMark(key,111,634+i*30),'#595959'),se('text',{x:132,y:638+i*30,'font-size':13},methodLabel(key)));
   for(const [i,key] of visibleModels.entries()){
-   const style=modelStyles.get(key),y=619+(keys.length+i)*30;
+   const style=modelStyles.get(key),y=644+(keys.length+i)*30;
    copy.append(se('rect',{x:101,y:y-13,width:12,height:12,fill:modelColor(key)}),se('text',{x:132,y,'font-size':13},style.label+' · '+style.name));
   }
   if(highlighted)copy.append(se('text',{x:100,y:height-12,'font-size':12},'Highlighted model: '+modelStyles.get(highlighted).name+'; other models dimmed.'));
