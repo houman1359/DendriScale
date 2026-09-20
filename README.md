@@ -59,3 +59,5 @@ Update the aggregate files and hash manifest in `data/` together from a verified
 Keep the original gate verdicts, provenance hashes and snapshot timestamp.
 Run validation and inspect the page before committing. Do not copy private
 research directories or their Git history into this repository.
+
+The matched comparison table now places dendritic hybrids beside quantization-only, pruning and layer-removal controls. Largest-passing cards are cohort-specific; all measured failures remain visible. ModelOpt-based controls describe this project's actual pipeline rather than claiming vendor benchmark performance.

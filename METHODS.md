@@ -77,8 +77,7 @@ in either format. Their whole-model factors are3.758×,3.781×,3.805× and3.817�
 respectively. All fail GSM while passing the other four development gates.
 None establishes a paired GSM gain over deleting the same two FFNs
 (881correct): even the largest point gain,+17,has95% interval[−4,+37].
-The joint/sequential recovery and attention descendants retain their separate
-pending full-battery status; their scores are not inherited from these models.
+Recovery descendants retain their own full-battery status; their scores are not inherited from these models. Native attention has now completed its own battery, as recorded below.
 
 The new 3.810× INT8 native-cell-plus-deletion model scores 910/1,024 GSM and
 5,262/6,144 MC against the original teacher's 948 and 5,292. It fails GSM alone:
@@ -109,3 +108,15 @@ visible by default, including dominated and failed-gate points. The verdict and
 frontier-only filters are optional views, never admission rules for the archive.
 Public SHA-256 references bind the aggregate points to archived evidence.
 Raw model artifacts and per-item data are not included in this website.
+
+## Matched dendritic and non-dendritic comparison
+
+The comparison table uses complete-model registered bytes and the exact original teacher and capability cohort. It includes all measured outcomes, not just passing or Pareto points. Its cards select the largest passing compression separately for dendritic and non-dendritic artifacts; this selection does not establish statistical superiority. Historical 7B results retain their marker/stopping caveat and are not assigned passing-frontier cards.
+
+For the current 32B cohort (BF16/eager H100 teacher: 948/1,024 GSM, 5,292/6,144 MC), the non-dendritic quantization-only control uses NVIDIA ModelOpt-based AWQ-lite INT4 on both FFN and attention projections, compact scale storage, and custom INT8 embeddings/head. It achieves 3.764× registered-byte compression, 918 GSM and 5,260 MC, passing all five development gates. The head-only variant achieves 3.654×, 919 GSM and 5,254 MC. These are measurements of our pipeline, not externally reported NVIDIA benchmark results. [NVIDIA Model Optimizer](https://github.com/NVIDIA/Model-Optimizer) documents its quantization and model-optimization tooling.
+
+Quantization plus FFN16 deletion reaches 3.813× (924 GSM, 5,263 MC). The two-dendritic-FFN hybrid reaches 3.814× (916 GSM, 5,260 MC); the small size difference does not establish a dendritic capability advantage over deletion. Native Q16 attention at INT8 has also completed its full battery: 3.766×, 929 GSM and 5,251 MC, passing all five gates. Larger shared-FFN banks and their combined native-attention derivatives remain experiments until their exported models pass reload qualification and their own batteries.
+
+Pruning, sparsity and layer deletion are distinct techniques and retain their original labels. No unmeasured pruning baseline is invented. Quantized dense projections, native dendritic attention projections and complete attention-block replacement are also distinct: Q16 changes only the Q projection and retains the attention mechanism.
+
+The September 20 independent four-FFN bank (sites 16–19, INT4 native values) completed at **3.870741×**, 16,655,355,368 registered bytes, **917/1,024 GSM and 5,229/6,144 MC**, passing all five development gates. GSM loss upper bound is 4.6875 points; MC point loss is 1.0254 points. C4 upper NLL increase is 0.03273; copy perplexity ratios are 1.15245 and 1.25150. It is the largest passing native artifact in this snapshot. This is a distinct site set from the equally sized early-site composition at 0/1/2/9, which fails copy. No equivalence between their artifacts or results is implied. The new result is one construction seed and calibration, with no reserved-final or isolated cell-versus-deletion superiority claim.

@@ -53,6 +53,53 @@ function num(v){if(v===null||v===undefined)return 'Not recorded';return new Intl
 function cost(p,v){return p.xunit==='bytes'?num(v/2**30)+' GiB':p.xunit==='parameters'?num(v/1e6)+' M':p.xunit==='percent'?num(v)+'%':p.xunit==='factor'?num(v)+'×':num(v)+' '+p.xunit;}
 function outcome(row){const text=String(row.gate_status||'').toLowerCase();return row.failed_gates?.length||/fail|reject|gate.stop/.test(text)?'failed':/all five.*pass|all.*gates pass|^pass/.test(text)?'passed':'other';}
 function matchesOutcome(row,choice){return choice==='all'||outcome(row)===choice;}
+function comparisonKind(row){
+ const label=row.label.toLowerCase(),method=row.method.toLowerCase();
+ if(label==='teacher reference')return {key:'teacher',group:'teacher',label:'Original teacher'};
+ if(method.includes('dendritic'))return {key:method.includes('quant')?'hybrid':'dendritic',group:'dendritic',label:label.includes('q16')?'Dendritic attention + quantization':method};
+ if(method.includes('dense'))return {key:'dense',group:'non-dendritic',label:method};
+ if(/delete|deletion/.test(label))return {key:'control',group:'non-dendritic',label:'Quantization + layer removal; no dendritic cells'};
+ if(/sparse|prun/.test(label))return {key:'control',group:'non-dendritic',label:'Quantization + sparsity/pruning; no dendritic cells'};
+ if(/quant|int[2348]|awq|gptq/i.test(label+' '+method))return {key:'control',group:'non-dendritic',label:'Quantization only; no dendritic cells'};
+ return {key:'unknown',group:'unknown',label:method};
+}
+const comparisons=(DATA.candidates||[]).filter(r=>r.source_level==='curated').map(r=>{
+ const p=DATA.panels.find(p=>p.id===r.panel_id)?.points.find(p=>p.id===r.point_id);
+ const size=p?.whole_model_size;
+ return {...r,kind:comparisonKind(r),size,factor:size?size.original_registered_bytes/size.registered_bytes:null};
+}).filter(r=>r.size&&r.measurements.some(m=>/^GSM/.test(m.benchmark)));
+const comparisonCohorts=[...new Map(comparisons.map(r=>[r.model+' | '+r.cohort,{model:r.model,cohort:r.cohort}])).entries()];
+opts(byId('comparisonCohort'),comparisonCohorts.map(([key,value])=>[key,value.model+' · '+value.cohort]));
+const primaryComparison=comparisonCohorts.find(([,v])=>v.model==='allenai/OLMo-2-0325-32B-Instruct');
+if(primaryComparison)byId('comparisonCohort').value=primaryComparison[0];
+function openComparison(row){
+ byId('model').value=row.model;byId('level').value=row.source_level;byId('gate').value='all';byId('onlyfront').checked=false;
+ selectPanels();byId('panel').value=row.panel_id;selectDose();byId('method').value='all';draw();
+ const panel=current(),point=panel.points.find(p=>p.id===row.point_id);if(point)detail(point,panel);
+ byId('detail').scrollIntoView({block:'center'});
+}
+function comparisonTable(){
+ const cohort=byId('comparisonCohort').value;
+ const all=comparisons.filter(r=>r.model+' | '+r.cohort===cohort);
+ const invalid=all.some(r=>r.model.includes('7B'));
+ byId('comparisonNote').textContent=(all[0]?.cohort||'No matched measurements')+(invalid?' Historical 7B marker/stopping protocol is not a validated reasoning frontier; no passing-frontier cards are assigned.':' Development only; one seed/calibration where recorded. Largest compression is not a SOTA or speed claim.');
+ byId('comparisonBest').replaceChildren();
+ for(const [group,label] of [['dendritic','Largest passing dendritic model'],['non-dendritic','Largest passing non-dendritic model']]){
+  const best=invalid?null:all.filter(r=>r.kind.group===group&&outcome(r)==='passed').sort((a,b)=>b.factor-a.factor)[0];
+  const card=el('div');card.className='stat comparison-stat';card.dataset.group=group;
+  card.append(el('span',label),el('b',best?best.factor.toFixed(3)+'×':'Not established'),el('span',best?best.label:'No validated passing artifact in this cohort'));
+  if(best)card.dataset.candidate=best.id;byId('comparisonBest').append(card);
+ }
+ byId('comparisonRows').replaceChildren();
+ for(const row of all.filter(r=>matchesOutcome(r,byId('comparisonGate').value)).sort((a,b)=>b.factor-a.factor)){
+  const tr=el('tr');tr.dataset.group=row.kind.group;tr.dataset.verdict=outcome(row);
+  const name=el('td'),button=el('button',row.label);button.addEventListener('click',()=>openComparison(row));name.append(button);
+  const method=el('td'),badge=el('span');badge.className='method-badge';badge.append(methodIcon(row.kind.key),el('span',row.kind.label));method.append(badge);
+  const score=pattern=>row.measurements.filter(m=>pattern.test(m.benchmark)).map(m=>num(m.value)+' · '+m.benchmark).join('; ')||'Not measured';
+  tr.append(name,method,el('td',row.factor.toFixed(3)+'×'),el('td',(row.size.registered_bytes/1e9).toFixed(3)),el('td',score(/^GSM/)),el('td',score(/^MC/)),el('td',row.gate_status+(row.failed_gates.length?' · Failed: '+row.failed_gates.join(', '):'')));
+  byId('comparisonRows').append(tr);
+ }
+}
 function nondominated(ps,p){const sx=p.xdirection==='min'?1:-1,sy=p.ydirection==='min'?1:-1;return ps.filter(a=>!ps.some(b=>sx*b.x<=sx*a.x&&sy*b.y<=sy*a.y&&(sx*b.x<sx*a.x||sy*b.y<sy*a.y)));}
 for(const [k,label] of [['experiments','experiments indexed'],['raw_metrics','recorded metrics'],['normalized_observations','size–score observations'],['multi_point_panels','panels with multiple points']]){const d=el('div');d.className='stat';d.append(el('b',num(DATA.summary[k])),el('span',label));byId('stats').append(d);}
 opts(byId('model'),[...new Set(DATA.panels.map(p=>p.model))].sort().map(x=>[x,x]));
@@ -122,7 +169,8 @@ const params=new URLSearchParams(location.search);
 for(const id of ['model','level']) if(params.has(id)&&[...byId(id).options].some(o=>o.value===params.get(id))) byId(id).value=params.get(id);
 selectPanels();
 if(params.has('panel')&&[...byId('panel').options].some(o=>o.value===params.get('panel'))){byId('panel').value=params.get('panel');selectDose();}
-coverage();candidateRegister();
+coverage();candidateRegister();comparisonTable();
+byId('comparisonCohort').addEventListener('change',comparisonTable);byId('comparisonGate').addEventListener('change',comparisonTable);byId('monochrome').addEventListener('change',comparisonTable);
 for(const id of ['model','level','panel']) byId(id).addEventListener('change',()=>{const q=new URLSearchParams();for(const key of ['model','level','panel'])q.set(key,byId(key).value);history.replaceState(null,'','?'+q.toString());});
 byId('loadError').hidden=true;
 document.body.dataset.ready='true';

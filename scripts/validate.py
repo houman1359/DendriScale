@@ -18,6 +18,18 @@ def frontier(points,xd,yd):
 
 
 class PublicContract(unittest.TestCase):
+    def test_matched_non_dendritic_baselines(self):
+        for arm,values in [('parent_both',(17127983360,918,5260)),('parent_head',(17641584896,919,5254))]:
+            found=[p for panel in DATA['panels'] for p in panel['points'] if p['id'].startswith('native_wave_'+arm+'__') and p['xunit']=='bytes']
+            self.assertTrue(found)
+            metrics={p['ylabel']:p['y'] for p in found}
+            self.assertEqual(metrics['GSM correct / 1024'],values[1]);self.assertEqual(metrics['MC correct / 6144'],values[2])
+            for point in found:
+                self.assertEqual(point['x'],values[0]);self.assertEqual(point['method_style']['key'],'control')
+                self.assertEqual(point['methods'],['method_quantization'])
+                self.assertIn('GSM948/1024',point['cohort']);self.assertIn('MC5292/6144',point['cohort'])
+                self.assertTrue(all(point['full_gate_checks'].values()));self.assertIn('ModelOpt',point['label'])
+
     def test_schema_and_coverage(self):
         self.assertEqual(DATA['schema'],'dendriscale/public-v1')
         self.assertEqual(len(DATA['coverage']),DATA['summary']['experiments'])
