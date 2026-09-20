@@ -52,7 +52,34 @@ window.DendriScalePooled = function(DATA,{el,se,shapeMark,methodIcon,methodLabel
  });
  const benchmarks=[...new Set(rows.map(r=>r.benchmark))].sort((a,b)=>(a==='GSM8K accuracy'?-1:b==='GSM8K accuracy'?1:a.localeCompare(b)));
  for(const key of benchmarks){const option=el('option',key);option.value=key;byId('pooledBenchmark').append(option);}
- const models=[...new Map(rows.map(r=>[r.modelKey,modelName(r.model)])).entries()];
+ const modelSize=name=>Number(name.match(/(?:^|[-/])(\d+(?:\.\d+)?)B(?:[-\s]|$)/i)?.[1]||Infinity);
+ const models=[...new Map(rows.map(r=>[r.modelKey,modelName(r.model)])).entries()].sort((a,b)=>modelSize(a[1])-modelSize(b[1])||a[0].localeCompare(b[0]));
+ const colors=['#0072B2','#B64A00','#006B57','#6842A0','#9E315E','#595959'];
+ const modelStyles=new Map(models.map(([key,name],index)=>{
+  const size=modelSize(name),sameSize=models.filter(([,other])=>modelSize(other)===size).length;
+  const label=Number.isFinite(size)?size+'B'+(sameSize>1?'·'+String.fromCharCode(65+index):''):String.fromCharCode(65+index);
+  return [key,{name,label,color:colors[index%colors.length]}];
+ }));
+ let highlighted=null;
+ const modelColor=key=>byId('monochrome').checked?'#151515':modelStyles.get(key).color;
+ function recolor(marker,color){for(const node of marker.children){if(node.getAttribute('fill')!=='white')node.setAttribute('fill',color);else if(node.getAttribute('stroke')!=='white')node.setAttribute('stroke',color);}return marker;}
+ function modelMark(row,x,y,size=7){return recolor(shapeMark(row.method,x,y,size),modelColor(row.modelKey));}
+ function applyHighlight(){
+  for(const node of byId('pooledPlot').querySelectorAll('[data-model]'))node.style.opacity=highlighted&&node.dataset.model!==highlighted?'0.12':'1';
+  for(const node of byId('pooledModelLegend').querySelectorAll('button'))node.setAttribute('aria-pressed',String((node.dataset.model||null)===highlighted));
+  byId('pooledHighlight').textContent=highlighted?'Highlighted: '+modelStyles.get(highlighted).name+'. Other models are dimmed; all points remain plotted.':'';
+ }
+ function modelLegend(points){
+  const container=byId('pooledModelLegend');container.replaceChildren();
+  const present=new Set(points.map(r=>r.modelKey));if(!present.has(highlighted))highlighted=null;
+  const all=el('button','Show all equally');all.type='button';all.addEventListener('click',()=>{highlighted=null;applyHighlight();});container.append(all);
+  for(const [key,style] of modelStyles)if(present.has(key)){
+   const button=el('button');button.type='button';button.className='pooled-model-key';button.dataset.model=key;
+   const badge=el('span',style.label);badge.className='pooled-model-badge';badge.style.borderColor=modelColor(key);badge.style.color=modelColor(key);
+   button.append(badge,el('span',style.name));button.addEventListener('click',()=>{highlighted=highlighted===key?null:key;applyHighlight();});container.append(button);
+  }
+ }
+
  for(const [key,label] of [['all','All models'],...models]){const option=el('option',label);option.value=key;byId('pooledModel').append(option);}
  function selected(row){
   byId('pooledDetail').textContent=JSON.stringify({candidate:row.label,model:row.model,benchmark:row.benchmark,
@@ -65,9 +92,10 @@ window.DendriScalePooled = function(DATA,{el,se,shapeMark,methodIcon,methodLabel
   const selectedModel=byId('pooledModel').value;
   const ps=rows.filter(r=>r.benchmark===byId('pooledBenchmark').value&&(selectedModel==='all'||r.modelKey===selectedModel));
   const svg=byId('pooledPlot');svg.replaceChildren();byId('pooledRows').replaceChildren();byId('pooledLegend').replaceChildren();
+  modelLegend(ps);
   const modelCount=new Set(ps.map(r=>r.modelKey)).size,unit=ps[0]?.displayUnit||'';
   byId('pooledCount').textContent=ps.length+' recorded points across '+modelCount+' models. All outcomes included. X = complete-model registered GB (10⁹ bytes).';
-  if(!ps.length){svg.append(se('text',{x:80,y:90},'No recorded whole-model sizes for this selection.'));return;}
+  if(!ps.length){applyHighlight();svg.append(se('text',{x:80,y:90},'No recorded whole-model sizes for this selection.'));return;}
   const W=1100,H=540,L=100,R=30,T=30,B=75,log=byId('pooledLog').checked;
   const xmin=log?Math.min(...ps.map(r=>r.gb))*.85:0,xmax=Math.max(...ps.map(r=>r.gb))*1.08;
   let ymin=Math.min(...ps.map(r=>r.displayY)),ymax=Math.max(...ps.map(r=>r.displayY));const delta=ymax-ymin||Math.max(Math.abs(ymax)*.1,.01);
@@ -83,12 +111,13 @@ window.DendriScalePooled = function(DATA,{el,se,shapeMark,methodIcon,methodLabel
    se('text',{x:23,y:H/2,transform:`rotate(-90 23 ${H/2})`,'text-anchor':'middle','font-size':14},byId('pooledBenchmark').value+' ('+unit+')'));
   for(const r of ps){
    const text=r.label+' · '+modelName(r.model)+' · '+r.gb.toFixed(3)+' GB · '+r.displayY.toFixed(3)+' '+unit+' · '+r.cohort;
-   const group=se('g',{class:'pooled-point',role:'button',tabindex:0,'aria-label':text,'data-model':r.modelKey,'data-bytes':r.bytes,'data-score':r.displayY,'data-verdict':outcome(r),'data-point-id':r.id});
-   group.append(se('title',{},text),shapeMark(r.method,X(r.gb),Y(r.displayY),7),se('circle',{cx:X(r.gb),cy:Y(r.displayY),r:11,fill:'transparent'}));
+   const group=se('g',{class:'pooled-point',role:'button',tabindex:0,'aria-label':text,'data-model':r.modelKey,'data-bytes':r.bytes,'data-score':r.displayY,'data-verdict':outcome(r),'data-point-id':r.id,'data-method':r.method,'data-model-label':modelStyles.get(r.modelKey).label});
+   group.append(se('title',{},text),modelMark(r,X(r.gb),Y(r.displayY),7),se('circle',{cx:X(r.gb),cy:Y(r.displayY),r:11,fill:'transparent'}));
    group.addEventListener('click',()=>selected(r));group.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();selected(r);}});svg.append(group);
-   if(byId('pooledLabels').checked)svg.append(se('text',{x:X(r.gb)+10,y:Y(r.displayY)-9,'font-size':10,fill:'#334a5c'},r.model.match(/(?:^|[-/])(\d+(?:\.\d+)?)B(?:[-\s]|$)/i)?.[1]+'B'));
+   if(byId('pooledLabels').checked)svg.append(se('text',{x:X(r.gb)+10,y:Y(r.displayY)-9,'font-size':10,'font-weight':600,fill:modelColor(r.modelKey),stroke:'white','stroke-width':3,'paint-order':'stroke','pointer-events':'none','data-model':r.modelKey,class:'pooled-model-label'},modelStyles.get(r.modelKey).label));
   }
-  for(const key of [...new Set(ps.map(r=>r.method))]){const label=el('span');label.className='method-key';label.append(methodIcon(key),el('span',methodLabel(key)));byId('pooledLegend').append(label);}
+  for(const key of [...new Set(ps.map(r=>r.method))]){const label=el('span');label.className='method-key';const icon=methodIcon(key);for(const mark of icon.children)recolor(mark,'#595959');label.append(icon,el('span',methodLabel(key)));byId('pooledLegend').append(label);}
+  applyHighlight();
   for(const r of [...ps].sort((a,b)=>a.gb-b.gb)){
    const tr=el('tr'),td=el('td'),button=el('button',r.label);button.addEventListener('click',()=>selected(r));td.append(button);
    tr.append(td,el('td',modelName(r.model)),el('td',r.gb.toFixed(3)),el('td',r.displayY.toFixed(3)+' '+unit),el('td',r.denominator?.n||'See protocol'),el('td',r.gate_status),el('td',r.cohort));byId('pooledRows').append(tr);
@@ -97,10 +126,16 @@ window.DendriScalePooled = function(DATA,{el,se,shapeMark,methodIcon,methodLabel
  for(const id of ['pooledBenchmark','pooledModel','pooledLog','pooledLabels'])byId(id).addEventListener('change',draw);
  byId('monochrome').addEventListener('change',draw);
  byId('pooledExport').addEventListener('click',()=>{
-  const copy=byId('pooledPlot').cloneNode(true),keys=[...new Set(rows.filter(r=>r.benchmark===byId('pooledBenchmark').value).map(r=>r.method))],height=610+keys.length*30;
+  const copy=byId('pooledPlot').cloneNode(true),ps=rows.filter(r=>r.benchmark===byId('pooledBenchmark').value&&(byId('pooledModel').value==='all'||r.modelKey===byId('pooledModel').value)),keys=[...new Set(ps.map(r=>r.method))],visibleModels=[...new Set(ps.map(r=>r.modelKey))],height=640+(keys.length+visibleModels.length)*30;
   copy.setAttribute('viewBox',`0 0 1100 ${height}`);copy.setAttribute('width',1100);copy.setAttribute('height',height);copy.setAttribute('xmlns','http://www.w3.org/2000/svg');copy.insertBefore(se('rect',{width:1100,height,fill:'white'}),copy.firstChild);
   copy.append(se('text',{x:100,y:563,'font-size':12},'All-model observations. Sample sizes and protocols vary; cohort details remain in the result table.'));
-  for(const [i,key] of keys.entries())copy.append(shapeMark(key,111,590+i*30),se('text',{x:132,y:594+i*30,'font-size':13},methodLabel(key)));
+  copy.append(se('text',{x:100,y:583,'font-size':13},'Shape = compression method; color and label = original model.'));
+  for(const [i,key] of keys.entries())copy.append(recolor(shapeMark(key,111,609+i*30),'#595959'),se('text',{x:132,y:613+i*30,'font-size':13},methodLabel(key)));
+  for(const [i,key] of visibleModels.entries()){
+   const style=modelStyles.get(key),y=619+(keys.length+i)*30;
+   copy.append(se('rect',{x:101,y:y-13,width:12,height:12,fill:modelColor(key)}),se('text',{x:132,y,'font-size':13},style.label+' · '+style.name));
+  }
+  if(highlighted)copy.append(se('text',{x:100,y:height-12,'font-size':12},'Highlighted model: '+modelStyles.get(highlighted).name+'; other models dimmed.'));
   const url=URL.createObjectURL(new Blob([new XMLSerializer().serializeToString(copy)],{type:'image/svg+xml'})),a=el('a');a.href=url;a.download='all-models-'+byId('pooledBenchmark').value.replaceAll(' ','-')+'.svg';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
  });
  draw();
