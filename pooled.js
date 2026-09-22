@@ -1,6 +1,6 @@
 'use strict';
-window.DendriScalePooled = function(DATA,{el,se,shapeMark,methodIcon,methodLabel,outcome,openComparison}) {
- const byId=id=>document.getElementById(id),UI=window.DendriScaleUI;
+window.DendriScalePooled = function(DATA,{el,se,shapeMark,methodIcon,methodLabel,outcome,openComparison,onlyPass}) {
+ const byId=id=>document.getElementById(id),UI=window.DendriScaleUI,TH=window.DendriScaleThresholds;
  const zoom=UI.chartZoom(byId('pooledFocus'),byId('pooledFull'),byId('pooledZoomNote'),draw);
  const modelName=m=>m.replace(/^allenai\//,'').replace(/^OLMo-/,'OLMo-');
  function metric(point){
@@ -99,10 +99,11 @@ window.DendriScalePooled = function(DATA,{el,se,shapeMark,methodIcon,methodLabel
   const all=rows.filter(r=>r.benchmark===byId('pooledBenchmark').value&&(selectedModel==='all'||r.modelKey===selectedModel));
   const entered=byId('pooledMinimum').valueAsNumber,minimum=Number.isFinite(entered)?Math.min(100,Math.max(0,entered)):10;
   const percent=all.length>0&&all.every(r=>r.displayUnit==='%'),filtered=percent&&!byId('pooledShowLow').checked;
-  return {all,minimum,percent,filtered,ps:filtered?all.filter(r=>r.displayY>=minimum):all};
+  const eligible=onlyPass()?all.filter(r=>UI.allBenchmarksPass(r)):all;
+  return {all,eligible,minimum,percent,filtered,ps:filtered?eligible.filter(r=>r.displayY>=minimum):eligible};
  }
- function filterDescription({all,ps,minimum,filtered}){
-  return filtered?(all.length-ps.length)+' below '+minimum+'% hidden.':'No score filter applied.';
+ function filterDescription({all,eligible,ps,minimum,filtered}){
+  return (onlyPass()?'Recorded full-suite passes only; '+(all.length-eligible.length)+' other results hidden. ':'')+(filtered?(eligible.length-ps.length)+' below '+minimum+'% hidden.':'No score filter applied.');
  }
  function draw(){
   const state=selection(),{all,ps,minimum,percent}=state;
@@ -113,16 +114,20 @@ window.DendriScalePooled = function(DATA,{el,se,shapeMark,methodIcon,methodLabel
   modelLegend(ps);
   const modelCount=new Set(ps.map(r=>r.modelKey)).size,unit=all[0]?.displayUnit||'';
   byId('pooledCount').textContent='Showing '+ps.length+' of '+all.length+' recorded points across '+modelCount+' models. '+filterDescription(state)+' X = complete-model registered GB (10⁹ bytes).';
-  if(!ps.length){zoom.view({xmin:0,xmax:1,ymin:0,ymax:1},[],'empty');applyHighlight();svg.append(se('text',{x:80,y:90},all.length?'No scores meet the minimum. Lower it or enable Show near-zero results.':'No recorded whole-model sizes for this selection.'));return;}
+  const band=TH.forPooled(DATA,ps,Number(byId('pooledTolerance').value)),showBand=byId('pooledShade').checked;
+  byId('pooledThresholdNote').textContent=TH.description(band,showBand);byId('pooledTolerance').disabled=!band.available;
+  if(!ps.length){zoom.view({xmin:0,xmax:1,ymin:0,ymax:1},[],'empty');applyHighlight();svg.append(se('text',{x:80,y:90},all.length?'No results meet the active pass and score filters.':'No recorded whole-model sizes for this selection.'));return;}
   const W=1100,H=540,L=100,R=30,T=30,B=75,log=byId('pooledLog').checked;
   let xmin=log?Math.min(...ps.map(r=>r.gb))*.85:0,xmax=Math.max(...ps.map(r=>r.gb))*1.08;
-  let ymin=Math.min(...ps.map(r=>r.displayY)),ymax=Math.max(...ps.map(r=>r.displayY));const delta=ymax-ymin||Math.max(Math.abs(ymax)*.1,.01);
+  const ys=ps.map(r=>r.displayY);if(showBand&&band.available)ys.push(band.recorded,band.exploratory);
+  let ymin=Math.min(...ys),ymax=Math.max(...ys);const delta=ymax-ymin||Math.max(Math.abs(ymax)*.1,.01);
   ymin-=delta*.12;ymax+=delta*.12;if(unit==='%'){ymin=Math.max(0,ymin);ymax=Math.min(100,ymax);}
   const transformed=zoom.view({xmin:log?Math.log(xmin):xmin,xmax:log?Math.log(xmax):xmax,ymin,ymax},ps.map(r=>({x:log?Math.log(r.gb):r.gb,y:r.displayY,reference:r.method==='teacher'})),byId('pooledBenchmark').value+'|'+log+'|'+ps.map(r=>r.id).join('|'));
   xmin=log?Math.exp(transformed.xmin):transformed.xmin;xmax=log?Math.exp(transformed.xmax):transformed.xmax;({ymin,ymax}=transformed);
   const visible=ps.filter(r=>zoom.contains(log?Math.log(r.gb):r.gb,r.displayY));
   const X=v=>L+((log?Math.log(v/xmin):v-xmin)/(log?Math.log(xmax/xmin):xmax-xmin))*(W-L-R);
   const Y=v=>H-B-(v-ymin)/(ymax-ymin)*(H-T-B);
+  if(showBand)TH.draw(svg,se,band,{Y,L,T,right:W-R,bottom:H-B,monochrome:byId('monochrome').checked,id:'pooledThreshold'});
   for(let i=0;i<=5;i++){
    const x=log?xmin*(xmax/xmin)**(i/5):xmin+(xmax-xmin)*i/5,y=ymin+(ymax-ymin)*i/5;
    svg.append(se('line',{x1:X(x),x2:X(x),y1:T,y2:H-B,stroke:'#e1e7ee'}),se('text',{x:X(x),y:H-B+25,'text-anchor':'middle','font-size':12,fill:'#526577'},Number(x.toPrecision(3))+' GB'),
@@ -156,8 +161,9 @@ window.DendriScalePooled = function(DATA,{el,se,shapeMark,methodIcon,methodLabel
  }
  for(const id of ['pooledBenchmark','pooledModel','pooledMinimum','pooledShowLow','pooledLog','pooledLabels'])byId(id).addEventListener('change',draw);
  byId('monochrome').addEventListener('change',draw);
+ document.addEventListener('dendriscale-display-change',()=>{zoom.reset();draw();});
  byId('pooledExport').addEventListener('click',()=>{
-  const state=selection(),{ps}=state,copy=byId('pooledPlot').cloneNode(true),keys=[...new Set(ps.map(r=>r.method))],visibleModels=[...new Set(ps.map(r=>r.modelKey))],height=719+(keys.length+visibleModels.length)*30;
+  const state=selection(),{ps}=state,copy=byId('pooledPlot').cloneNode(true),keys=[...new Set(ps.map(r=>r.method))],visibleModels=[...new Set(ps.map(r=>r.modelKey))],height=745+(keys.length+visibleModels.length)*30;
   copy.setAttribute('viewBox',`0 0 1100 ${height}`);copy.setAttribute('width',1100);copy.setAttribute('height',height);copy.setAttribute('xmlns','http://www.w3.org/2000/svg');copy.insertBefore(se('rect',{width:1100,height,fill:'white'}),copy.firstChild);
   copy.append(se('text',{x:100,y:563,'font-size':12},'All-model observations. Sample sizes and protocols vary; cohort details remain in the result table.'));
   copy.append(se('text',{x:100,y:583,'font-size':13},'Shape = compression method; color and label = original model.'));
@@ -168,6 +174,8 @@ window.DendriScalePooled = function(DATA,{el,se,shapeMark,methodIcon,methodLabel
    const style=modelStyles.get(key),y=672+(keys.length+i)*30;
    copy.append(se('rect',{x:101,y:y-13,width:12,height:12,fill:modelColor(key)}),se('text',{x:132,y,'font-size':13},style.label+' · '+style.name));
   }
+  const band=TH.forPooled(DATA,ps,Number(byId('pooledTolerance').value));
+  copy.append(se('text',{x:100,y:height-62,'font-size':11},byId('pooledShade').checked&&band.available?'Shading = score allowance for this matched cohort only; wider bands are exploratory.':'No shared threshold shown across incompatible cohorts.'));
   if(zoom.active)copy.append(se('text',{x:100,y:height-36,'font-size':12},zoom.description));
   if(highlighted)copy.append(se('text',{x:100,y:height-12,'font-size':12},'Highlighted model: '+modelStyles.get(highlighted).name+'; other models dimmed.'));
   const url=URL.createObjectURL(new Blob([new XMLSerializer().serializeToString(copy)],{type:'image/svg+xml'})),a=el('a');a.href=url;a.download='all-models-'+byId('pooledBenchmark').value.replaceAll(' ','-')+'.svg';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);

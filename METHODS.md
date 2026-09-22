@@ -145,3 +145,37 @@ Counts are converted to accuracy percentages only with sample sizes explicitly r
 In the pooled plot, original models have distinct colors and short text labels, while marker shapes identify compression methods. Model labels are enabled by default and remain visible in monochrome. The model legend can highlight a model while retaining all points; the existing Models selector isolates it. SVG exports include both legends and any active highlight. Original matched plots keep their existing styling.
 
 At the user's request, the pooled view defaults to hiding percentage scores below 10%, independently of gate verdict. The minimum is adjustable; “Show near-zero results” restores every measured point for the selection. Ratios, losses and counts without a known denominator are unaffected. The on-page count and SVG export disclose the filter and hidden count. This is a display preference, not a quality gate or deletion of evidence: the matched views, full register and downloads retain all records.
+
+
+### Pass-only filter and visual quality allowances
+
+The synchronized **Passes all benchmarks only** checkboxes filter both charts,
+the matched method table and the model-result register. They use the same
+source-bound, completed, curated five-gate verdict as the check inside each
+marker. A good score on one benchmark, a local diagnostic, or a partial battery
+does not qualify. Teacher references are omitted under this filter. The complete
+experiment ledger and downloadable records remain unchanged. Recorded historical
+7B passes retain their protocol warning; they are not a validated reasoning frontier.
+
+Shading currently has a verified mapping only for the original OLMo-2-32B
+H100 BF16/eager full-development cohort (teacher GSM 948/1024, MC 5292/6144).
+Its original tolerances are GSM paired one-sided 95% upper loss 0.05,
+MC macro point loss 0.02, C4 paired one-sided 95% upper delta NLL 0.1,
+and copy-512/2048 point perplexity ratios 1.25/1.50. This is the frozen
+five-gate decision used by the physical FFN16 deletion receipt and the matched
+full-development comparisons. No separate stopping or per-task MC gate is inferred.
+
+The blue band shows the recorded **point-score allowance**, not a passing verdict.
+For example, GSM's line is 948 − 0.05 × 1024 = 896.8 correct; the actual paired
+confidence-bound gate is stricter. A point above that line can still fail.
+MC's line is 5169.12 correct, using six equally sized tasks. C4's line is the
+cohort teacher NLL plus 0.1. Unknown or incompatible cohorts get no inferred band.
+The pooled plot draws a band only when all displayed results share a supported
+model, cohort, benchmark and score scale; explicit counts are converted to percent.
+
+**Explore +25% / +50%** multiplies the permitted degradation, not the score.
+For example, +25% changes GSM's 5-point allowance to 6.25 points and copy-512's
+1.25 ratio to 1 + 1.25 × 0.25 = 1.3125. The hatched extension is an exploratory
+visual comparison. It never changes full-suite verdicts, check marks, or the
+pass-only subset. Recorded tolerances are the default. Lines and hatching remain
+distinct in monochrome and SVG downloads.

@@ -6,7 +6,9 @@ const response = await fetch('data/snapshot.json');
 if (!response.ok) throw new Error('Snapshot could not be loaded');
 const DATA=await response.json(),byId=id=>document.getElementById(id);
 byId('updated').textContent=new Date(DATA.updated_at_utc).toLocaleString(undefined,{timeZoneName:'short'});
-const UI=window.DendriScaleUI;
+const UI=window.DendriScaleUI,TH=window.DendriScaleThresholds;
+const onlyPass=()=>byId('passOnly').checked;
+const tolerance=()=>Number(byId('plotTolerance').value);
 const plotZoom=UI.chartZoom(byId('plotFocus'),byId('plotFull'),byId('plotZoomNote'),draw);
 byId('latest').textContent=DATA.highlights.length+' complete benchmark batteries in this snapshot. All measured outcomes remain available, including failures. Development results; reserved final tests are separate.';
 const svgNS='http://www.w3.org/2000/svg';
@@ -87,7 +89,7 @@ function comparisonTable(){
   if(best)card.dataset.candidate=best.id;byId('comparisonBest').append(card);
  }
  byId('comparisonRows').replaceChildren();
- for(const row of all.filter(r=>matchesOutcome(r,byId('comparisonGate').value)).sort((a,b)=>b.factor-a.factor)){
+ for(const row of all.filter(r=>(!onlyPass()||r.allPass)&&matchesOutcome(r,byId('comparisonGate').value)).sort((a,b)=>b.factor-a.factor)){
   const tr=el('tr');tr.dataset.group=row.kind.group;tr.dataset.verdict=outcome(row);
   const name=el('td'),button=el('button',UI.candidateName(row.label));button.addEventListener('click',()=>openComparison(row));name.append(button);if(row.allPass)name.append(UI.passBadge());tr.dataset.allBenchmarksPass=String(row.allPass);
   const method=el('td'),badge=el('span');badge.className='method-badge';badge.append(methodIcon(row.kind.key),el('span',row.kind.label));method.append(badge);
@@ -118,7 +120,10 @@ function detail(v,p){
 }
 
 function draw(){const p=current(),svg=byId('plot');svg.replaceChildren();byId('points').replaceChildren();UI.empty(byId('detail'));delete byId('detail').dataset.pointId;if(!p)return;
- let ps=p.points.filter(v=>(byId('dose').value==='all'||String(v.dose)===byId('dose').value)&&(byId('teacher').checked||v.label!=='Teacher reference')&&(byId('method').value==='all'||methodKey(v)===byId('method').value)&&matchesOutcome(v,byId('gate').value));
+ let ps=p.points.filter(v=>(!onlyPass()||UI.allBenchmarksPass(v))&&(byId('dose').value==='all'||String(v.dose)===byId('dose').value)&&(byId('teacher').checked||v.label!=='Teacher reference')&&(byId('method').value==='all'||methodKey(v)===byId('method').value)&&matchesOutcome(v,byId('gate').value));
+ const band=TH.forPanel(p,tolerance()),showBand=byId('plotShade').checked;
+ byId('plotThresholdNote').textContent=TH.description(band,showBand);byId('plotTolerance').disabled=!band.available;
+ byId('outcomeScope').textContent=onlyPass()?'Recorded full-suite passes only':'All outcomes included';
  const fp=nondominated(ps,p),ids=new Set(fp.map(v=>v.id));if(byId('onlyfront').checked)ps=fp;
  byId('protocolWarning').hidden=!(p.model.includes('7B')&&p.source_level==='curated');
  byId('plotTitle').textContent=UI.metricName(p.ylabel);byId('plotSubtitle').textContent=(p.xdirection==='min'?'← Smaller model':'Larger compression →')+' · '+(p.ydirection==='min'?'Lower score is better':'Higher score is better');byId('plotCount').textContent=ps.length+' / '+p.points.length+' results';byId('pointCount').textContent=ps.length+' shown';
@@ -128,6 +133,7 @@ function draw(){const p=current(),svg=byId('plot');svg.replaceChildren();byId('p
  byId('methodLegend').replaceChildren();for(const key of visibleMethodKeys(ps)){const item=el('span');item.className='method-key';item.dataset.method=key;item.append(methodIcon(key),el('span',methodStyle(key).shapeLabel+' · '+methodLabel(key)));byId('methodLegend').append(item);}
  if(!ps.length){plotZoom.view({xmin:0,xmax:1,ymin:0,ymax:1},[],p.id+':empty');svg.append(se('text',{x:70,y:100},'No observations for this filter.'));return;}
  const W=1100,H=540,L=95,R=30,T=30,B=85,xv=ps.map(v=>v.x),yv=ps.map(v=>v.y);
+ if(showBand&&band.available)yv.push(band.recorded,band.exploratory);
  let xmin=Math.min(...xv),xmax=Math.max(...xv),ymin=Math.min(...yv),ymax=Math.max(...yv);
  let dx=xmax-xmin,dy=ymax-ymin;if(!dx)dx=Math.max(Math.abs(xmax)*.03,1);if(!dy)dy=Math.max(Math.abs(ymax)*.03,.01);
  xmin=Math.max(0,xmin-dx*.08);xmax+=dx*.08;ymin-=dy*.12;ymax+=dy*.12;
@@ -135,6 +141,7 @@ function draw(){const p=current(),svg=byId('plot');svg.replaceChildren();byId('p
  const visible=ps.filter(v=>plotZoom.contains(v.x,v.y));
  if(plotZoom.active)byId('plotCount').textContent=visible.length+' / '+ps.length+' in zoom';
  const X=v=>L+(v-xmin)/(xmax-xmin)*(W-L-R),Y=v=>H-B-(v-ymin)/(ymax-ymin)*(H-T-B);
+ if(showBand)TH.draw(svg,se,band,{Y,L,T,right:W-R,bottom:H-B,monochrome:byId('monochrome').checked,id:'matchedThreshold'});
  for(const x of UI.ticks(xmin,xmax))svg.append(se('line',{x1:X(x),y1:T,x2:X(x),y2:H-B,stroke:'#e1e7ee'}),se('text',{x:X(x),y:H-B+26,'text-anchor':'middle','font-size':12,fill:'#526577'},UI.tickCost(p,x)));
  for(const y of UI.ticks(ymin,ymax))svg.append(se('line',{x1:L,y1:Y(y),x2:W-R,y2:Y(y),stroke:'#e1e7ee'}),se('text',{x:L-12,y:Y(y)+4,'text-anchor':'end','font-size':12,fill:'#526577'},UI.tick(y)));
  svg.append(se('text',{x:(W+L-R)/2,y:H-20,'text-anchor':'middle','font-size':14},UI.axisName(p)),se('text',{x:20,y:(H+T-B)/2,transform:`rotate(-90 20 ${(H+T-B)/2})`,'text-anchor':'middle','font-size':14},UI.metricName(p.ylabel)));
@@ -159,8 +166,8 @@ function coverage(){const q=byId('search').value.toLowerCase(),rows=DATA.coverag
  for(const r of rows){const tr=el('tr');for(const x of [r.title||r.experiment_id,UI.modelName(r.model),r.execution,r.numeric_metrics,r.paired_observations,[...r.reasons,r.next_action].join(' · ')])tr.append(el('td',String(x)));byId('coverage').append(tr);}}
 function candidateRegister(){
  const all=DATA.candidates||[],q=byId('candidateSearch').value.toLowerCase();
- const rows=all.filter(r=>JSON.stringify(r).toLowerCase().includes(q)&&matchesOutcome(r,byId('candidateGate').value));
- byId('candidates').replaceChildren();byId('candidateCount').textContent=rows.length+' of '+all.length+' candidate/cohort records; '+all.filter(r=>outcome(r)==='failed').length+' explicitly failed or stopped. No pass requirement for inclusion.';
+ const rows=all.filter(r=>(!onlyPass()||UI.allBenchmarksPass(UI.candidatePoint(DATA,r)))&&JSON.stringify(r).toLowerCase().includes(q)&&matchesOutcome(r,byId('candidateGate').value));
+ byId('candidates').replaceChildren();byId('candidateCount').textContent=rows.length+' of '+all.length+' candidate/cohort records; '+all.filter(r=>outcome(r)==='failed').length+' explicitly failed or stopped. '+(onlyPass()?'Showing recorded five-gate passes only; the complete archive is unchanged.':'No pass requirement for inclusion.');
  for(const r of rows){const tr=el('tr'),name=el('td'),button=el('button',UI.candidateName(r.label));button.title=r.label;
   button.addEventListener('click',()=>{if(!r.panel_id){UI.result(byId('detail'),{title:r.label,subtitle:UI.modelName(r.model),state:outcome(r),status:r.gate_status,facts:[['Status',r.gate_status],['Capability','Not yet measured']],raw:r});byId('detail').scrollIntoView({block:'center'});return;}
    byId('model').value=r.model;byId('level').value=r.source_level;byId('gate').value='all';byId('onlyfront').checked=false;selectPanels();byId('panel').value=r.panel_id;selectDose();byId('method').value='all';draw();const p=current(),point=p.points.find(v=>v.id===r.point_id);if(point)detail(point,p);byId('explorer').scrollIntoView({block:'start'});});
@@ -173,17 +180,33 @@ function candidateRegister(){
   const status=el('td',r.gate_status+(r.failed_gates.length?' · Failed: '+r.failed_gates.join(', '):''));status.dataset.verdict=outcome(r);tr.append(status);byId('candidates').append(tr);
  }
 }
-byId('resetFilters').addEventListener('click',()=>{plotZoom.reset();byId('dose').value='all';byId('method').value='all';byId('gate').value='all';byId('onlyfront').checked=false;byId('teacher').checked=true;draw();});
+function setPassOnly(value){
+ byId('passOnly').checked=value;byId('pooledPassOnly').checked=value;plotZoom.reset();
+ if(value)for(const id of ['gate','candidateGate','comparisonGate'])byId(id).value='all';
+ draw();candidateRegister();comparisonTable();document.dispatchEvent(new Event('dendriscale-display-change'));
+}
+for(const id of ['passOnly','pooledPassOnly'])byId(id).addEventListener('change',()=>setPassOnly(byId(id).checked));
+for(const prefix of ['plot','pooled']){
+ for(const suffix of ['Shade','Tolerance'])byId(prefix+suffix).addEventListener('change',()=>{
+  const source=byId(prefix+suffix),other=byId((prefix==='plot'?'pooled':'plot')+suffix);
+  if(suffix==='Shade')other.checked=source.checked;else other.value=source.value;
+  plotZoom.reset();draw();document.dispatchEvent(new Event('dendriscale-display-change'));
+ });
+}
+byId('resetFilters').addEventListener('click',()=>{plotZoom.reset();byId('dose').value='all';byId('method').value='all';byId('gate').value='all';byId('onlyfront').checked=false;byId('teacher').checked=true;setPassOnly(false);});
 byId('model').addEventListener('change',selectPanels);byId('level').addEventListener('change',selectPanels);byId('panel').addEventListener('change',selectDose);for(const id of ['dose','teacher','onlyfront','method','monochrome','gate'])byId(id).addEventListener('change',draw);byId('search').addEventListener('input',coverage);
 byId('candidateSearch').addEventListener('input',candidateRegister);byId('candidateGate').addEventListener('change',candidateRegister);
 byId('monochrome').addEventListener('change',()=>{try{localStorage.setItem('dendriscale-monochrome',String(byId('monochrome').checked));}catch(_){}});
 byId('export').addEventListener('click',()=>{const copy=byId('plot').cloneNode(true);
- const keys=[...byId('methodLegend').children].map(item=>item.dataset.method),height=658+keys.length*32;
+ const keys=[...byId('methodLegend').children].map(item=>item.dataset.method),height=714+keys.length*32;
  copy.setAttribute('viewBox',`0 0 1100 ${height}`);copy.setAttribute('width','1100');copy.setAttribute('height',String(height));
  copy.insertBefore(se('rect',{x:0,y:0,width:1100,height,fill:'white'}),copy.firstChild);
  copy.append(se('text',{x:95,y:565,fill:'#151515','font-size':15,'font-family':'sans-serif'},'Method = shape + color. Dashed line = observed Pareto front.'));
  copy.append(shapeMark('hybrid',108,590));UI.passMark(copy,se,108,590);copy.append(se('text',{x:132,y:595,fill:'#151515','font-size':13,'font-family':'sans-serif'},'Check inside a symbol = '+UI.passLabel+' · recorded development suite.'));
  for(const [i,key] of keys.entries()){copy.append(shapeMark(key,108,620+i*32),se('text',{x:132,y:625+i*32,fill:'#151515','font-size':15,'font-family':'sans-serif'},methodStyle(key).shapeLabel+' · '+methodLabel(key)));}
+copy.append(se('text',{x:95,y:height-64,'font-size':12},onlyPass()?'Showing recorded full-suite passes only.':'All verdicts eligible; other chart filters may apply.'));
+const band=TH.forPanel(current(),tolerance());
+copy.append(se('text',{x:95,y:height-42,'font-size':11},byId('plotShade').checked&&band.available?'Shading = score allowance only; full-suite checks use original verdicts. '+(band.multiplier>1?'Wider band is exploratory.':''):'No threshold shading.'));
 if(plotZoom.active)copy.append(se('text',{x:95,y:height-12,'font-size':12},plotZoom.description));
 copy.setAttribute('xmlns',svgNS);const blob=new Blob([new XMLSerializer().serializeToString(copy)],{type:'image/svg+xml'}),url=URL.createObjectURL(blob),a=el('a');a.href=url;a.download=(current()?.id||'pareto')+'.svg';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);});
 const params=new URLSearchParams(location.search);
@@ -191,7 +214,7 @@ for(const id of ['model','level']) if(params.has(id)&&[...byId(id).options].some
 selectPanels();
 if(params.has('panel')&&[...byId('panel').options].some(o=>o.value===params.get('panel'))){byId('panel').value=params.get('panel');selectDose();}
 coverage();candidateRegister();comparisonTable();
-window.DendriScalePooled(DATA,{el,se,shapeMark,methodIcon,methodLabel,outcome,openComparison});
+window.DendriScalePooled(DATA,{el,se,shapeMark,methodIcon,methodLabel,outcome,openComparison,onlyPass});
 byId('comparisonCohort').addEventListener('change',comparisonTable);byId('comparisonGate').addEventListener('change',comparisonTable);byId('monochrome').addEventListener('change',comparisonTable);
 for(const id of ['model','level','panel']) byId(id).addEventListener('change',()=>{const q=new URLSearchParams();for(const key of ['model','level','panel'])q.set(key,byId(key).value);history.replaceState(null,'','?'+q.toString());});
 byId('loadError').hidden=true;
