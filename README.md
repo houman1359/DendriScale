@@ -13,6 +13,25 @@ whole model are different measurements. The explorer keeps these separate.
 The website is static HTML, CSS and JavaScript. No account, GPU, database,
 analytics service or third-party JavaScript is needed.
 
+## Explore the results
+
+1. **Model size vs. performance** opens first. Choose a model and benchmark;
+   use **More filters** for verdicts, training data, and the observed frontier.
+   All outcomes are included by default. **Reset filters** restores them.
+2. **Dendritic and conventional compression** compares matched cohorts.
+   The cards identify the most compressed passing models; the table retains
+   unsuccessful and dominated candidates as well.
+3. **All models, one size axis** pools each benchmark against absolute GB.
+   Model colors and labels, method shapes, and the monochrome option remain
+   available. Evaluation protocols stay attached to individual points.
+4. **Results & experiment records** keeps every candidate and experiment
+   searchable, including original technical identifiers.
+
+Select a point for readable performance, size, and gate details. Expand
+**Full record & source hashes** for the original labels and exact values.
+Display titles are formatted for readability; aggregate data are unchanged.
+Both charts export SVGs with their legends, and the downloads retain all records.
+
 ## Run locally
 
 ```sh

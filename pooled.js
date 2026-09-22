@@ -1,6 +1,6 @@
 'use strict';
 window.DendriScalePooled = function(DATA,{el,se,shapeMark,methodIcon,methodLabel,outcome,openComparison}) {
- const byId=id=>document.getElementById(id);
+ const byId=id=>document.getElementById(id),UI=window.DendriScaleUI;
  const modelName=m=>m.replace(/^allenai\//,'').replace(/^OLMo-/,'OLMo-');
  function metric(point){
   const label=point.ylabel,unit=point.yunit;
@@ -82,10 +82,13 @@ window.DendriScalePooled = function(DATA,{el,se,shapeMark,methodIcon,methodLabel
 
  for(const [key,label] of [['all','All models'],...models]){const option=el('option',label);option.value=key;byId('pooledModel').append(option);}
  function selected(row){
-  byId('pooledDetail').textContent=JSON.stringify({candidate:row.label,model:row.model,benchmark:row.benchmark,
+  const raw={candidate:row.label,model:row.model,benchmark:row.benchmark,
    absolute_registered_bytes:row.bytes,absolute_registered_GB:row.gb,score:row.displayY,score_unit:row.displayUnit,
    original_score:row.y,original_score_unit:row.yunit,sample_size:row.denominator,cohort:row.cohort,
-   original_status:row.gate_status,conditions:row.conditions,limitations:row.limitations,source_hashes:row.source_hashes},null,2);
+   original_status:row.gate_status,conditions:row.conditions,limitations:row.limitations,source_hashes:row.source_hashes};
+  UI.result(byId('pooledDetail'),{title:row.label,subtitle:UI.modelName(row.model)+' · '+methodLabel(row.method),state:row.label==='Teacher reference'?'reference':outcome(row),status:row.gate_status,
+   stats:[[row.benchmark,UI.number(row.displayY)+' '+row.displayUnit],['Whole-model size',UI.number(row.gb)+' GB'],['Sample size',row.denominator?UI.number(row.denominator.n):'See protocol']],
+   facts:[['Original verdict',row.gate_status],['Cohort',row.cohort],['Conditions',row.conditions],['Limitations',row.limitations]],raw});
   byId('pooledDetails').open=true;byId('pooledOpen').hidden=false;byId('pooledOpen').onclick=()=>openComparison(row);
  }
  function selection(){
@@ -100,6 +103,7 @@ window.DendriScalePooled = function(DATA,{el,se,shapeMark,methodIcon,methodLabel
  }
  function draw(){
   const state=selection(),{all,ps,minimum,percent}=state;
+  UI.empty(byId('pooledDetail'));byId('pooledOpen').hidden=true;byId('pooledDetails').open=false;
   byId('pooledMinimum').value=minimum;byId('pooledMinimum').disabled=!percent||byId('pooledShowLow').checked;
   byId('pooledShowLow').disabled=!percent;
   const svg=byId('pooledPlot');svg.replaceChildren();byId('pooledRows').replaceChildren();byId('pooledLegend').replaceChildren();
@@ -124,13 +128,14 @@ window.DendriScalePooled = function(DATA,{el,se,shapeMark,methodIcon,methodLabel
    const text=r.label+' · '+modelName(r.model)+' · '+r.gb.toFixed(3)+' GB · '+r.displayY.toFixed(3)+' '+unit+' · '+r.cohort;
    const group=se('g',{class:'pooled-point',role:'button',tabindex:0,'aria-label':text,'data-model':r.modelKey,'data-bytes':r.bytes,'data-score':r.displayY,'data-verdict':outcome(r),'data-point-id':r.id,'data-method':r.method,'data-model-label':modelStyles.get(r.modelKey).label});
    group.append(se('title',{},text),modelMark(r,X(r.gb),Y(r.displayY),7),se('circle',{cx:X(r.gb),cy:Y(r.displayY),r:11,fill:'transparent'}));
+   UI.tooltip(group,r.label,modelName(r.model)+' · '+r.gb.toFixed(3)+' GB · '+UI.number(r.displayY)+' '+unit);
    group.addEventListener('click',()=>selected(r));group.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();selected(r);}});svg.append(group);
    if(byId('pooledLabels').checked)svg.append(se('text',{x:X(r.gb)+10,y:Y(r.displayY)-9,'font-size':10,'font-weight':600,fill:modelColor(r.modelKey),stroke:'white','stroke-width':3,'paint-order':'stroke','pointer-events':'none','data-model':r.modelKey,class:'pooled-model-label'},modelStyles.get(r.modelKey).label));
   }
   for(const key of [...new Set(ps.map(r=>r.method))]){const label=el('span');label.className='method-key';const icon=methodIcon(key);for(const mark of icon.children)recolor(mark,'#595959');label.append(icon,el('span',methodLabel(key)));byId('pooledLegend').append(label);}
   applyHighlight();
   for(const r of [...ps].sort((a,b)=>a.gb-b.gb)){
-   const tr=el('tr'),td=el('td'),button=el('button',r.label);button.addEventListener('click',()=>selected(r));td.append(button);
+   const tr=el('tr'),td=el('td'),button=el('button',UI.candidateName(r.label));button.addEventListener('click',()=>selected(r));td.append(button);
    tr.append(td,el('td',modelName(r.model)),el('td',r.gb.toFixed(3)),el('td',r.displayY.toFixed(3)+' '+unit),el('td',r.denominator?.n||'See protocol'),el('td',r.gate_status),el('td',r.cohort));byId('pooledRows').append(tr);
   }
  }
