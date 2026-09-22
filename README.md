@@ -32,6 +32,20 @@ Select a point for readable performance, size, and gate details. Expand
 Display titles are formatted for readability; aggregate data are unchanged.
 Both charts export SVGs with their legends, and the downloads retain all records.
 
+**✓ Passes all benchmarks** marks a candidate whose complete recorded development
+suite passes: GSM8K, multiple choice, C4, copy 512 and copy 2048, within that
+cohort's tolerances. The check appears in both charts, tables, selected results
+and SVG exports; it is independent of the Pareto ring and compression-method
+shape. It requires a completed, curated observation with all five explicit gate
+checks true, or an explicit "All five development gates pass" verdict on an older
+battery without individual check fields. Failed or partial check fields prevent
+the mark; generic positive/pass labels are insufficient. Candidate rows resolve
+to that exact model/cohort observation. Teacher references, partial batteries,
+local fits and pending results receive no check. An unmarked result can be
+incomplete or failed; its original verdict remains available. These are
+development results; reserved final-test qualification is separate.
+
+
 ## Run locally
 
 ```sh

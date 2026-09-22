@@ -52,11 +52,43 @@ window.DendriScaleUI = (() => {
     element.title = original || verdictName(state);
     return element;
   }
-  function result(container, {title, subtitle, state, status, stats = [], facts = [], raw}) {
+  const passLabel = 'Passes all benchmarks';
+  const passScope = 'All five recorded development gates pass: GSM8K, multiple choice, C4, copy 512 and copy 2048. Within the recorded tolerances and evaluation cohort.';
+  function allBenchmarksPass(point) {
+    if (!point || point.source_level !== 'curated' || point.execution !== 'completed'
+      || point.label === 'Teacher reference' || point.method_style?.key === 'teacher'
+      || point.failed_gates?.length || /fail|reject|gate.stop/i.test(point.gate_status || '')) return false;
+    const checks = point.full_gate_checks;
+    if (checks != null) return ['gsm', 'mc', 'c4', 'copy512', 'copy2048'].every(key => checks[key] === true)
+      && Object.values(checks).every(value => value === true);
+    // Older curated batteries carry an explicit whole-suite verdict instead.
+    // A generic positive/pass verdict or a partial checks object is insufficient.
+    return /^All five (?:(?:full|fresh|original) )*development gates pass$/i.test(point.gate_status || '');
+  }
+  // Bind register rows to their exact observation; labels alone are not identities.
+  function candidatePoint(data, row) {
+    const panel = data.panels.find(panel => panel.id === row.panel_id);
+    const point = panel?.points.find(point => point.id === row.point_id);
+    return point && point.model === row.model && point.cohort === row.cohort
+      && point.source_level === row.source_level ? point : null;
+  }
+  function passBadge() {
+    const element = node('span', '✓ ' + passLabel, 'all-pass-badge');
+    element.title = passScope;
+    return element;
+  }
+  function passMark(target, se, x, y) {
+    const attrs = {d: `M ${x-5} ${y} l 3 3 l 7 -8`, fill: 'none',
+      'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'pointer-events': 'none', 'aria-hidden': 'true'};
+    target.append(se('path', {...attrs, stroke: 'white', 'stroke-width': 6}),
+      se('path', {...attrs, stroke: '#151515', 'stroke-width': 2.8, class: 'all-pass-mark'}));
+  }
+  function result(container, {title, subtitle, state, status, allPass = false, stats = [], facts = [], raw}) {
     container.replaceChildren();
     const heading = node('div', undefined, 'detail-heading');
-    heading.append(node('h3', candidateName(title)), badge(state, status));
+    heading.append(node('h3', candidateName(title)), allPass ? passBadge() : badge(state, status));
     container.append(heading, node('p', subtitle, 'detail-meta'));
+    if (allPass) container.append(node('p', passScope, 'pass-scope'));
     if (stats.length) {
       const grid = node('div', undefined, 'detail-stats');
       for (const [label, value] of stats) {
@@ -90,5 +122,6 @@ window.DendriScaleUI = (() => {
     for (const event of ['pointerleave', 'blur', 'click']) target.addEventListener(event, () => {tip.hidden = true;});
     target.addEventListener('keydown', event => {if (event.key === 'Escape') tip.hidden = true;});
   }
-  return {modelName, candidateName, metricName, axisName, number, tick, tickCost, ticks, badge, result, empty, tooltip};
+  return {modelName, candidateName, metricName, axisName, number, tick, tickCost, ticks, badge, result, empty, tooltip,
+    allBenchmarksPass, candidatePoint, passBadge, passMark, passLabel, passScope};
 })();

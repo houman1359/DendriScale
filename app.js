@@ -58,9 +58,9 @@ function comparisonKind(row){
  return {key:'unknown',group:'unknown',label:method};
 }
 const comparisons=(DATA.candidates||[]).filter(r=>r.source_level==='curated').map(r=>{
- const p=DATA.panels.find(p=>p.id===r.panel_id)?.points.find(p=>p.id===r.point_id);
+ const p=UI.candidatePoint(DATA,r);
  const size=p?.whole_model_size;
- return {...r,kind:comparisonKind(r),size,factor:size?size.original_registered_bytes/size.registered_bytes:null};
+ return {...r,kind:comparisonKind(r),allPass:UI.allBenchmarksPass(p),size,factor:size?size.original_registered_bytes/size.registered_bytes:null};
 }).filter(r=>r.size&&r.measurements.some(m=>/^GSM/.test(m.benchmark)));
 const comparisonCohorts=[...new Map(comparisons.map(r=>[r.model+' | '+r.cohort,{model:r.model,cohort:r.cohort}])).entries()];
 opts(byId('comparisonCohort'),comparisonCohorts.map(([key,value])=>[key,UI.modelName(value.model)+' · '+(value.cohort.includes('Historical')?'Historical diagnostic':value.cohort.includes('H200')?'BF16 / H200 · full development':'BF16 / H100 · full development')]));
@@ -79,16 +79,16 @@ function comparisonTable(){
  byId('comparisonNote').textContent=(all[0]?.cohort||'No matched measurements')+(invalid?' Historical 7B marker/stopping protocol is not a validated reasoning frontier; no passing-frontier cards are assigned.':' Development only; one seed/calibration where recorded. Largest compression is not a SOTA or speed claim.');
  byId('comparisonBest').replaceChildren();
  for(const [group,label] of [['dendritic','Most compressed passing · dendritic'],['non-dendritic','Most compressed passing · non-dendritic']]){
-  const best=invalid?null:all.filter(r=>r.kind.group===group&&outcome(r)==='passed').sort((a,b)=>b.factor-a.factor)[0];
+  const best=invalid?null:all.filter(r=>r.kind.group===group&&r.allPass).sort((a,b)=>b.factor-a.factor)[0];
   const card=el('div');card.className='stat comparison-stat';card.dataset.group=group;
   card.append(el('span',label),el('b',best?best.factor.toFixed(3)+'×':'Not established'));
-  if(best){const link=el('button',UI.candidateName(best.label));link.title=best.label;link.addEventListener('click',()=>openComparison(best));card.append(link);}else card.append(el('span','No validated passing artifact in this cohort'));
+  if(best){const link=el('button',UI.candidateName(best.label));link.title=best.label;link.addEventListener('click',()=>openComparison(best));card.append(link,UI.passBadge());}else card.append(el('span','No validated passing artifact in this cohort'));
   if(best)card.dataset.candidate=best.id;byId('comparisonBest').append(card);
  }
  byId('comparisonRows').replaceChildren();
  for(const row of all.filter(r=>matchesOutcome(r,byId('comparisonGate').value)).sort((a,b)=>b.factor-a.factor)){
   const tr=el('tr');tr.dataset.group=row.kind.group;tr.dataset.verdict=outcome(row);
-  const name=el('td'),button=el('button',UI.candidateName(row.label));button.addEventListener('click',()=>openComparison(row));name.append(button);
+  const name=el('td'),button=el('button',UI.candidateName(row.label));button.addEventListener('click',()=>openComparison(row));name.append(button);if(row.allPass)name.append(UI.passBadge());tr.dataset.allBenchmarksPass=String(row.allPass);
   const method=el('td'),badge=el('span');badge.className='method-badge';badge.append(methodIcon(row.kind.key),el('span',row.kind.label));method.append(badge);
   const score=pattern=>row.measurements.filter(m=>pattern.test(m.benchmark)).map(m=>{const n=m.benchmark.match(/\/\s*([\d,]+)$/);return n?num(m.value)+' / '+num(Number(n[1].replaceAll(',',''))):num(m.value)+' · '+UI.metricName(m.benchmark);}).join('; ')||'Not measured';
   tr.append(name,method,el('td',row.factor.toFixed(3)+'×'),el('td',(row.size.registered_bytes/1e9).toFixed(3)),el('td',score(/^GSM/)),el('td',score(/^MC/)),el('td',row.gate_status+(row.failed_gates.length?' · Failed: '+row.failed_gates.join(', '):'')));
@@ -108,7 +108,7 @@ function detail(v,p){
  const raw={candidate:v.label,experiment_id:v.experiment_id,cohort:v.cohort,method:methodLabel(methodKey(v)),marker_shape:methodStyle(methodKey(v)).shapeLabel,model:v.model,benchmark:p.ylabel,quality:v.y,size_axis:p.xlabel,size:v.x,size_unit:p.xunit,unique_positions:v.dose,presentations:v.presentations,resources:v.resources,whole_model_size:v.whole_model_size||(v.xaxis==="whole_registered_bytes"?{registered_bytes:v.x,basis:"Measured complete-model registered tensor bytes. Original-size normalization is not attached to this registry entry."}:v.xaxis==="whole_compression"?{compression_factor:v.x,basis:"Reported complete-model compression factor. Absolute-byte normalization is not attached to this registry entry."}:"Not measured for this local or unmatched artifact"),original_status:v.gate_status,conditions:v.conditions,limitations:v.limitations,uncertainty:v.uncertainty,full_gate_checks:v.full_gate_checks,source_hashes:v.source_hashes};
  const size=v.whole_model_size;
  const checks=v.full_gate_checks?Object.entries(v.full_gate_checks).map(([name,pass])=>name.toUpperCase()+': '+(pass?'pass':'fail')).join(' · '):null;
- UI.result(byId('detail'),{title:v.label,subtitle:UI.modelName(v.model)+' · '+methodLabel(methodKey(v)),state:v.label==='Teacher reference'?'reference':outcome(v),status:v.gate_status,
+ UI.result(byId('detail'),{title:v.label,subtitle:UI.modelName(v.model)+' · '+methodLabel(methodKey(v)),state:v.label==='Teacher reference'?'reference':outcome(v),status:v.gate_status,allPass:UI.allBenchmarksPass(v),
   stats:[[UI.metricName(p.ylabel),num(v.y)],[size?'Whole-model size':UI.axisName(p),size?(size.registered_bytes/1e9).toFixed(3)+' GB':cost(p,v.x)],['Whole-model compression',size?(size.original_registered_bytes/size.registered_bytes).toFixed(3)+'×':'Not measured']],
   facts:[['Size retained',size?size.retained_percent.toFixed(2)+'% retained · '+size.saved_percent.toFixed(2)+'% saved':null],['Original verdict',v.gate_status],['Gate checks',checks],['Conditions',v.conditions],['Limitations',v.limitations],['Training data',v.dose==null?null:num(v.dose)+' unique positions']],raw});
  byId('detail').dataset.pointId=v.id;
@@ -134,15 +134,17 @@ function draw(){const p=current(),svg=byId('plot');svg.replaceChildren();byId('p
  svg.append(se('text',{x:(W+L-R)/2,y:H-20,'text-anchor':'middle','font-size':14},UI.axisName(p)),se('text',{x:20,y:(H+T-B)/2,transform:`rotate(-90 20 ${(H+T-B)/2})`,'text-anchor':'middle','font-size':14},UI.metricName(p.ylabel)));
  const sorted=[...fp].sort((a,b)=>a.x-b.x);if(sorted.length>1)svg.append(se('polyline',{points:sorted.map(v=>`${X(v.x)},${Y(v.y)}`).join(' '),fill:'none',stroke:'#39434e','stroke-width':1.5,'stroke-dasharray':'5 4'}));
  for(const v of ps){
- const key=methodKey(v),point=se('g',{class:'plot-point',tabindex:0,role:'button','aria-label':v.label+'; '+methodLabel(key)+'; '+methodStyle(key).shapeLabel+'; '+cost(p,v.x)+'; '+num(v.y)+(ids.has(v.id)?'; observed Pareto point':''),'data-point-id':v.id,'data-method':key,'data-shape':methodStyle(key).shape});
- point.append(se('title',{},v.label+'\n'+methodStyle(key).shapeLabel+' · '+methodLabel(key)+'\n'+cost(p,v.x)+' · '+num(v.y)));
+ const allPass=UI.allBenchmarksPass(v),passText=allPass?'; '+UI.passLabel+' (development suite)':'';
+ const key=methodKey(v),point=se('g',{class:'plot-point',tabindex:0,role:'button','aria-label':v.label+'; '+methodLabel(key)+'; '+methodStyle(key).shapeLabel+'; '+cost(p,v.x)+'; '+num(v.y)+(ids.has(v.id)?'; observed Pareto point':'')+passText,'data-all-benchmarks-pass':allPass,'data-point-id':v.id,'data-method':key,'data-shape':methodStyle(key).shape});
+ point.append(se('title',{},v.label+'\n'+methodStyle(key).shapeLabel+' · '+methodLabel(key)+'\n'+cost(p,v.x)+' · '+num(v.y)+passText));
  if(ids.has(v.id))point.append(se('circle',{cx:X(v.x),cy:Y(v.y),r:14,fill:'none',stroke:'white','stroke-width':6}),se('circle',{cx:X(v.x),cy:Y(v.y),r:14,fill:'none',stroke:'#151515','stroke-width':2,class:'pareto-ring'}));
  point.append(shapeMark(key,X(v.x),Y(v.y)),se('circle',{cx:X(v.x),cy:Y(v.y),r:16,fill:'transparent',class:'point-hit'}));
- UI.tooltip(point,v.label,cost(p,v.x)+' · '+num(v.y)+' · '+methodLabel(key));
+ if(allPass)UI.passMark(point,se,X(v.x)-13,Y(v.y)-12);
+ UI.tooltip(point,v.label,cost(p,v.x)+' · '+num(v.y)+' · '+methodLabel(key)+passText);
  point.addEventListener('click',()=>detail(v,p));point.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();detail(v,p);}});svg.append(point);
  }
  for(const v of [...ps].sort((a,b)=>a.x-b.x)){
- const key=methodKey(v),tr=el('tr'),td=el('td'),b=el('button',UI.candidateName(v.label));b.addEventListener('click',()=>detail(v,p));td.append(b);tr.append(td);
+ const key=methodKey(v),tr=el('tr'),td=el('td'),b=el('button',UI.candidateName(v.label));b.addEventListener('click',()=>detail(v,p));td.append(b);if(UI.allBenchmarksPass(v))td.append(UI.passBadge());tr.dataset.pointId=v.id;tr.dataset.allBenchmarksPass=String(UI.allBenchmarksPass(v));tr.append(td);
  const method=el('td'),badge=el('span');badge.className='method-badge';badge.append(methodIcon(key),el('span',methodStyle(key).shapeLabel+' · '+methodLabel(key)));method.append(badge);tr.append(method);
  for(const text of [cost(p,v.x),num(v.y),v.whole_model_size?num(v.whole_model_size.retained_percent)+'%':'Not measured',v.whole_model_size?num(v.whole_model_size.saved_percent)+'%':'Not measured',num(v.dose),v.gate_status,ids.has(v.id)?'Yes · ring':'No'])tr.append(el('td',text));byId('points').append(tr);
  }
@@ -156,7 +158,7 @@ function candidateRegister(){
  for(const r of rows){const tr=el('tr'),name=el('td'),button=el('button',UI.candidateName(r.label));button.title=r.label;
   button.addEventListener('click',()=>{if(!r.panel_id){UI.result(byId('detail'),{title:r.label,subtitle:UI.modelName(r.model),state:outcome(r),status:r.gate_status,facts:[['Status',r.gate_status],['Capability','Not yet measured']],raw:r});byId('detail').scrollIntoView({block:'center'});return;}
    byId('model').value=r.model;byId('level').value=r.source_level;byId('gate').value='all';byId('onlyfront').checked=false;selectPanels();byId('panel').value=r.panel_id;selectDose();byId('method').value='all';draw();const p=current(),point=p.points.find(v=>v.id===r.point_id);if(point)detail(point,p);byId('explorer').scrollIntoView({block:'start'});});
-  name.append(button);tr.append(name,el('td',UI.modelName(r.model)+' · '+r.source_level));
+  name.append(button);const allPass=UI.allBenchmarksPass(UI.candidatePoint(DATA,r));if(allPass)name.append(UI.passBadge());tr.dataset.candidateId=r.id;tr.dataset.allBenchmarksPass=String(allPass);tr.append(name,el('td',UI.modelName(r.model)+' · '+r.source_level));
   tr.append(el('td',r.sizes.map(s=>s.label+': '+cost({xunit:s.unit},s.value)).join(' · ')));
   const measured=el('td');
   if(!r.measurements.length)measured.textContent='Capability not yet measured';
@@ -170,11 +172,12 @@ byId('model').addEventListener('change',selectPanels);byId('level').addEventList
 byId('candidateSearch').addEventListener('input',candidateRegister);byId('candidateGate').addEventListener('change',candidateRegister);
 byId('monochrome').addEventListener('change',()=>{try{localStorage.setItem('dendriscale-monochrome',String(byId('monochrome').checked));}catch(_){}});
 byId('export').addEventListener('click',()=>{const copy=byId('plot').cloneNode(true);
- const keys=[...byId('methodLegend').children].map(item=>item.dataset.method),height=610+keys.length*32;
+ const keys=[...byId('methodLegend').children].map(item=>item.dataset.method),height=638+keys.length*32;
  copy.setAttribute('viewBox',`0 0 1100 ${height}`);copy.setAttribute('width','1100');copy.setAttribute('height',String(height));
  copy.insertBefore(se('rect',{x:0,y:0,width:1100,height,fill:'white'}),copy.firstChild);
  copy.append(se('text',{x:95,y:565,fill:'#151515','font-size':15,'font-family':'sans-serif'},'Method = shape + color. Outer ring / dashed line = observed Pareto front.'));
- for(const [i,key] of keys.entries()){copy.append(shapeMark(key,108,592+i*32),se('text',{x:132,y:597+i*32,fill:'#151515','font-size':15,'font-family':'sans-serif'},methodStyle(key).shapeLabel+' · '+methodLabel(key)));}
+ UI.passMark(copy,se,108,590);copy.append(se('text',{x:132,y:595,fill:'#151515','font-size':13,'font-family':'sans-serif'},UI.passLabel+' · all five recorded development gates, within cohort tolerances.'));
+ for(const [i,key] of keys.entries()){copy.append(shapeMark(key,108,620+i*32),se('text',{x:132,y:625+i*32,fill:'#151515','font-size':15,'font-family':'sans-serif'},methodStyle(key).shapeLabel+' · '+methodLabel(key)));}
 copy.setAttribute('xmlns',svgNS);const blob=new Blob([new XMLSerializer().serializeToString(copy)],{type:'image/svg+xml'}),url=URL.createObjectURL(blob),a=el('a');a.href=url;a.download=(current()?.id||'pareto')+'.svg';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);});
 const params=new URLSearchParams(location.search);
 for(const id of ['model','level']) if(params.has(id)&&[...byId(id).options].some(o=>o.value===params.get(id))) byId(id).value=params.get(id);
