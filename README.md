@@ -35,8 +35,14 @@ Both charts export SVGs with their legends, and the downloads retain all records
 **✓ Passes all benchmarks** marks a candidate whose complete recorded development
 suite passes: GSM8K, multiple choice, C4, copy 512 and copy 2048, within that
 cohort's tolerances. The check appears in both charts, tables, selected results
-and SVG exports; it is independent of the Pareto ring and compression-method
-shape. It requires a completed, curated observation with all five explicit gate
+and SVG exports; the small white check sits **inside** the compression-method symbol.
+The dashed frontier line is separate; there are no large rings or floating checks.
+Use **Expand crowded points** to magnify the densest group, then **Show full range**
+to restore every plotted point. This changes the axes only; measurements and the
+complete filtered result table stay intact. Both SVG exports retain the current
+view and label any zoom. Overlapping model labels are suppressed in the pooled
+chart; every point retains its model color, tooltip and exact record.
+It requires a completed, curated observation with all five explicit gate
 checks true, or an explicit "All five development gates pass" verdict on an older
 battery without individual check fields. Failed or partial check fields prevent
 the mark; generic positive/pass labels are insufficient. Candidate rows resolve

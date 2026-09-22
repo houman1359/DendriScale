@@ -1,6 +1,7 @@
 'use strict';
 window.DendriScalePooled = function(DATA,{el,se,shapeMark,methodIcon,methodLabel,outcome,openComparison}) {
  const byId=id=>document.getElementById(id),UI=window.DendriScaleUI;
+ const zoom=UI.chartZoom(byId('pooledFocus'),byId('pooledFull'),byId('pooledZoomNote'),draw);
  const modelName=m=>m.replace(/^allenai\//,'').replace(/^OLMo-/,'OLMo-');
  function metric(point){
   const label=point.ylabel,unit=point.yunit;
@@ -63,7 +64,7 @@ window.DendriScalePooled = function(DATA,{el,se,shapeMark,methodIcon,methodLabel
  let highlighted=null;
  const modelColor=key=>byId('monochrome').checked?'#151515':modelStyles.get(key).color;
  function recolor(marker,color){for(const node of marker.children){if(node.getAttribute('fill')!=='white')node.setAttribute('fill',color);else if(node.getAttribute('stroke')!=='white')node.setAttribute('stroke',color);}return marker;}
- function modelMark(row,x,y,size=7){return recolor(shapeMark(row.method,x,y,size),modelColor(row.modelKey));}
+ function modelMark(row,x,y,size=5.5){return recolor(shapeMark(row.method,x,y,size),modelColor(row.modelKey));}
  function applyHighlight(){
   for(const node of byId('pooledPlot').querySelectorAll('[data-model]'))node.style.opacity=highlighted&&node.dataset.model!==highlighted?'0.12':'1';
   for(const node of byId('pooledModelLegend').querySelectorAll('button'))node.setAttribute('aria-pressed',String((node.dataset.model||null)===highlighted));
@@ -110,11 +111,14 @@ window.DendriScalePooled = function(DATA,{el,se,shapeMark,methodIcon,methodLabel
   modelLegend(ps);
   const modelCount=new Set(ps.map(r=>r.modelKey)).size,unit=all[0]?.displayUnit||'';
   byId('pooledCount').textContent='Showing '+ps.length+' of '+all.length+' recorded points across '+modelCount+' models. '+filterDescription(state)+' X = complete-model registered GB (10⁹ bytes).';
-  if(!ps.length){applyHighlight();svg.append(se('text',{x:80,y:90},all.length?'No scores meet the minimum. Lower it or enable Show near-zero results.':'No recorded whole-model sizes for this selection.'));return;}
+  if(!ps.length){zoom.view({xmin:0,xmax:1,ymin:0,ymax:1},[],'empty');applyHighlight();svg.append(se('text',{x:80,y:90},all.length?'No scores meet the minimum. Lower it or enable Show near-zero results.':'No recorded whole-model sizes for this selection.'));return;}
   const W=1100,H=540,L=100,R=30,T=30,B=75,log=byId('pooledLog').checked;
-  const xmin=log?Math.min(...ps.map(r=>r.gb))*.85:0,xmax=Math.max(...ps.map(r=>r.gb))*1.08;
+  let xmin=log?Math.min(...ps.map(r=>r.gb))*.85:0,xmax=Math.max(...ps.map(r=>r.gb))*1.08;
   let ymin=Math.min(...ps.map(r=>r.displayY)),ymax=Math.max(...ps.map(r=>r.displayY));const delta=ymax-ymin||Math.max(Math.abs(ymax)*.1,.01);
   ymin-=delta*.12;ymax+=delta*.12;if(unit==='%'){ymin=Math.max(0,ymin);ymax=Math.min(100,ymax);}
+  const transformed=zoom.view({xmin:log?Math.log(xmin):xmin,xmax:log?Math.log(xmax):xmax,ymin,ymax},ps.map(r=>({x:log?Math.log(r.gb):r.gb,y:r.displayY,reference:r.method==='teacher'})),byId('pooledBenchmark').value+'|'+log+'|'+ps.map(r=>r.id).join('|'));
+  xmin=log?Math.exp(transformed.xmin):transformed.xmin;xmax=log?Math.exp(transformed.xmax):transformed.xmax;({ymin,ymax}=transformed);
+  const visible=ps.filter(r=>zoom.contains(log?Math.log(r.gb):r.gb,r.displayY));
   const X=v=>L+((log?Math.log(v/xmin):v-xmin)/(log?Math.log(xmax/xmin):xmax-xmin))*(W-L-R);
   const Y=v=>H-B-(v-ymin)/(ymax-ymin)*(H-T-B);
   for(let i=0;i<=5;i++){
@@ -124,15 +128,22 @@ window.DendriScalePooled = function(DATA,{el,se,shapeMark,methodIcon,methodLabel
   }
   svg.append(se('text',{x:(L+W-R)/2,y:H-20,'text-anchor':'middle','font-size':14},'Absolute whole-model size (GB)'+(log?' · log scale':'')),
    se('text',{x:23,y:H/2,transform:`rotate(-90 23 ${H/2})`,'text-anchor':'middle','font-size':14},byId('pooledBenchmark').value+' ('+unit+')'));
-  for(const r of ps){
+  const labelBoxes=[],visibleModels=new Set(visible.map(r=>r.modelKey));
+  if(visibleModels.size===1){const style=modelStyles.get([...visibleModels][0]);svg.append(se('text',{x:L,y:17,'font-size':11,fill:'#42586d',class:'pooled-single-model'},style.label+' · '+style.name));}
+  for(const r of visible){
    const allPass=UI.allBenchmarksPass(r),passText=allPass?' · '+UI.passLabel+' (development suite)':'';
    const text=r.label+' · '+modelName(r.model)+' · '+r.gb.toFixed(3)+' GB · '+r.displayY.toFixed(3)+' '+unit+' · '+r.cohort+passText;
-   const group=se('g',{class:'pooled-point',role:'button',tabindex:0,'aria-label':text,'data-all-benchmarks-pass':allPass,'data-model':r.modelKey,'data-bytes':r.bytes,'data-score':r.displayY,'data-verdict':outcome(r),'data-point-id':r.id,'data-method':r.method,'data-model-label':modelStyles.get(r.modelKey).label});
-   group.append(se('title',{},text),modelMark(r,X(r.gb),Y(r.displayY),7),se('circle',{cx:X(r.gb),cy:Y(r.displayY),r:11,fill:'transparent'}));
-   if(allPass)UI.passMark(group,se,X(r.gb)-13,Y(r.displayY)-12);
+   const group=se('g',{class:'pooled-point',role:'button',tabindex:0,'aria-label':text,'data-all-benchmarks-pass':allPass,'data-x':X(r.gb),'data-y':Y(r.displayY),'data-model':r.modelKey,'data-bytes':r.bytes,'data-score':r.displayY,'data-verdict':outcome(r),'data-point-id':r.id,'data-method':r.method,'data-model-label':modelStyles.get(r.modelKey).label});
+   group.append(se('title',{},text),modelMark(r,X(r.gb),Y(r.displayY),5.5),se('circle',{cx:X(r.gb),cy:Y(r.displayY),r:8,fill:'transparent',class:'point-hit'}));
+   if(allPass)UI.passMark(group,se,X(r.gb),Y(r.displayY));
    UI.tooltip(group,r.label,modelName(r.model)+' · '+r.gb.toFixed(3)+' GB · '+UI.number(r.displayY)+' '+unit+passText);
    group.addEventListener('click',()=>selected(r));group.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();selected(r);}});svg.append(group);
-   if(byId('pooledLabels').checked)svg.append(se('text',{x:X(r.gb)+10,y:Y(r.displayY)-9,'font-size':10,'font-weight':600,fill:modelColor(r.modelKey),stroke:'white','stroke-width':3,'paint-order':'stroke','pointer-events':'none','data-model':r.modelKey,class:'pooled-model-label'},modelStyles.get(r.modelKey).label));
+   const labelX=X(r.gb)+9,labelY=Y(r.displayY)-7,modelLabel=modelStyles.get(r.modelKey).label;
+   const labelTouchesPoint=visible.some(q=>q!==r&&X(q.gb)+7>labelX&&X(q.gb)-7<labelX+modelLabel.length*6&&Y(q.displayY)+7>labelY-10&&Y(q.displayY)-7<labelY+2);
+   if(byId('pooledLabels').checked&&visibleModels.size>1&&!labelTouchesPoint&&!labelBoxes.some(b=>Math.abs(b.x-labelX)<Math.max(b.width,modelLabel.length*6)&&Math.abs(b.y-labelY)<13)){
+    labelBoxes.push({x:labelX,y:labelY,width:modelLabel.length*6});
+    svg.append(se('text',{x:labelX,y:labelY,'font-size':10,'font-weight':600,fill:modelColor(r.modelKey),stroke:'white','stroke-width':2,'paint-order':'stroke','pointer-events':'none','data-model':r.modelKey,class:'pooled-model-label'},modelLabel));
+   }
   }
   for(const key of [...new Set(ps.map(r=>r.method))]){const label=el('span');label.className='method-key';const icon=methodIcon(key);for(const mark of icon.children)recolor(mark,'#595959');label.append(icon,el('span',methodLabel(key)));byId('pooledLegend').append(label);}
   applyHighlight();
@@ -144,17 +155,18 @@ window.DendriScalePooled = function(DATA,{el,se,shapeMark,methodIcon,methodLabel
  for(const id of ['pooledBenchmark','pooledModel','pooledMinimum','pooledShowLow','pooledLog','pooledLabels'])byId(id).addEventListener('change',draw);
  byId('monochrome').addEventListener('change',draw);
  byId('pooledExport').addEventListener('click',()=>{
-  const state=selection(),{ps}=state,copy=byId('pooledPlot').cloneNode(true),keys=[...new Set(ps.map(r=>r.method))],visibleModels=[...new Set(ps.map(r=>r.modelKey))],height=693+(keys.length+visibleModels.length)*30;
+  const state=selection(),{ps}=state,copy=byId('pooledPlot').cloneNode(true),keys=[...new Set(ps.map(r=>r.method))],visibleModels=[...new Set(ps.map(r=>r.modelKey))],height=719+(keys.length+visibleModels.length)*30;
   copy.setAttribute('viewBox',`0 0 1100 ${height}`);copy.setAttribute('width',1100);copy.setAttribute('height',height);copy.setAttribute('xmlns','http://www.w3.org/2000/svg');copy.insertBefore(se('rect',{width:1100,height,fill:'white'}),copy.firstChild);
   copy.append(se('text',{x:100,y:563,'font-size':12},'All-model observations. Sample sizes and protocols vary; cohort details remain in the result table.'));
   copy.append(se('text',{x:100,y:583,'font-size':13},'Shape = compression method; color and label = original model.'));
   copy.append(se('text',{x:100,y:603,'font-size':12},'Showing '+ps.length+' of '+state.all.length+' recorded points. '+filterDescription(state)));
-  UI.passMark(copy,se,111,626);copy.append(se('text',{x:132,y:631,'font-size':12},UI.passLabel+' · all five recorded development gates, within cohort tolerances.'));
+  copy.append(recolor(shapeMark('hybrid',111,626),'#595959'));UI.passMark(copy,se,111,626);copy.append(se('text',{x:132,y:631,'font-size':12},'Check inside a symbol = '+UI.passLabel+' · recorded development suite.'));
   for(const [i,key] of keys.entries())copy.append(recolor(shapeMark(key,111,662+i*30),'#595959'),se('text',{x:132,y:666+i*30,'font-size':13},methodLabel(key)));
   for(const [i,key] of visibleModels.entries()){
    const style=modelStyles.get(key),y=672+(keys.length+i)*30;
    copy.append(se('rect',{x:101,y:y-13,width:12,height:12,fill:modelColor(key)}),se('text',{x:132,y,'font-size':13},style.label+' · '+style.name));
   }
+  if(zoom.active)copy.append(se('text',{x:100,y:height-36,'font-size':12},zoom.description));
   if(highlighted)copy.append(se('text',{x:100,y:height-12,'font-size':12},'Highlighted model: '+modelStyles.get(highlighted).name+'; other models dimmed.'));
   const url=URL.createObjectURL(new Blob([new XMLSerializer().serializeToString(copy)],{type:'image/svg+xml'})),a=el('a');a.href=url;a.download='all-models-'+byId('pooledBenchmark').value.replaceAll(' ','-')+'.svg';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
  });

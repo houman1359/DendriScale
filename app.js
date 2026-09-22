@@ -7,6 +7,7 @@ if (!response.ok) throw new Error('Snapshot could not be loaded');
 const DATA=await response.json(),byId=id=>document.getElementById(id);
 byId('updated').textContent=new Date(DATA.updated_at_utc).toLocaleString(undefined,{timeZoneName:'short'});
 const UI=window.DendriScaleUI;
+const plotZoom=UI.chartZoom(byId('plotFocus'),byId('plotFull'),byId('plotZoomNote'),draw);
 byId('latest').textContent=DATA.highlights.length+' complete benchmark batteries in this snapshot. All measured outcomes remain available, including failures. Development results; reserved final tests are separate.';
 const svgNS='http://www.w3.org/2000/svg';
 // Presentation is independent of archived measurements and method classifications.
@@ -21,7 +22,7 @@ const METHOD_STYLES={
 function methodKey(point){return point.method_style?.key||'unknown';}
 function methodStyle(key){return METHOD_STYLES[key]||METHOD_STYLES.unknown;}
 function methodLabel(key){return DATA.method_palette[key]?.label||'Method not classified';}
-function shapeMark(key,x,y,size=8){
+function shapeMark(key,x,y,size=5.5){
  const style=methodStyle(key),color=byId('monochrome').checked?'#151515':style.color;
  const group=se('g',{'data-method':key,'data-shape':style.shape});
  let tag,attrs;
@@ -32,11 +33,11 @@ function shapeMark(key,x,y,size=8){
  else if(style.shape==='cross'){
   const a=size*.36,b=size*1.2;tag='path';attrs={d:`M ${x-a} ${y-b} H ${x+a} V ${y-a} H ${x+b} V ${y+a} H ${x+a} V ${y+b} H ${x-a} V ${y+a} H ${x-b} V ${y-a} H ${x-a} Z`};
  }else{tag='polygon';attrs={points:Array.from({length:6},(_,i)=>`${x+size*Math.cos(i*Math.PI/3)},${y+size*Math.sin(i*Math.PI/3)}`).join(' ')};}
- group.append(se(tag,{...attrs,fill:style.shape==='hexagon'?'white':color,stroke:'white','stroke-width':5,'stroke-linejoin':'round'}));
- group.append(se(tag,{...attrs,fill:style.shape==='hexagon'?'white':color,stroke:'#151515','stroke-width':1.4,'stroke-linejoin':'round'}));
+ group.append(se(tag,{...attrs,fill:style.shape==='hexagon'?'white':color,stroke:'white','stroke-width':2.5,'stroke-linejoin':'round'}));
+ group.append(se(tag,{...attrs,fill:style.shape==='hexagon'?'white':color,stroke:'#151515','stroke-width':1,'stroke-linejoin':'round'}));
  return group;
 }
-function methodIcon(key){const icon=se('svg',{viewBox:'0 0 30 30',width:30,height:30,'aria-hidden':'true',focusable:'false',class:'method-icon'});icon.append(shapeMark(key,15,15,8));return icon;}
+function methodIcon(key){const icon=se('svg',{viewBox:'0 0 24 24',width:24,height:24,'aria-hidden':'true',focusable:'false',class:'method-icon'});icon.append(shapeMark(key,12,12,5.5));return icon;}
 function visibleMethodKeys(points){return Object.keys(METHOD_STYLES).filter(key=>points.some(v=>methodKey(v)===key));}
 try{byId('monochrome').checked=localStorage.getItem('dendriscale-monochrome')==='true';}catch(_){}
 
@@ -99,12 +100,13 @@ function nondominated(ps,p){const sx=p.xdirection==='min'?1:-1,sy=p.ydirection==
 for(const [k,label] of [['experiments','experiments'],['candidate_cohort_records','result records'],['normalized_observations','size–score points'],['multi_point_panels','comparison panels']]){const d=el('div');d.className='stat';d.append(el('b',num(DATA.summary[k])),el('span',label));byId('stats').append(d);}
 opts(byId('model'),[...new Set(DATA.panels.map(p=>p.model))].sort().map(x=>[x,UI.modelName(x)]));
 const preferred='allenai/OLMo-2-0325-32B-Instruct';if([...byId('model').options].some(x=>x.value===preferred))byId('model').value=preferred;
-function selectPanels(){let ps=DATA.panels.filter(p=>p.model===byId('model').value&&p.source_level===byId('level').value);
+function selectPanels(){plotZoom.reset();let ps=DATA.panels.filter(p=>p.model===byId('model').value&&p.source_level===byId('level').value);
  if(!ps.length){const fallback=DATA.panels.find(p=>p.model===byId('model').value);if(fallback){byId('level').value=fallback.source_level;ps=DATA.panels.filter(p=>p.model===fallback.model&&p.source_level===fallback.source_level);}}
  opts(byId('panel'),ps.map(p=>[p.id,UI.metricName(p.ylabel)+' · '+UI.axisName(p)+(p.source_level==='registry-reported'?' · '+p.cohort:'')]));selectDose();}
 function current(){return DATA.panels.find(p=>p.id===byId('panel').value);}
 function selectDose(){const p=current();if(!p)return;const chosen=byId('method').value;opts(byId('method'),[['all','All methods'],...visibleMethodKeys(p.points).map(key=>[key,methodStyle(key).shapeLabel+' · '+methodLabel(key)])]);if([...byId('method').options].some(o=>o.value===chosen))byId('method').value=chosen;const doses=[...new Set(p.points.map(x=>x.dose).filter(x=>x!==null))].sort((a,b)=>a-b);opts(byId('dose'),[['all','All recorded doses'],...doses.map(x=>[String(x),num(x)])]);byId('dose').disabled=!doses.length;draw();}
 function detail(v,p){
+ if(plotZoom.active&&!plotZoom.contains(v.x,v.y)){plotZoom.reset();draw();}
  const raw={candidate:v.label,experiment_id:v.experiment_id,cohort:v.cohort,method:methodLabel(methodKey(v)),marker_shape:methodStyle(methodKey(v)).shapeLabel,model:v.model,benchmark:p.ylabel,quality:v.y,size_axis:p.xlabel,size:v.x,size_unit:p.xunit,unique_positions:v.dose,presentations:v.presentations,resources:v.resources,whole_model_size:v.whole_model_size||(v.xaxis==="whole_registered_bytes"?{registered_bytes:v.x,basis:"Measured complete-model registered tensor bytes. Original-size normalization is not attached to this registry entry."}:v.xaxis==="whole_compression"?{compression_factor:v.x,basis:"Reported complete-model compression factor. Absolute-byte normalization is not attached to this registry entry."}:"Not measured for this local or unmatched artifact"),original_status:v.gate_status,conditions:v.conditions,limitations:v.limitations,uncertainty:v.uncertainty,full_gate_checks:v.full_gate_checks,source_hashes:v.source_hashes};
  const size=v.whole_model_size;
  const checks=v.full_gate_checks?Object.entries(v.full_gate_checks).map(([name,pass])=>name.toUpperCase()+': '+(pass?'pass':'fail')).join(' · '):null;
@@ -123,30 +125,33 @@ function draw(){const p=current(),svg=byId('plot');svg.replaceChildren();byId('p
  byId('panelNote').textContent=p.cohort+' · '+p.source_level+' · '+ps.length+' observations. '+(p.xdirection==='min'?'Smaller size is better. ':'Larger compression is better. ')+(p.ydirection==='min'?'Lower score is better.':'Higher score is better.')+' '+(p.size_note||'Whole-model percentage is shown only when this exact cohort has an original-teacher byte reference.')+((p.model.includes('7B')&&p.source_level==='curated')?' Historical marker/stopping protocol: do not interpret as a validated reasoning frontier.':'');
  byId('xhead').textContent=UI.axisName(p);byId('yhead').textContent=UI.metricName(p.ylabel);
  byId('methodLegend').replaceChildren();for(const key of visibleMethodKeys(ps)){const item=el('span');item.className='method-key';item.dataset.method=key;item.append(methodIcon(key),el('span',methodStyle(key).shapeLabel+' · '+methodLabel(key)));byId('methodLegend').append(item);}
- if(!ps.length){svg.append(se('text',{x:70,y:100},'No observations for this filter.'));return;}
+ if(!ps.length){plotZoom.view({xmin:0,xmax:1,ymin:0,ymax:1},[],p.id+':empty');svg.append(se('text',{x:70,y:100},'No observations for this filter.'));return;}
  const W=1100,H=540,L=95,R=30,T=30,B=85,xv=ps.map(v=>v.x),yv=ps.map(v=>v.y);
  let xmin=Math.min(...xv),xmax=Math.max(...xv),ymin=Math.min(...yv),ymax=Math.max(...yv);
  let dx=xmax-xmin,dy=ymax-ymin;if(!dx)dx=Math.max(Math.abs(xmax)*.03,1);if(!dy)dy=Math.max(Math.abs(ymax)*.03,.01);
  xmin=Math.max(0,xmin-dx*.08);xmax+=dx*.08;ymin-=dy*.12;ymax+=dy*.12;
+ ({xmin,xmax,ymin,ymax}=plotZoom.view({xmin,xmax,ymin,ymax},ps.map(v=>({x:v.x,y:v.y,reference:methodKey(v)==='teacher'})),p.id+'|'+ps.map(v=>v.id).join('|')));
+ const visible=ps.filter(v=>plotZoom.contains(v.x,v.y));
+ if(plotZoom.active)byId('plotCount').textContent=visible.length+' / '+ps.length+' in zoom';
  const X=v=>L+(v-xmin)/(xmax-xmin)*(W-L-R),Y=v=>H-B-(v-ymin)/(ymax-ymin)*(H-T-B);
  for(const x of UI.ticks(xmin,xmax))svg.append(se('line',{x1:X(x),y1:T,x2:X(x),y2:H-B,stroke:'#e1e7ee'}),se('text',{x:X(x),y:H-B+26,'text-anchor':'middle','font-size':12,fill:'#526577'},UI.tickCost(p,x)));
  for(const y of UI.ticks(ymin,ymax))svg.append(se('line',{x1:L,y1:Y(y),x2:W-R,y2:Y(y),stroke:'#e1e7ee'}),se('text',{x:L-12,y:Y(y)+4,'text-anchor':'end','font-size':12,fill:'#526577'},UI.tick(y)));
  svg.append(se('text',{x:(W+L-R)/2,y:H-20,'text-anchor':'middle','font-size':14},UI.axisName(p)),se('text',{x:20,y:(H+T-B)/2,transform:`rotate(-90 20 ${(H+T-B)/2})`,'text-anchor':'middle','font-size':14},UI.metricName(p.ylabel)));
- const sorted=[...fp].sort((a,b)=>a.x-b.x);if(sorted.length>1)svg.append(se('polyline',{points:sorted.map(v=>`${X(v.x)},${Y(v.y)}`).join(' '),fill:'none',stroke:'#39434e','stroke-width':1.5,'stroke-dasharray':'5 4'}));
- for(const v of ps){
+ const clip=se('clipPath',{id:'matchedDataClip'});clip.append(se('rect',{x:L,y:T,width:W-L-R,height:H-T-B}));svg.append(clip);
+ const sorted=[...fp].sort((a,b)=>a.x-b.x);if(sorted.length>1)svg.append(se('polyline',{points:sorted.map(v=>`${X(v.x)},${Y(v.y)}`).join(' '),fill:'none',stroke:'#74818c','stroke-width':1.1,'stroke-dasharray':'4 4','clip-path':'url(#matchedDataClip)'}));
+ for(const v of visible){
  const allPass=UI.allBenchmarksPass(v),passText=allPass?'; '+UI.passLabel+' (development suite)':'';
- const key=methodKey(v),point=se('g',{class:'plot-point',tabindex:0,role:'button','aria-label':v.label+'; '+methodLabel(key)+'; '+methodStyle(key).shapeLabel+'; '+cost(p,v.x)+'; '+num(v.y)+(ids.has(v.id)?'; observed Pareto point':'')+passText,'data-all-benchmarks-pass':allPass,'data-point-id':v.id,'data-method':key,'data-shape':methodStyle(key).shape});
+ const key=methodKey(v),point=se('g',{class:'plot-point',tabindex:0,role:'button','aria-label':v.label+'; '+methodLabel(key)+'; '+methodStyle(key).shapeLabel+'; '+cost(p,v.x)+'; '+num(v.y)+(ids.has(v.id)?'; observed Pareto point':'')+passText,'data-all-benchmarks-pass':allPass,'data-x':X(v.x),'data-y':Y(v.y),'data-point-id':v.id,'data-method':key,'data-shape':methodStyle(key).shape});
  point.append(se('title',{},v.label+'\n'+methodStyle(key).shapeLabel+' · '+methodLabel(key)+'\n'+cost(p,v.x)+' · '+num(v.y)+passText));
- if(ids.has(v.id))point.append(se('circle',{cx:X(v.x),cy:Y(v.y),r:14,fill:'none',stroke:'white','stroke-width':6}),se('circle',{cx:X(v.x),cy:Y(v.y),r:14,fill:'none',stroke:'#151515','stroke-width':2,class:'pareto-ring'}));
- point.append(shapeMark(key,X(v.x),Y(v.y)),se('circle',{cx:X(v.x),cy:Y(v.y),r:16,fill:'transparent',class:'point-hit'}));
- if(allPass)UI.passMark(point,se,X(v.x)-13,Y(v.y)-12);
+ point.append(shapeMark(key,X(v.x),Y(v.y)),se('circle',{cx:X(v.x),cy:Y(v.y),r:8,fill:'transparent',class:'point-hit'}));
+ if(allPass)UI.passMark(point,se,X(v.x),Y(v.y));
  UI.tooltip(point,v.label,cost(p,v.x)+' · '+num(v.y)+' · '+methodLabel(key)+passText);
  point.addEventListener('click',()=>detail(v,p));point.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();detail(v,p);}});svg.append(point);
  }
  for(const v of [...ps].sort((a,b)=>a.x-b.x)){
  const key=methodKey(v),tr=el('tr'),td=el('td'),b=el('button',UI.candidateName(v.label));b.addEventListener('click',()=>detail(v,p));td.append(b);if(UI.allBenchmarksPass(v))td.append(UI.passBadge());tr.dataset.pointId=v.id;tr.dataset.allBenchmarksPass=String(UI.allBenchmarksPass(v));tr.append(td);
  const method=el('td'),badge=el('span');badge.className='method-badge';badge.append(methodIcon(key),el('span',methodStyle(key).shapeLabel+' · '+methodLabel(key)));method.append(badge);tr.append(method);
- for(const text of [cost(p,v.x),num(v.y),v.whole_model_size?num(v.whole_model_size.retained_percent)+'%':'Not measured',v.whole_model_size?num(v.whole_model_size.saved_percent)+'%':'Not measured',num(v.dose),v.gate_status,ids.has(v.id)?'Yes · ring':'No'])tr.append(el('td',text));byId('points').append(tr);
+ for(const text of [cost(p,v.x),num(v.y),v.whole_model_size?num(v.whole_model_size.retained_percent)+'%':'Not measured',v.whole_model_size?num(v.whole_model_size.saved_percent)+'%':'Not measured',num(v.dose),v.gate_status,ids.has(v.id)?'Yes':'No'])tr.append(el('td',text));byId('points').append(tr);
  }
 }
 function coverage(){const q=byId('search').value.toLowerCase(),rows=DATA.coverage.filter(r=>JSON.stringify(r).toLowerCase().includes(q));byId('coverage').replaceChildren();byId('coverageCount').textContent=rows.length+' of '+DATA.coverage.length+' experiments. '+DATA.coverage.filter(r=>r.paired_observations===0).length+' records have no conservative within-record size–score join; explicit curated/local mappings are additional.';
@@ -167,17 +172,18 @@ function candidateRegister(){
   const status=el('td',r.gate_status+(r.failed_gates.length?' · Failed: '+r.failed_gates.join(', '):''));status.dataset.verdict=outcome(r);tr.append(status);byId('candidates').append(tr);
  }
 }
-byId('resetFilters').addEventListener('click',()=>{byId('dose').value='all';byId('method').value='all';byId('gate').value='all';byId('onlyfront').checked=false;byId('teacher').checked=true;draw();});
+byId('resetFilters').addEventListener('click',()=>{plotZoom.reset();byId('dose').value='all';byId('method').value='all';byId('gate').value='all';byId('onlyfront').checked=false;byId('teacher').checked=true;draw();});
 byId('model').addEventListener('change',selectPanels);byId('level').addEventListener('change',selectPanels);byId('panel').addEventListener('change',selectDose);for(const id of ['dose','teacher','onlyfront','method','monochrome','gate'])byId(id).addEventListener('change',draw);byId('search').addEventListener('input',coverage);
 byId('candidateSearch').addEventListener('input',candidateRegister);byId('candidateGate').addEventListener('change',candidateRegister);
 byId('monochrome').addEventListener('change',()=>{try{localStorage.setItem('dendriscale-monochrome',String(byId('monochrome').checked));}catch(_){}});
 byId('export').addEventListener('click',()=>{const copy=byId('plot').cloneNode(true);
- const keys=[...byId('methodLegend').children].map(item=>item.dataset.method),height=638+keys.length*32;
+ const keys=[...byId('methodLegend').children].map(item=>item.dataset.method),height=658+keys.length*32;
  copy.setAttribute('viewBox',`0 0 1100 ${height}`);copy.setAttribute('width','1100');copy.setAttribute('height',String(height));
  copy.insertBefore(se('rect',{x:0,y:0,width:1100,height,fill:'white'}),copy.firstChild);
- copy.append(se('text',{x:95,y:565,fill:'#151515','font-size':15,'font-family':'sans-serif'},'Method = shape + color. Outer ring / dashed line = observed Pareto front.'));
- UI.passMark(copy,se,108,590);copy.append(se('text',{x:132,y:595,fill:'#151515','font-size':13,'font-family':'sans-serif'},UI.passLabel+' · all five recorded development gates, within cohort tolerances.'));
+ copy.append(se('text',{x:95,y:565,fill:'#151515','font-size':15,'font-family':'sans-serif'},'Method = shape + color. Dashed line = observed Pareto front.'));
+ copy.append(shapeMark('hybrid',108,590));UI.passMark(copy,se,108,590);copy.append(se('text',{x:132,y:595,fill:'#151515','font-size':13,'font-family':'sans-serif'},'Check inside a symbol = '+UI.passLabel+' · recorded development suite.'));
  for(const [i,key] of keys.entries()){copy.append(shapeMark(key,108,620+i*32),se('text',{x:132,y:625+i*32,fill:'#151515','font-size':15,'font-family':'sans-serif'},methodStyle(key).shapeLabel+' · '+methodLabel(key)));}
+if(plotZoom.active)copy.append(se('text',{x:95,y:height-12,'font-size':12},plotZoom.description));
 copy.setAttribute('xmlns',svgNS);const blob=new Blob([new XMLSerializer().serializeToString(copy)],{type:'image/svg+xml'}),url=URL.createObjectURL(blob),a=el('a');a.href=url;a.download=(current()?.id||'pareto')+'.svg';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);});
 const params=new URLSearchParams(location.search);
 for(const id of ['model','level']) if(params.has(id)&&[...byId(id).options].some(o=>o.value===params.get(id))) byId(id).value=params.get(id);

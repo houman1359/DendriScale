@@ -78,10 +78,40 @@ window.DendriScaleUI = (() => {
     return element;
   }
   function passMark(target, se, x, y) {
-    const attrs = {d: `M ${x-5} ${y} l 3 3 l 7 -8`, fill: 'none',
+    const attrs = {d: `M ${x-2.7} ${y} l 1.8 1.8 l 3.6 -3.6`, fill: 'none',
       'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'pointer-events': 'none', 'aria-hidden': 'true'};
-    target.append(se('path', {...attrs, stroke: 'white', 'stroke-width': 6}),
-      se('path', {...attrs, stroke: '#151515', 'stroke-width': 2.8, class: 'all-pass-mark'}));
+    target.append(se('path', {...attrs, stroke: 'white', 'stroke-width': 1.5,
+      class: 'all-pass-mark', 'data-center-x': x, 'data-center-y': y}));
+  }
+  // Zoom the axes only: coordinates, verdicts and the complete table stay intact.
+  function chartZoom(focusButton, resetButton, note, redraw) {
+    let scope, window, crowded;
+    const contains = (x, y) => !window || (x >= window.xmin && x <= window.xmax && y >= window.ymin && y <= window.ymax);
+    const reset = () => { window = null; };
+    focusButton.addEventListener('click', () => { if (crowded) { window = crowded; redraw(); } });
+    resetButton.addEventListener('click', () => { reset(); redraw(); });
+    function view(full, points, key) {
+      if (scope !== key) { reset(); scope = key; }
+      const eligible = points.filter(p => !p.reference), dx = full.xmax-full.xmin, dy = full.ymax-full.ymin;
+      let cluster = [];
+      for (const p of eligible) {
+        const near = eligible.filter(q => Math.hypot((p.x-q.x)/dx*975, (p.y-q.y)/dy*425) <= 50);
+        if (near.length > cluster.length) cluster = near;
+      }
+      crowded = null;
+      if (cluster.length >= 3) {
+        const xs = cluster.map(p => p.x), ys = cluster.map(p => p.y);
+        const x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
+        const px = Math.max((x1-x0)*.18, dx*.003), py = Math.max((y1-y0)*.18, dy*.003);
+        crowded = {xmin: x0-px, xmax: x1+px, ymin: y0-py, ymax: y1+py};
+      }
+      focusButton.disabled = !crowded || !!window;
+      resetButton.hidden = !window;
+      note.hidden = !window;
+      note.textContent = window ? `Zoomed view · ${points.filter(p => contains(p.x,p.y)).length} of ${points.length} points. The result table still includes all filtered results.` : '';
+      return window || full;
+    }
+    return {view, contains, reset, get active() {return !!window;}, get description() {return note.textContent;}};
   }
   function result(container, {title, subtitle, state, status, allPass = false, stats = [], facts = [], raw}) {
     container.replaceChildren();
@@ -123,5 +153,5 @@ window.DendriScaleUI = (() => {
     target.addEventListener('keydown', event => {if (event.key === 'Escape') tip.hidden = true;});
   }
   return {modelName, candidateName, metricName, axisName, number, tick, tickCost, ticks, badge, result, empty, tooltip,
-    allBenchmarksPass, candidatePoint, passBadge, passMark, passLabel, passScope};
+    allBenchmarksPass, candidatePoint, passBadge, passMark, passLabel, passScope, chartZoom};
 })();
