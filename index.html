@@ -4,7 +4,7 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="description" content="Compare final model size and benchmark performance across dendritic networks, quantization, and hybrid compression.">
 <title>DendriScale · Model compression explorer</title>
-<link rel="stylesheet" href="styles.css?v=clarity-20260922"><link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="styles.css?v=accounting-20260922"><link rel="icon" href="favicon.svg" type="image/svg+xml">
 </head>
 <body>
 <a class="skip" href="#explorer">Skip to the main chart</a>
@@ -29,6 +29,7 @@
 <label>Training data · unique positions<select id="dose"></select></label><label>Development verdict<select id="gate"><option value="all">All outcomes</option><option value="failed">Failed or stopped</option><option value="passed">Passed</option><option value="other">Pending, local or unclassified</option></select></label><label class="check"><input id="teacher" type="checkbox" checked>Include teacher</label><label class="check"><input id="onlyfront" type="checkbox">Frontier points only</label>
 </div></details><button id="resetFilters" class="quiet-button" type="button">Reset filters</button><button id="export" class="export-button" type="button">Download SVG ↓</button></div>
 <div class="chart-heading"><div><h3 id="plotTitle">Loading benchmark…</h3><p id="plotSubtitle" class="small muted"></p></div><span id="plotCount" class="count-label"></span></div>
+<p id="axisExplanation" class="small muted"></p>
 <p id="protocolWarning" class="notice small" hidden>Historical 7B scores use a marker-sensitive reasoning protocol. Treat these as diagnostic results, not a validated reasoning frontier.</p>
 <div class="zoom-toolbar"><button id="plotFocus" type="button">Expand crowded points</button><button id="plotFull" type="button" hidden>Show full range</button><span id="plotZoomNote" class="small muted" aria-live="polite" hidden></span></div>
 <p class="mobile-hint small">Swipe horizontally to explore the full chart.</p>
@@ -68,5 +69,5 @@
 <section class="downloads" id="downloads" aria-labelledby="downloadsTitle"><div><h2 id="downloadsTitle">Take the data with you.</h2><p class="small muted">Aggregate measurements, original verdicts, and source hashes.</p></div><div class="download-links"><a href="data/candidates.csv">Model results · CSV ↓</a><a href="data/observations.csv">Size–score points · CSV ↓</a><a href="data/metrics.csv">All metrics · CSV ↓</a><a href="data/coverage.csv">Experiment ledger · CSV ↓</a><a href="data/snapshot.json">Full snapshot · JSON ↓</a></div></section>
 </main>
 <footer><span>DendriScale · An open compression experiment record</span><p>Development results, not reserved-final certification. Model weights, training corpora, and per-item traces are not distributed here. <a href="METHODS.md">Methods &amp; limitations</a></p></footer>
-<script src="presentation.js?v=clarity-20260922" defer></script><script src="pooled.js?v=clarity-20260922" defer></script><script src="app.js?v=clarity-20260922" defer></script>
+<script src="presentation.js?v=accounting-20260922" defer></script><script src="pooled.js?v=accounting-20260922" defer></script><script src="app.js?v=accounting-20260922" defer></script>
 </body></html>

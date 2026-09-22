@@ -12,6 +12,7 @@ window.DendriScalePooled = function(DATA,{el,se,shapeMark,methodIcon,methodLabel
   return {key:label,unit:unit==='factor'?'ratio':unit==='nats_per_token'?'nats/token':unit};
  }
  function explicitN(point,m){
+  const recorded=UI.countDenominator(point);if(recorded)return {n:recorded,basis:'Explicit benchmark/cohort sample size'};
   const label=point.ylabel.match(/\/\s*([\d,]+)$/);
   if(label)return {n:Number(label[1].replaceAll(',','')),basis:'Recorded benchmark label'};
   if(!m.family)return null;
@@ -83,13 +84,14 @@ window.DendriScalePooled = function(DATA,{el,se,shapeMark,methodIcon,methodLabel
 
  for(const [key,label] of [['all','All models'],...models]){const option=el('option',label);option.value=key;byId('pooledModel').append(option);}
  function selected(row){
+  const accounting=UI.sizeAccounting(DATA,row);
   const raw={candidate:row.label,model:row.model,benchmark:row.benchmark,
-   absolute_registered_bytes:row.bytes,absolute_registered_GB:row.gb,score:row.displayY,score_unit:row.displayUnit,
+   size_accounting:accounting,absolute_registered_bytes:row.bytes,absolute_registered_GB:row.gb,score:row.displayY,score_unit:row.displayUnit,
    original_score:row.y,original_score_unit:row.yunit,sample_size:row.denominator,cohort:row.cohort,
    original_status:row.gate_status,full_gate_checks:row.full_gate_checks,conditions:row.conditions,limitations:row.limitations,source_hashes:row.source_hashes};
   UI.result(byId('pooledDetail'),{title:row.label,subtitle:UI.modelName(row.model)+' · '+methodLabel(row.method),state:row.label==='Teacher reference'?'reference':outcome(row),status:row.gate_status,allPass:UI.allBenchmarksPass(row),
-   stats:[[row.benchmark,UI.number(row.displayY)+' '+row.displayUnit],['Whole-model size',UI.number(row.gb)+' GB'],['Sample size',row.denominator?UI.number(row.denominator.n):'See protocol']],
-   facts:[['Original verdict',row.gate_status],['Cohort',row.cohort],['Conditions',row.conditions],['Limitations',row.limitations]],raw});
+   stats:[[row.benchmark,UI.number(row.displayY)+' '+row.displayUnit],['Whole-model size',UI.number(row.gb)+' GB'],['Whole-model compression (bytes)',accounting.factor?accounting.factor.toFixed(3)+'×':'Reference not linked']],
+   facts:[['Sample size',row.denominator?UI.number(row.denominator.n):'See protocol'],['Original reference',accounting.originalBytes?UI.number(accounting.originalBytes/1e9)+' GB · '+accounting.referenceBasis:null],['Size accounting',accounting.basis],['Original verdict',row.gate_status],['Cohort',row.cohort],['Conditions',row.conditions],['Limitations',row.limitations]],raw});
   byId('pooledDetails').open=true;byId('pooledOpen').hidden=false;byId('pooledOpen').onclick=()=>openComparison(row);
  }
  function selection(){

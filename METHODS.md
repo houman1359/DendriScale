@@ -16,6 +16,19 @@ divided by the original teacher's bytes in that exact comparison cohort.
 100% means unchanged size; 25% means 4× compression. Precision reductions are
 included. This percentage is not the fraction of active weights retained.
 
+Compression ratios describe **bytes, including quantization**, not a proportional
+reduction in the number of parameters. For example, changing a stored weight from
+BF16 (16 bits) to INT4 (4 bits) reduces its value storage by 4× while retaining that
+weight. Scales, other tensors and untouched components affect the whole-model ratio.
+
+A historical record may provide complete-model bytes and a compression factor as
+separate measurements. The detail card links them only within the same candidate,
+model, evaluation cohort and provenance hashes. It never borrows a denominator
+from another model or cohort. When a denominator is genuinely absent, it says
+“Reference not linked”; that does not negate an independently measured byte size.
+The displayed original reference is labeled as implied when recovered by multiplying
+the same record's byte size and factor.
+
 **Active learned values** count selected connections after excluding unused
 masked weights, including selected values that happen to be zero. Removing a
 mask does not remove the need for executable connectivity. Local replacement
@@ -51,7 +64,9 @@ A point is non-dominated if no measured alternative in the exact panel is
 both smaller and at least as good, with one strict improvement. Exact ties
 remain. Each method has a distinct shape and high-contrast color, repeated in
 the legend and table. The monochrome option preserves all shape distinctions.
-Outer rings identify point-estimate Pareto membership, independently of method.
+The dashed line identifies the observed frontier. A white check inside a marker
+indicates that its recorded full development suite passed; it is independent of
+point-estimate Pareto membership.
 Filtering by dose, method, verdict or teacher inclusion recomputes the displayed front
 for that subset. SVG downloads include the method symbols and legend.
 

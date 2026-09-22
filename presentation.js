@@ -72,6 +72,42 @@ window.DendriScaleUI = (() => {
     return point && point.model === row.model && point.cohort === row.cohort
       && point.source_level === row.source_level ? point : null;
   }
+  function sizeAccounting(data, point) {
+    const normalized = point.whole_model_size;
+    const positive = value => Number.isFinite(value) && value > 0;
+    if (positive(normalized?.registered_bytes) && positive(normalized?.original_registered_bytes)) {
+      return {whole: true, bytes: normalized.registered_bytes, originalBytes: normalized.original_registered_bytes,
+        factor: normalized.original_registered_bytes/normalized.registered_bytes, basis: normalized.basis,
+        referenceBasis: 'Recorded original-model reference'};
+    }
+    if (!['whole_registered_bytes','whole_registered_percent','whole_compression'].includes(point.xaxis))
+      return {whole: false, bytes: null, factor: null, originalBytes: null, basis: 'Local resource measurement'};
+    const hashes = row => JSON.stringify([...(row.source_hashes || [])].sort());
+    const matches = (data.candidates || []).filter(row => row.model === point.model && row.cohort === point.cohort
+      && row.experiment_id === point.experiment_id && row.label === point.label && row.source_level === point.source_level
+      && point.source_hashes?.length && hashes(row) === hashes(point)
+      && row.measurements.some(m => m.benchmark === point.ylabel && m.value === point.y && m.unit === point.yunit));
+    const collect = (axis, unit) => {
+      const values = matches.flatMap(row => row.sizes.filter(s => s.axis === axis && s.unit === unit).map(s => s.value));
+      if (point.xaxis === axis && point.xunit === unit) values.push(point.x);
+      const unique = [...new Set(values.filter(positive))];
+      return {value: unique.length === 1 ? unique[0] : null, conflict: unique.length > 1};
+    };
+    const bytes = collect('whole_registered_bytes','bytes'), factor = collect('whole_compression','factor');
+    const conflict = bytes.conflict || factor.conflict;
+    return {whole: true, bytes: bytes.value, factor: conflict ? null : factor.value,
+      originalBytes: !conflict && bytes.value && factor.value ? bytes.value*factor.value : null,
+      referenceBasis: 'Implied by the same recorded byte size and compression ratio',
+      basis: conflict ? 'Conflicting size records; ratio withheld' : 'Recorded whole-model tensor bytes and ratio, linked within the same candidate, model, cohort and source hashes'};
+  }
+  function countDenominator(point, label = point.ylabel) {
+    if (!/^(GSM|MC) correct\b/i.test(label || '')) return null;
+    const count = String(label).match(/\/\s*([\d,]+)$/);
+    if (count) return Number(count[1].replaceAll(',',''));
+    const family = /^GSM/i.test(label) ? 'GSM(?:8K)?' : 'MC';
+    const explicit = String(point.cohort || '').match(new RegExp('\\b'+family+'\\s+(?:train\\s+)?(?:development|dev|test)\\s*([\\d,]+)\\b','i'));
+    return explicit ? Number(explicit[1].replaceAll(',','')) : null;
+  }
   function passBadge() {
     const element = node('span', '✓ ' + passLabel, 'all-pass-badge');
     element.title = passScope;
@@ -153,5 +189,5 @@ window.DendriScaleUI = (() => {
     target.addEventListener('keydown', event => {if (event.key === 'Escape') tip.hidden = true;});
   }
   return {modelName, candidateName, metricName, axisName, number, tick, tickCost, ticks, badge, result, empty, tooltip,
-    allBenchmarksPass, candidatePoint, passBadge, passMark, passLabel, passScope, chartZoom};
+    allBenchmarksPass, candidatePoint, sizeAccounting, countDenominator, passBadge, passMark, passLabel, passScope, chartZoom};
 })();
