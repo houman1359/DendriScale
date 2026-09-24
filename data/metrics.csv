@@ -4839,3 +4839,7 @@ exp_20260911_matched_whole_pool_recovery,allenai/OLMo-2-0325-32B-Instruct,28,ori
 exp_20260911_matched_whole_pool_recovery,allenai/OLMo-2-0325-32B-Instruct,29,original1536_replay4_row_presentations,6144,count,actual3072-update training,Matched presentations; breadth and math difficulty also change
 exp_20260911_matched_whole_pool_recovery,allenai/OLMo-2-0325-32B-Instruct,30,original1536_replay4_input_positions,3145728,count,actual3072-update training,Matched presentations; breadth and math difficulty also change
 exp_20260911_matched_whole_pool_recovery,allenai/OLMo-2-0325-32B-Instruct,31,original1536_replay4_target_positions,3139584,count,actual3072-update training,Matched presentations; breadth and math difficulty also change
+exp_20260924_same_span_deletion,allenai/OLMo-2-0325-32B-Instruct,0,registered_bytes,16251750656,bytes,development,whole_model
+exp_20260924_same_span_deletion,allenai/OLMo-2-0325-32B-Instruct,1,whole_model_compression,3.9668686464986336,ratio,development,whole_model
+exp_20260924_same_span_deletion,allenai/OLMo-2-0325-32B-Instruct,2,GSM_correct,897,items,development,whole_model
+exp_20260924_same_span_deletion,allenai/OLMo-2-0325-32B-Instruct,3,MC_correct,5231,items,development,whole_model
