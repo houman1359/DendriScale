@@ -25,7 +25,8 @@ window.DendriScalePooled = function(DATA,{el,se,shapeMark,methodIcon,methodLabel
   return null;
  }
  const candidates=[],seen=new Set();
- for(const panel of [...DATA.panels].sort((a,b)=>(a.xunit==='bytes'?0:1)-(b.xunit==='bytes'?0:1)))for(const point of panel.points){
+ // External reports have no DendriScale protocol counterpart, so they stay out of the pooled plot.
+ for(const panel of DATA.panels.filter(p=>p.source_level!=='external-reported').sort((a,b)=>(a.xunit==='bytes'?0:1)-(b.xunit==='bytes'?0:1)))for(const point of panel.points){
   const bytes=point.whole_model_size?.registered_bytes??(point.xaxis==='whole_registered_bytes'&&point.xunit==='bytes'?point.x:null);
   if(!Number.isFinite(bytes)||bytes<=0||!Number.isFinite(point.y))continue;
   const id=JSON.stringify([point.id.replace(/__whole_percent$/,''),point.model,point.cohort,point.ylabel,bytes,point.y]);

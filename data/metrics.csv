@@ -4902,3 +4902,11 @@ exp_20260924_surrounding_recovery_32b,allenai/OLMo-2-0325-32B-Instruct,5,quantiz
 exp_20260924_surrounding_recovery_32b,allenai/OLMo-2-0325-32B-Instruct,6,quantized_lora GSM correct,930,items,full frozen development,"Complete model, all adapters and norms included; exact H100 cold reload"
 exp_20260924_surrounding_recovery_32b,allenai/OLMo-2-0325-32B-Instruct,7,quantized_lora MC correct,5267,items,full frozen development,"Complete model, all adapters and norms included; exact H100 cold reload"
 exp_20260924_surrounding_recovery_32b,allenai/OLMo-2-0325-32B-Instruct,8,quantized_lora whole model bytes,17313984768,bytes,full frozen development,"Complete model, all adapters and norms included; exact H100 cold reload"
+exp_20260925_external_prism_bonsai2,Qwen/Qwen3.8-27B,0,Bonsai 2 27B reported language-model size,5.93,GB,"PrismML whitepaper, thinking xhigh",External report; not reproduced
+exp_20260925_external_prism_bonsai2,Qwen/Qwen3.8-27B,1,Qwen3.8-27B FP16 reported language-model size,53.8,GB,"PrismML whitepaper, thinking xhigh",External report; not reproduced
+exp_20260925_external_prism_bonsai2,Qwen/Qwen3.8-27B,2,Bonsai 2 27B reported 20-benchmark average,83.9,percent,"PrismML whitepaper, thinking xhigh",External report; not reproduced
+exp_20260925_external_prism_bonsai2,Qwen/Qwen3.8-27B,3,Qwen3.8-27B FP16 reported 20-benchmark average,85.4,percent,"PrismML whitepaper, thinking xhigh",External report; not reproduced
+exp_20260925_external_prism_bonsai2,Qwen/Qwen3.8-27B,4,Bonsai 2 27B reported SWE-bench Verified,60.8,percent,"PrismML whitepaper, thinking xhigh",External report; not reproduced
+exp_20260925_external_prism_bonsai2,Qwen/Qwen3.8-27B,5,Qwen3.8-27B FP16 reported SWE-bench Verified,80.6,percent,"PrismML whitepaper, thinking xhigh",External report; not reproduced
+exp_20260925_external_prism_bonsai2,Qwen/Qwen3.8-27B,6,Bonsai 2 27B reported Terminal-Bench 2.1,52.8,percent,"PrismML whitepaper, thinking xhigh",External report; not reproduced
+exp_20260925_external_prism_bonsai2,Qwen/Qwen3.8-27B,7,Qwen3.8-27B FP16 reported Terminal-Bench 2.1,69.7,percent,"PrismML whitepaper, thinking xhigh",External report; not reproduced

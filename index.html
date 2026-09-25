@@ -21,7 +21,7 @@
 <div class="section-heading"><div><p class="eyebrow">01 / EXPLORE A MODEL</p><h2 id="explorerTitle">Model size vs. performance</h2><p class="section-copy">Compare results with the same original model and evaluation conditions.</p></div><span id="outcomeScope" class="badge neutral">All outcomes included</span></div>
 <div class="controls primary-controls">
 <label>Original model<select id="model"></select></label>
-<label>Result type<select id="level"><option value="curated">Whole-model benchmarks</option><option value="local">Local fitting diagnostics</option><option value="registry-reported">Other recorded measurements</option></select></label>
+<label>Result type<select id="level"><option value="curated">Whole-model benchmarks</option><option value="local">Local fitting diagnostics</option><option value="registry-reported">Other recorded measurements</option><option value="external-reported">Externally reported results</option></select></label>
 <label class="benchmark-control">Benchmark · size measure<select id="panel"></select></label>
 </div>
 <div class="plot-toolbar"><label>Method<select id="method"></select></label><label class="check"><input id="monochrome" type="checkbox">Monochrome</label>
@@ -31,7 +31,7 @@
 </div></details><button id="resetFilters" class="quiet-button" type="button">Reset filters</button><button id="export" class="export-button" type="button">Download SVG ↓</button></div>
 <div class="chart-heading"><div><h3 id="plotTitle">Loading benchmark…</h3><p id="plotSubtitle" class="small muted"></p></div><span id="plotCount" class="count-label"></span></div>
 <p id="axisExplanation" class="small muted"></p>
-<p id="protocolWarning" class="notice small" hidden>Historical 7B scores use a marker-sensitive reasoning protocol. Treat these as diagnostic results, not a validated reasoning frontier.</p>
+<p id="externalWarning" class="notice small" hidden>Externally reported results: sizes and scores as published by PrismML for Qwen3.8-27B, using its own benchmarks, sampling and harness. DendriScale has not reproduced them, applies no development gates to them and does not compare them with its own measurements.</p><p id="protocolWarning" class="notice small" hidden>Historical 7B scores use a marker-sensitive reasoning protocol. Treat these as diagnostic results, not a validated reasoning frontier.</p>
 <div class="zoom-toolbar"><label class="check"><input id="plotShade" type="checkbox" checked>Threshold shading</label><label class="threshold-choice">Visual allowance<select id="plotTolerance" aria-describedby="plotThresholdNote"><option value="1">Recorded</option><option value="1.25">Explore +25%</option><option value="1.5">Explore +50%</option></select></label><button id="plotFocus" type="button">Expand crowded points</button><button id="plotFull" type="button" hidden>Show full range</button><span id="plotZoomNote" class="small muted" aria-live="polite" hidden></span></div>
 <p class="mobile-hint small">Swipe horizontally to explore the full chart.</p>
 <div class="plot-scroll"><svg id="plot" viewBox="0 0 1100 540" role="group" aria-label="Interactive compression–quality scatter plot"></svg></div>

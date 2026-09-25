@@ -29,6 +29,7 @@ window.DendriScaleUI = (() => {
     .replace(/^Copy(\d+)/, 'Copy $1')
     .replace(/^C4 NLL$/, 'C4 · language-model loss');
   const axisName = panel => {
+    if (panel.source_level === 'external-reported') return panel.xunit === 'percent' ? 'Reported size retained (%)' : 'Reported model size (GB)';
     if (panel.xunit === 'percent') return 'Whole-model size retained (%)';
     if ((panel.xaxis || panel.points?.[0]?.xaxis) === 'whole_registered_bytes') return 'Whole-model size (GB)';
     if (panel.xunit === 'bytes') return panel.xlabel.replace(/\s*\(bytes\)/gi, '').replace(/\s*bytes\s*$/i, '').trim() + ' (GB)';

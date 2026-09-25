@@ -80,6 +80,9 @@ public-data contract, and the newly reported failed-gate result.
 - Downloadable aggregate CSV/JSON and exportable SVG plots.
 - Distinct marker shapes, larger high-contrast symbols, a method filter and a
   remembered monochrome option; color is never the only method identifier.
+- Externally reported reference models in their own result type, currently
+  PrismML's Qwen3.8-27B and Ternary Bonsai 2 27B report. They are marked with a
+  star, labeled as not reproduced and never compared with DendriScale measurements.
 
 The snapshot is a dated export, not a live job monitor. The public data contain
 aggregate measurements and source hashes; they omit internal filesystem paths,

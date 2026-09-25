@@ -179,3 +179,38 @@ For example, +25% changes GSM's 5-point allowance to 6.25 points and copy-512's
 visual comparison. It never changes full-suite verdicts, check marks, or the
 pass-only subset. Recorded tolerances are the default. Lines and hatching remain
 distinct in monochrome and SVG downloads.
+
+## Externally reported references
+
+The **Externally reported results** type holds published numbers that
+DendriScale has not measured. It currently contains PrismML's reports for
+Qwen3.8-27B: the FP16 original, two conventional GGUF quantizations
+(UD-Q4_K_XL and IQ2_XXS) and Ternary Bonsai 2 27B, taken from the
+[Bonsai 2 27B whitepaper](https://github.com/PrismML-Eng/Bonsai-demo/blob/main/bonsai-2-27b-whitepaper.pdf)
+(Tables 10 and 11 and Section 4) and the
+[model card](https://huggingface.co/prism-ml/Ternary-Bonsai-2-27B-gguf).
+Each source is its own cohort:
+
+| Cohort | Models and reported sizes | Benchmarks |
+|---|---|---|
+| PrismML whitepaper · thinking xhigh | FP16 53.8 GB, IQ2_XXS 7.3 GB, Bonsai 5.93 GB | 20 benchmarks and their average; Terminal-Bench 2.1 and SWE-bench Verified for FP16 and Bonsai only |
+| PrismML whitepaper · thinking medium | FP16 53.8 GB, Bonsai 5.93 GB | 20 benchmarks and their average |
+| PrismML model card · thinking | FP16 54.66 GB, UD-Q4_K_XL 17.56 GB, IQ2_XXS 7.27 GB, Bonsai 5.95 GB | 14 benchmarks and their average |
+
+Sizes are PrismML's language-model bytes (whitepaper) or on-disk file sizes
+(model card) in decimal GB, not DendriScale byte ledgers. Scores come from
+PrismML's harness: EvalScope with vLLM on H100, thinking mode, temperature 1.0
+and single-sample pass@1. The two agentic benchmarks use Harbor with the
+Terminus-2 agent and the mini-swe-agent scaffold.
+
+The two documents disagree about IQ2_XXS. For example, AIME26 is 78.6 in the
+whitepaper and 57.50 on the model card, and LiveCodeBench is 70.05 and 56.40.
+Both versions are kept, each in its own cohort. The FP16 and Bonsai values agree
+wherever the benchmarks overlap.
+
+A star marks an externally reported compressed model; the original model keeps
+the cross. These points never receive the passing check. They are excluded
+from the matched comparison table and from the pooled all-model plot, because
+no DendriScale measurement shares their teacher, benchmarks or protocol. A
+reported score is not a DendriScale verdict. Reproducing these baselines in one
+harness is a separate, pending experiment.

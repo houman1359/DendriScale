@@ -109,6 +109,19 @@ class PublicContract(unittest.TestCase):
                 self.assertFalse(r['measurements']);self.assertIsNone(r['panel_id'])
         with (ROOT/'data/candidates.csv').open() as f:self.assertEqual(len(list(csv.DictReader(f))),len(rows))
 
+    def test_external_reports_are_isolated(self):
+        external=[p for p in DATA['panels'] if p['source_level']=='external-reported']
+        self.assertTrue(external)
+        models={p['model'] for p in external}
+        self.assertFalse(any(p['model'] in models for p in DATA['panels'] if p['source_level']!='external-reported'))
+        for panel in external:
+            self.assertIn('PrismML',panel['cohort'])
+            for p in panel['points']:
+                self.assertIn(p['method_style']['key'],('teacher','external'))
+                self.assertIn('not reproduced',p['evidence'])
+                self.assertNotIn('full_gate_checks',p)
+        self.assertIn('external',DATA['method_palette'])
+
     def test_only_aggregate_uncertainty_is_public(self):
         forbidden={'paired_item_differences','paired_delta_by_window','records'}
         def keys(value):
