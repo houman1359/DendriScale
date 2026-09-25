@@ -85,6 +85,9 @@ window.DendriScaleUI = (() => {
         factor: normalized.original_registered_bytes/normalized.registered_bytes, basis: normalized.basis,
         referenceBasis: 'Recorded original-model reference'};
     }
+    if (point.xaxis === 'weight_file_bytes' && positive(point.x))
+      return {whole: false, bytes: point.x, factor: null, originalBytes: null,
+        basis: 'Delivered weight files, including stored auxiliary tensors; not resident memory or complete executed-model bytes.'};
     if (!['whole_registered_bytes','whole_registered_percent','whole_compression'].includes(point.xaxis))
       return {whole: false, bytes: null, factor: null, originalBytes: null, basis: 'Local resource measurement'};
     const hashes = row => JSON.stringify([...(row.source_hashes || [])].sort());

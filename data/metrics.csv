@@ -4913,3 +4913,13 @@ exp_20260924_surrounding_recovery_32b,allenai/OLMo-2-0325-32B-Instruct,8,quantiz
 exp_20260924_surrounding_recovery_32b,allenai/OLMo-2-0325-32B-Instruct,9,quantized_lora GSM correct,930,items,full frozen development,"Complete model, adapters and norms counted; H100 cold reload"
 exp_20260924_surrounding_recovery_32b,allenai/OLMo-2-0325-32B-Instruct,10,quantized_lora MC correct,5267,items,full frozen development,"Complete model, adapters and norms counted; H100 cold reload"
 exp_20260924_surrounding_recovery_32b,allenai/OLMo-2-0325-32B-Instruct,11,quantized_lora whole model bytes,17313984768,bytes,full frozen development,"Complete model, adapters and norms counted; H100 cold reload"
+exp_20260925_local_coding_smoke_final_v2,Qwen/Qwen3.8-27B,0,qwen38_bf16 LCB smoke final answers / 12,5,items,fixed smoke12,Final answers only; no statistical admission
+exp_20260925_local_coding_smoke_final_v2,Qwen/Qwen3.8-27B,1,qwen38_bf16 LCB smoke token caps / 12,7,items,fixed smoke12,Final answers only; no statistical admission
+exp_20260925_local_coding_smoke_final_v2,Qwen/Qwen3.8-27B,2,bonsai2_ptq LCB smoke final answers / 12,5,items,fixed smoke12,Final answers only; no statistical admission
+exp_20260925_local_coding_smoke_final_v2,Qwen/Qwen3.8-27B,3,bonsai2_ptq LCB smoke token caps / 12,6,items,fixed smoke12,Final answers only; no statistical admission
+exp_20260925_local_coding_smoke_final_v2,Qwen/Qwen3.8-27B,4,bonsai2_pq LCB smoke final answers / 12,6,items,fixed smoke12,Final answers only; no statistical admission
+exp_20260925_local_coding_smoke_final_v2,Qwen/Qwen3.8-27B,5,bonsai2_pq LCB smoke token caps / 12,7,items,fixed smoke12,Final answers only; no statistical admission
+exp_20260925_local_coding_smoke_final_v2,Qwen/Qwen3.8-27B,6,qwen38_ud_q4 LCB smoke final answers / 12,6,items,fixed smoke12,Final answers only; no statistical admission
+exp_20260925_local_coding_smoke_final_v2,Qwen/Qwen3.8-27B,7,qwen38_ud_q4 LCB smoke token caps / 12,6,items,fixed smoke12,Final answers only; no statistical admission
+exp_20260925_local_coding_smoke_final_v2,Qwen/Qwen3.8-27B,8,qwen38_ud_iq2 LCB smoke final answers / 12,4,items,fixed smoke12,Final answers only; no statistical admission
+exp_20260925_local_coding_smoke_final_v2,Qwen/Qwen3.8-27B,9,qwen38_ud_iq2 LCB smoke token caps / 12,8,items,fixed smoke12,Final answers only; no statistical admission

@@ -112,8 +112,11 @@ class PublicContract(unittest.TestCase):
     def test_external_reports_are_isolated(self):
         external=[p for p in DATA['panels'] if p['source_level']=='external-reported']
         self.assertTrue(external)
-        models={p['model'] for p in external}
-        self.assertFalse(any(p['model'] in models for p in DATA['panels'] if p['source_level']!='external-reported'))
+        # The same model may now have both an external report and a local smoke.
+        # Cohorts and provenance must stay separate; model identity is not scope.
+        local=[p for p in DATA['panels'] if p['source_level']!='external-reported']
+        self.assertFalse({p['cohort'] for p in external}&{p['cohort'] for p in local})
+        self.assertFalse({x['id'] for p in external for x in p['points']}&{x['id'] for p in local for x in p['points']})
         for panel in external:
             self.assertIn('PrismML',panel['cohort'])
             for p in panel['points']:
@@ -121,6 +124,18 @@ class PublicContract(unittest.TestCase):
                 self.assertIn('not reproduced',p['evidence'])
                 self.assertNotIn('full_gate_checks',p)
         self.assertIn('external',DATA['method_palette'])
+
+    def test_coding_smoke_has_no_whole_model_admission(self):
+        points=[x for p in DATA['panels'] for x in p['points']
+                if x['id'].startswith('coding_smoke_final_v2_')]
+        self.assertEqual(len(points),10)
+        for point in points:
+            self.assertEqual(point['source_level'],'registry-reported')
+            self.assertEqual(point['xaxis'],'weight_file_bytes')
+            self.assertFalse(point.get('full_gate_checks'))
+            self.assertFalse(point.get('whole_model_size'))
+        teacher=next(p for p in points if p['id']=='coding_smoke_final_v2_qwen38_bf16__LCB smoke final answers / 12')
+        self.assertEqual(teacher['y'],5)
 
     def test_only_aggregate_uncertainty_is_public(self):
         forbidden={'paired_item_differences','paired_delta_by_window','records'}
