@@ -58,6 +58,7 @@ function comparisonKind(row){
  if(/delete|deletion/.test(label))return {key:'control',group:'non-dendritic',label:'Quantization + layer removal; no dendritic cells'};
  if(/sparse|prun/.test(label))return {key:'control',group:'non-dendritic',label:'Quantization + sparsity/pruning; no dendritic cells'};
  if(/quant|int[2348]|awq|gptq/i.test(label+' '+method))return {key:'control',group:'non-dendritic',label:'Quantization only; no dendritic cells'};
+ if(UI.candidatePoint(DATA,row)?.method_style?.key==='control')return {key:'control',group:'non-dendritic',label:row.method};
  return {key:'unknown',group:'unknown',label:method};
 }
 const comparisons=(DATA.candidates||[]).filter(r=>r.source_level==='curated').map(r=>{
