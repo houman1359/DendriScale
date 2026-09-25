@@ -2,7 +2,7 @@
 window.DendriScalePooled = function(DATA,{el,se,shapeMark,methodIcon,methodLabel,outcome,openComparison,onlyPass}) {
  const byId=id=>document.getElementById(id),UI=window.DendriScaleUI,TH=window.DendriScaleThresholds;
  const zoom=UI.chartZoom(byId('pooledFocus'),byId('pooledFull'),byId('pooledZoomNote'),draw);
- const modelName=m=>m.replace(/^allenai\//,'').replace(/^OLMo-/,'OLMo-');
+ const modelName=UI.modelName;
  function metric(point){
   const label=point.ylabel,unit=point.yunit;
   if(/^GSM (correct|accuracy)/i.test(label))return {key:'GSM8K accuracy',family:'GSM',accuracy:true};
@@ -32,7 +32,7 @@ window.DendriScalePooled = function(DATA,{el,se,shapeMark,methodIcon,methodLabel
   if(seen.has(id))continue;seen.add(id);
   const m=metric(point);
   candidates.push({...point,bytes,gb:bytes/1e9,metric:m,n:explicitN(point,m),panel_id:panel.id,point_id:point.id,
-   method:point.method_style?.key||'unknown',modelKey:point.model.replace(/^allenai\//i,'').toLowerCase()});
+   method:point.method_style?.key||'unknown',modelKey:UI.canonicalModelId(point.model)});
  }
  // Propagate only unambiguous explicitly recorded counts within an experiment
  // and benchmark family. Conflicting sample sizes remain separate observations.
@@ -59,7 +59,7 @@ window.DendriScalePooled = function(DATA,{el,se,shapeMark,methodIcon,methodLabel
  const colors=['#0072B2','#B64A00','#006B57','#6842A0','#9E315E','#595959'];
  const modelStyles=new Map(models.map(([key,name],index)=>{
   const size=modelSize(name),sameSize=models.filter(([,other])=>modelSize(other)===size).length;
-  const label=Number.isFinite(size)?size+'B'+(sameSize>1?'·'+String.fromCharCode(65+index):''):String.fromCharCode(65+index);
+  const label=Number.isFinite(size)?size+'B'+(sameSize>1?'·OLMo '+(name.match(/^OLMo-(\d+)-/)?.[1]||String.fromCharCode(65+index)):''):String.fromCharCode(65+index);
   return [key,{name,label,color:colors[index%colors.length]}];
  }));
  let highlighted=null;

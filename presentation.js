@@ -7,7 +7,11 @@ window.DendriScaleUI = (() => {
     if (className) element.className = className;
     return element;
   };
-  const modelName = name => String(name).replace(/^allenai\//, '');
+  // Known spelling aliases only: this never merges model generations or cohorts.
+  const canonicalModelId = name => /^(?:allenai\/)?olmo-3-7b-instruct$/i.test(String(name))
+    ? 'allenai/OLMo-3-7B-Instruct' : String(name);
+  const modelName = name => canonicalModelId(name).replace(/^allenai\//, '');
+  const historicalProtocol = record => canonicalModelId(record?.model) === 'allenai/OLMo-3-7B-Instruct';
   const candidateName = label => String(label)
     .replace(/_/g, ' ')
     .replace(/\bspan4 exit4k\b/gi, '4-FFN span · 4,096-update recovery')
@@ -188,6 +192,6 @@ window.DendriScaleUI = (() => {
     for (const event of ['pointerleave', 'blur', 'click']) target.addEventListener(event, () => {tip.hidden = true;});
     target.addEventListener('keydown', event => {if (event.key === 'Escape') tip.hidden = true;});
   }
-  return {modelName, candidateName, metricName, axisName, number, tick, tickCost, ticks, badge, result, empty, tooltip,
+  return {canonicalModelId, historicalProtocol, modelName, candidateName, metricName, axisName, number, tick, tickCost, ticks, badge, result, empty, tooltip,
     allBenchmarksPass, candidatePoint, sizeAccounting, countDenominator, passBadge, passMark, passLabel, passScope, chartZoom};
 })();

@@ -53,7 +53,7 @@ function matchesOutcome(row,choice){return choice==='all'||outcome(row)===choice
 function comparisonKind(row){
  const label=row.label.toLowerCase(),method=row.method.toLowerCase();
  if(label==='teacher reference')return {key:'teacher',group:'teacher',label:'Original teacher'};
- if(method.includes('dendritic'))return {key:method.includes('quant')?'hybrid':'dendritic',group:'dendritic',label:label.includes('q16')?'Dendritic attention + quantization':method};
+ if(['dendritic','hybrid'].includes(UI.candidatePoint(DATA,row)?.method_style?.key))return {key:method.includes('quant')?'hybrid':'dendritic',group:'dendritic',label:label.includes('q16')?'Dendritic attention + quantization':method};
  if(method.includes('dense'))return {key:'dense',group:'non-dendritic',label:method};
  if(/delete|deletion/.test(label))return {key:'control',group:'non-dendritic',label:'Quantization + layer removal; no dendritic cells'};
  if(/sparse|prun/.test(label))return {key:'control',group:'non-dendritic',label:'Quantization + sparsity/pruning; no dendritic cells'};
@@ -66,11 +66,11 @@ const comparisons=(DATA.candidates||[]).filter(r=>r.source_level==='curated').ma
  return {...r,kind:comparisonKind(r),allPass:UI.allBenchmarksPass(p),size,factor:size?size.original_registered_bytes/size.registered_bytes:null};
 }).filter(r=>r.size&&r.measurements.some(m=>/^GSM/.test(m.benchmark)));
 const comparisonCohorts=[...new Map(comparisons.map(r=>[r.model+' | '+r.cohort,{model:r.model,cohort:r.cohort}])).entries()];
-opts(byId('comparisonCohort'),comparisonCohorts.map(([key,value])=>[key,UI.modelName(value.model)+' · '+(value.cohort.includes('Historical')?'Historical diagnostic':value.cohort.includes('H200')?'BF16 / H200 · full development':'BF16 / H100 · full development')]));
+opts(byId('comparisonCohort'),comparisonCohorts.map(([key,value])=>[key,UI.modelName(value.model)+' · '+(UI.historicalProtocol(value)?'Historical diagnostic':value.cohort.includes('H200')?'BF16 / H200 · full development':'BF16 / H100 · full development')]));
 const primaryComparison=comparisonCohorts.find(([,v])=>v.model==='allenai/OLMo-2-0325-32B-Instruct');
 if(primaryComparison)byId('comparisonCohort').value=primaryComparison[0];
 function openComparison(row){
- byId('model').value=row.model;byId('level').value=row.source_level;byId('gate').value='all';byId('onlyfront').checked=false;
+ byId('model').value=UI.canonicalModelId(row.model);byId('level').value=row.source_level;byId('gate').value='all';byId('onlyfront').checked=false;
  selectPanels();byId('panel').value=row.panel_id;selectDose();byId('method').value='all';draw();
  const panel=current(),point=panel.points.find(p=>p.id===row.point_id);if(point)detail(point,panel);
  byId('detail').scrollIntoView({block:'center'});
@@ -78,7 +78,7 @@ function openComparison(row){
 function comparisonTable(){
  const cohort=byId('comparisonCohort').value;
  const all=comparisons.filter(r=>r.model+' | '+r.cohort===cohort);
- const invalid=all.some(r=>r.model.includes('7B'));
+ const invalid=all.some(UI.historicalProtocol);
  byId('comparisonNote').textContent=(all[0]?.cohort||'No matched measurements')+(invalid?' Historical 7B marker/stopping protocol is not a validated reasoning frontier; no passing-frontier cards are assigned.':' Development only; one seed/calibration where recorded. Largest compression is not a SOTA or speed claim.');
  byId('comparisonBest').replaceChildren();
  for(const [group,label] of [['dendritic','Most compressed passing · dendritic'],['non-dendritic','Most compressed passing · non-dendritic']]){
@@ -100,10 +100,10 @@ function comparisonTable(){
 }
 function nondominated(ps,p){const sx=p.xdirection==='min'?1:-1,sy=p.ydirection==='min'?1:-1;return ps.filter(a=>!ps.some(b=>sx*b.x<=sx*a.x&&sy*b.y<=sy*a.y&&(sx*b.x<sx*a.x||sy*b.y<sy*a.y)));}
 for(const [k,label] of [['experiments','experiments'],['candidate_cohort_records','result records'],['normalized_observations','size–score points'],['multi_point_panels','comparison panels']]){const d=el('div');d.className='stat';d.append(el('b',num(DATA.summary[k])),el('span',label));byId('stats').append(d);}
-opts(byId('model'),[...new Set(DATA.panels.map(p=>p.model))].sort().map(x=>[x,UI.modelName(x)]));
+opts(byId('model'),[...new Set(DATA.panels.map(p=>UI.canonicalModelId(p.model)))].sort().map(x=>[x,UI.modelName(x)]));
 const preferred='allenai/OLMo-2-0325-32B-Instruct';if([...byId('model').options].some(x=>x.value===preferred))byId('model').value=preferred;
-function selectPanels(){plotZoom.reset();let ps=DATA.panels.filter(p=>p.model===byId('model').value&&p.source_level===byId('level').value);
- if(!ps.length){const fallback=DATA.panels.find(p=>p.model===byId('model').value);if(fallback){byId('level').value=fallback.source_level;ps=DATA.panels.filter(p=>p.model===fallback.model&&p.source_level===fallback.source_level);}}
+function selectPanels(){plotZoom.reset();let ps=DATA.panels.filter(p=>UI.canonicalModelId(p.model)===byId('model').value&&p.source_level===byId('level').value);
+ if(!ps.length){const fallback=DATA.panels.find(p=>UI.canonicalModelId(p.model)===byId('model').value);if(fallback){byId('level').value=fallback.source_level;ps=DATA.panels.filter(p=>UI.canonicalModelId(p.model)===UI.canonicalModelId(fallback.model)&&p.source_level===fallback.source_level);}}
  opts(byId('panel'),ps.map(p=>[p.id,UI.metricName(p.ylabel)+' · '+UI.axisName(p)+(p.source_level==='registry-reported'?' · '+p.cohort:'')]));selectDose();}
 function current(){return DATA.panels.find(p=>p.id===byId('panel').value);}
 function selectDose(){const p=current();if(!p)return;const chosen=byId('method').value;opts(byId('method'),[['all','All methods'],...visibleMethodKeys(p.points).map(key=>[key,methodStyle(key).shapeLabel+' · '+methodLabel(key)])]);if([...byId('method').options].some(o=>o.value===chosen))byId('method').value=chosen;const doses=[...new Set(p.points.map(x=>x.dose).filter(x=>x!==null))].sort((a,b)=>a-b);opts(byId('dose'),[['all','All recorded doses'],...doses.map(x=>[String(x),num(x)])]);byId('dose').disabled=!doses.length;draw();}
@@ -125,9 +125,9 @@ function draw(){const p=current(),svg=byId('plot');svg.replaceChildren();byId('p
  byId('plotThresholdNote').textContent=TH.description(band,showBand);byId('plotTolerance').disabled=!band.available;
  byId('outcomeScope').textContent=onlyPass()?'Recorded full-suite passes only':'All outcomes included';
  const fp=nondominated(ps,p),ids=new Set(fp.map(v=>v.id));if(byId('onlyfront').checked)ps=fp;
- byId('protocolWarning').hidden=!(p.model.includes('7B')&&p.source_level==='curated');
+ byId('protocolWarning').hidden=!(UI.historicalProtocol(p)&&p.source_level==='curated');
  byId('plotTitle').textContent=UI.metricName(p.ylabel);byId('plotSubtitle').textContent=(p.xdirection==='min'?'← Smaller model':'Larger compression →')+' · '+(p.ydirection==='min'?'Lower score is better':'Higher score is better');byId('plotCount').textContent=ps.length+' / '+p.points.length+' results';byId('pointCount').textContent=ps.length+' shown';
- byId('panelNote').textContent=p.cohort+' · '+p.source_level+' · '+ps.length+' observations. '+(p.xdirection==='min'?'Smaller size is better. ':'Larger compression is better. ')+(p.ydirection==='min'?'Lower score is better.':'Higher score is better.')+' '+(p.size_note||'Whole-model percentage is shown only when this exact cohort has an original-teacher byte reference.')+((p.model.includes('7B')&&p.source_level==='curated')?' Historical marker/stopping protocol: do not interpret as a validated reasoning frontier.':'');
+ byId('panelNote').textContent=p.cohort+' · '+p.source_level+' · '+ps.length+' observations. '+(p.xdirection==='min'?'Smaller size is better. ':'Larger compression is better. ')+(p.ydirection==='min'?'Lower score is better.':'Higher score is better.')+' '+(p.size_note||'Whole-model percentage is shown only when this exact cohort has an original-teacher byte reference.')+((UI.historicalProtocol(p)&&p.source_level==='curated')?' Historical marker/stopping protocol: do not interpret as a validated reasoning frontier.':'');
  byId('axisExplanation').textContent=p.xunit==='percent'?'X = whole-model bytes retained. 25% retained means 4× smaller. Quantization and connectivity costs are included.':p.points?.[0]?.xaxis==='whole_registered_bytes'?'X = complete-model registered size, including stored weights, connectivity, scales and buffers. GPU working memory is measured separately.':p.points?.[0]?.xaxis==='whole_compression'?'X = original reference model bytes ÷ compressed model bytes. This is byte compression, including quantization.':'X = the recorded local resource below. Whole-model byte compression is reported separately when available.';
  byId('xhead').textContent=UI.axisName(p);byId('yhead').textContent=UI.metricName(p.ylabel);
  byId('methodLegend').replaceChildren();for(const key of visibleMethodKeys(ps)){const item=el('span');item.className='method-key';item.dataset.method=key;item.append(methodIcon(key),el('span',methodStyle(key).shapeLabel+' · '+methodLabel(key)));byId('methodLegend').append(item);}
@@ -170,7 +170,7 @@ function candidateRegister(){
  byId('candidates').replaceChildren();byId('candidateCount').textContent=rows.length+' of '+all.length+' candidate/cohort records; '+all.filter(r=>outcome(r)==='failed').length+' explicitly failed or stopped. '+(onlyPass()?'Showing recorded five-gate passes only; the complete archive is unchanged.':'No pass requirement for inclusion.');
  for(const r of rows){const tr=el('tr'),name=el('td'),button=el('button',UI.candidateName(r.label));button.title=r.label;
   button.addEventListener('click',()=>{if(!r.panel_id){UI.result(byId('detail'),{title:r.label,subtitle:UI.modelName(r.model),state:outcome(r),status:r.gate_status,facts:[['Status',r.gate_status],['Capability','Not yet measured']],raw:r});byId('detail').scrollIntoView({block:'center'});return;}
-   byId('model').value=r.model;byId('level').value=r.source_level;byId('gate').value='all';byId('onlyfront').checked=false;selectPanels();byId('panel').value=r.panel_id;selectDose();byId('method').value='all';draw();const p=current(),point=p.points.find(v=>v.id===r.point_id);if(point)detail(point,p);byId('explorer').scrollIntoView({block:'start'});});
+   byId('model').value=UI.canonicalModelId(r.model);byId('level').value=r.source_level;byId('gate').value='all';byId('onlyfront').checked=false;selectPanels();byId('panel').value=r.panel_id;selectDose();byId('method').value='all';draw();const p=current(),point=p.points.find(v=>v.id===r.point_id);if(point)detail(point,p);byId('explorer').scrollIntoView({block:'start'});});
   name.append(button);const allPass=UI.allBenchmarksPass(UI.candidatePoint(DATA,r));if(allPass)name.append(UI.passBadge());tr.dataset.candidateId=r.id;tr.dataset.allBenchmarksPass=String(allPass);tr.append(name,el('td',UI.modelName(r.model)+' · '+r.source_level));
   tr.append(el('td',r.sizes.map(s=>s.label+': '+cost({xunit:s.unit},s.value)).join(' · ')));
   const measured=el('td');
@@ -210,7 +210,7 @@ copy.append(se('text',{x:95,y:height-42,'font-size':11},byId('plotShade').checke
 if(plotZoom.active)copy.append(se('text',{x:95,y:height-12,'font-size':12},plotZoom.description));
 copy.setAttribute('xmlns',svgNS);const blob=new Blob([new XMLSerializer().serializeToString(copy)],{type:'image/svg+xml'}),url=URL.createObjectURL(blob),a=el('a');a.href=url;a.download=(current()?.id||'pareto')+'.svg';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);});
 const params=new URLSearchParams(location.search);
-for(const id of ['model','level']) if(params.has(id)&&[...byId(id).options].some(o=>o.value===params.get(id))) byId(id).value=params.get(id);
+for(const id of ['model','level']) {const value=id==='model'?UI.canonicalModelId(params.get(id)):params.get(id);if(params.has(id)&&[...byId(id).options].some(o=>o.value===value))byId(id).value=value;}
 selectPanels();
 if(params.has('panel')&&[...byId('panel').options].some(o=>o.value===params.get('panel'))){byId('panel').value=params.get('panel');selectDose();}
 coverage();candidateRegister();comparisonTable();
