@@ -5007,3 +5007,12 @@ exp_20260926_noon_olmo7b,allenai/OLMo-2-1124-7B-Instruct,5,span1_ei GSM,635,item
 exp_20260926_noon_olmo7b,allenai/OLMo-2-1124-7B-Instruct,6,span2_ei GSM,688,items,frozen development,Measured GSM; projected size
 exp_20260926_noon_olmo7b,allenai/OLMo-2-1124-7B-Instruct,7,dense_lr3e-5 GSM,667,items,frozen development,Measured GSM; projected size
 exp_20260926_noon_olmo7b,allenai/OLMo-2-1124-7B-Instruct,8,native_16M GSM,719,items,frozen development,Measured GSM; projected size
+exp_20260926_afternoon_control_connectivity,Multiple separate model cohorts,0,OLMo7B matched-LR dense GSM at64M,703,items,frozen development,Measured GSM; projected byte cost
+exp_20260926_afternoon_control_connectivity,Multiple separate model cohorts,1,native_dts2048_lr3e-5 C4 teacher KL,0.2732751174289369,nats/token,held windows,Measured diagnostic; projected byte cost
+exp_20260926_afternoon_control_connectivity,Multiple separate model cohorts,2,native_dts2048_lr3e-5 Copy2048 teacher KL,0.01327104063352548,nats/token,held windows,Measured diagnostic; projected byte cost
+exp_20260926_afternoon_control_connectivity,Multiple separate model cohorts,3,native_rewire2048_lr3e-5 C4 teacher KL,0.2830976912256486,nats/token,held windows,Measured diagnostic; projected byte cost
+exp_20260926_afternoon_control_connectivity,Multiple separate model cohorts,4,native_rewire2048_lr3e-5 Copy2048 teacher KL,0.013782959645042137,nats/token,held windows,Measured diagnostic; projected byte cost
+exp_20260926_afternoon_control_connectivity,Multiple separate model cohorts,5,native_dts1024_lr3e-5 C4 teacher KL,0.2724017749296159,nats/token,held windows,Measured diagnostic; projected byte cost
+exp_20260926_afternoon_control_connectivity,Multiple separate model cohorts,6,native_dts1024_lr3e-5 Copy2048 teacher KL,0.014014461937613357,nats/token,held windows,Measured diagnostic; projected byte cost
+exp_20260926_afternoon_control_connectivity,Multiple separate model cohorts,7,native_fixed1024_lr3e-5 C4 teacher KL,0.2838134606415706,nats/token,held windows,Measured diagnostic; projected byte cost
+exp_20260926_afternoon_control_connectivity,Multiple separate model cohorts,8,native_fixed1024_lr3e-5 Copy2048 teacher KL,0.013967970475478559,nats/token,held windows,Measured diagnostic; projected byte cost
