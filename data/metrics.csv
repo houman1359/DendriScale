@@ -4951,3 +4951,12 @@ exp_20260925_broad_surrounding_partial,allenai/OLMo-2-0325-32B-Instruct,12,ffn32
 exp_20260925_broad_surrounding_partial,allenai/OLMo-2-0325-32B-Instruct,13,ffn32_baseline C4 NLL,3.1600761461384934,nats/token,frozen development,Complete component; MC pending
 exp_20260925_broad_surrounding_partial,allenai/OLMo-2-0325-32B-Instruct,14,ffn32_baseline Copy512 perplexity ratio,185133.19715828903,ratio,frozen development,Complete component; MC pending
 exp_20260925_broad_surrounding_partial,allenai/OLMo-2-0325-32B-Instruct,15,ffn32_baseline Copy2048 perplexity ratio,3092842.882708013,ratio,frozen development,Complete component; MC pending
+exp_20260926_broad_baseline_complete,allenai/OLMo-2-0325-32B-Instruct,0,MC correct,4639,items,frozen development,Complete six-task battery
+exp_20260926_qwen8b_parallel_readback,Qwen/Qwen3-8B,0,parent_rec_lr3e-5 C4 teacher KL,0.045454662207551955,nats/token,development,Quality measured; bytes projected
+exp_20260926_qwen8b_parallel_readback,Qwen/Qwen3-8B,1,parent_rec_lr3e-5 GSM correct / 1024,935,items,development,Quality measured; bytes projected
+exp_20260926_qwen8b_parallel_readback,Qwen/Qwen3-8B,2,dense_lr3e-5 C4 teacher KL,0.29524583306314567,nats/token,development,Quality measured; bytes projected
+exp_20260926_qwen8b_parallel_readback,Qwen/Qwen3-8B,3,dense_lr3e-5 GSM correct / 1024,744,items,development,Quality measured; bytes projected
+exp_20260926_qwen8b_parallel_readback,Qwen/Qwen3-8B,4,dense_lr1e-4 C4 teacher KL,0.314392859641402,nats/token,development,Quality measured; bytes projected
+exp_20260926_qwen8b_parallel_readback,Qwen/Qwen3-8B,5,dense_lr1e-4 GSM correct / 1024,664,items,development,Quality measured; bytes projected
+exp_20260926_qwen8b_parallel_readback,Qwen/Qwen3-8B,6,native_lr3e-5 C4 teacher KL,0.27775127184566706,nats/token,development,Quality measured; bytes projected
+exp_20260926_qwen8b_parallel_readback,Qwen/Qwen3-8B,7,native_lr1e-4 C4 teacher KL,0.2928322680356352,nats/token,development,Quality measured; bytes projected
