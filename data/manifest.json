@@ -1,11 +1,11 @@
 {
   "schema": "dendriscale/public-manifest-v1",
-  "updated_at_utc": "2026-09-25T18:25:33.897258+00:00",
+  "updated_at_utc": "2026-09-26T02:19:37.143111+00:00",
   "sha256": {
-    "candidates.csv": "50eef3ee87f41f36a75573508b172d8ecdb2758cb62772116cf44cc6b4801ae5",
-    "coverage.csv": "3eef426517317b138bce03e8667b4d8674e996118795422b8e3154f78ebfeda7",
-    "metrics.csv": "5a1991275cf3e3fb3f8333938b3f53fda072ea22fd0af2bb8639769c3b144861",
-    "observations.csv": "024fc16f38cc7dcd5c72c8d32c20b2f8c6dce07817cc7c63694e5415fde6fa0c",
-    "snapshot.json": "6443ce015295d40ebbf04d867a41edc3e6cd400e55eeee624115bfb2880bbc3c"
+    "candidates.csv": "a187a4118cebe92f9cc7dcdaa7e24d2289058d324d1f81d995b7337ea7adf5fd",
+    "coverage.csv": "0de4d8d5f8f2163c2b4d22714cedf1c0e0f8e3edeef08f6d997bbfb60b52af25",
+    "metrics.csv": "aad73c1385d73744a25886abfc8a886eee73d8c5974ad698813fbd62c2342561",
+    "observations.csv": "6b2583e9c08e8b3776a89c73dacd833d84b58c0bce3c5f225673a9e1b41721ff",
+    "snapshot.json": "614cb9d4f58bf4f329acf48feb4ed22cf1fa0e3dae4ef9082ad34577fcf161c1"
   }
 }

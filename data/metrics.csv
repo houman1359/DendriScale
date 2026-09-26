@@ -4923,3 +4923,31 @@ exp_20260925_local_coding_smoke_final_v2,Qwen/Qwen3.8-27B,6,qwen38_ud_q4 LCB smo
 exp_20260925_local_coding_smoke_final_v2,Qwen/Qwen3.8-27B,7,qwen38_ud_q4 LCB smoke token caps / 12,6,items,fixed smoke12,Final answers only; no statistical admission
 exp_20260925_local_coding_smoke_final_v2,Qwen/Qwen3.8-27B,8,qwen38_ud_iq2 LCB smoke final answers / 12,4,items,fixed smoke12,Final answers only; no statistical admission
 exp_20260925_local_coding_smoke_final_v2,Qwen/Qwen3.8-27B,9,qwen38_ud_iq2 LCB smoke token caps / 12,8,items,fixed smoke12,Final answers only; no statistical admission
+exp_20260925_lcb_budget16k_v2,Qwen/Qwen3.8-27B,0,qwen38_bf16 LCB smoke final answers / 12,8,items,fixed smoke12,Smoke only
+exp_20260925_lcb_budget16k_v2,Qwen/Qwen3.8-27B,1,qwen38_bf16 LCB smoke token caps / 12,1,items,fixed smoke12,Smoke only
+exp_20260925_lcb_budget16k_v2,Qwen/Qwen3.8-27B,2,bonsai2_ptq LCB smoke final answers / 12,7,items,fixed smoke12,Smoke only
+exp_20260925_lcb_budget16k_v2,Qwen/Qwen3.8-27B,3,bonsai2_ptq LCB smoke token caps / 12,2,items,fixed smoke12,Smoke only
+exp_20260925_lcb_budget16k_v2,Qwen/Qwen3.8-27B,4,bonsai2_pq LCB smoke final answers / 12,10,items,fixed smoke12,Smoke only
+exp_20260925_lcb_budget16k_v2,Qwen/Qwen3.8-27B,5,bonsai2_pq LCB smoke token caps / 12,2,items,fixed smoke12,Smoke only
+exp_20260925_lcb_budget16k_v2,Qwen/Qwen3.8-27B,6,qwen38_ud_q4 LCB smoke final answers / 12,9,items,fixed smoke12,Smoke only
+exp_20260925_lcb_budget16k_v2,Qwen/Qwen3.8-27B,7,qwen38_ud_q4 LCB smoke token caps / 12,2,items,fixed smoke12,Smoke only
+exp_20260925_lcb_budget16k_v2,Qwen/Qwen3.8-27B,8,qwen38_ud_iq2 LCB smoke final answers / 12,6,items,fixed smoke12,Smoke only
+exp_20260925_lcb_budget16k_v2,Qwen/Qwen3.8-27B,9,qwen38_ud_iq2 LCB smoke token caps / 12,3,items,fixed smoke12,Smoke only
+exp_20260925_lcb_fast_candidate16k_v1,Qwen/Qwen3.8-27B,0,qwen38_bf16 LCB smoke final answers / 12,9,items,fixed smoke12,Smoke only
+exp_20260925_lcb_fast_candidate16k_v1,Qwen/Qwen3.8-27B,1,qwen38_bf16 LCB smoke token caps / 12,1,items,fixed smoke12,Smoke only
+exp_20260925_broad_surrounding_partial,allenai/OLMo-2-0325-32B-Instruct,0,ffn16_baseline GSM correct / 1024,390,items,frozen development,Complete component; MC pending
+exp_20260925_broad_surrounding_partial,allenai/OLMo-2-0325-32B-Instruct,1,ffn16_baseline C4 NLL,2.677635355966662,nats/token,frozen development,Complete component; MC pending
+exp_20260925_broad_surrounding_partial,allenai/OLMo-2-0325-32B-Instruct,2,ffn16_baseline Copy512 perplexity ratio,3.5152095732214823,ratio,frozen development,Complete component; MC pending
+exp_20260925_broad_surrounding_partial,allenai/OLMo-2-0325-32B-Instruct,3,ffn16_baseline Copy2048 perplexity ratio,28.184569191460564,ratio,frozen development,Complete component; MC pending
+exp_20260925_broad_surrounding_partial,allenai/OLMo-2-0325-32B-Instruct,4,ffn16_norms GSM correct / 1024,394,items,frozen development,Complete component; MC pending
+exp_20260925_broad_surrounding_partial,allenai/OLMo-2-0325-32B-Instruct,5,ffn16_norms C4 NLL,2.673052562503086,nats/token,frozen development,Complete component; MC pending
+exp_20260925_broad_surrounding_partial,allenai/OLMo-2-0325-32B-Instruct,6,ffn16_norms Copy512 perplexity ratio,1.5363610730626847,ratio,frozen development,Complete component; MC pending
+exp_20260925_broad_surrounding_partial,allenai/OLMo-2-0325-32B-Instruct,7,ffn16_norms Copy2048 perplexity ratio,2.2403106527561882,ratio,frozen development,Complete component; MC pending
+exp_20260925_broad_surrounding_partial,allenai/OLMo-2-0325-32B-Instruct,8,ffn16_lora GSM correct / 1024,488,items,frozen development,Complete component; MC pending
+exp_20260925_broad_surrounding_partial,allenai/OLMo-2-0325-32B-Instruct,9,ffn16_lora C4 NLL,2.667813911901077,nats/token,frozen development,Complete component; MC pending
+exp_20260925_broad_surrounding_partial,allenai/OLMo-2-0325-32B-Instruct,10,ffn16_lora Copy512 perplexity ratio,0.9905303305178756,ratio,frozen development,Complete component; MC pending
+exp_20260925_broad_surrounding_partial,allenai/OLMo-2-0325-32B-Instruct,11,ffn16_lora Copy2048 perplexity ratio,0.9625044396624027,ratio,frozen development,Complete component; MC pending
+exp_20260925_broad_surrounding_partial,allenai/OLMo-2-0325-32B-Instruct,12,ffn32_baseline GSM correct / 1024,7,items,frozen development,Complete component; MC pending
+exp_20260925_broad_surrounding_partial,allenai/OLMo-2-0325-32B-Instruct,13,ffn32_baseline C4 NLL,3.1600761461384934,nats/token,frozen development,Complete component; MC pending
+exp_20260925_broad_surrounding_partial,allenai/OLMo-2-0325-32B-Instruct,14,ffn32_baseline Copy512 perplexity ratio,185133.19715828903,ratio,frozen development,Complete component; MC pending
+exp_20260925_broad_surrounding_partial,allenai/OLMo-2-0325-32B-Instruct,15,ffn32_baseline Copy2048 perplexity ratio,3092842.882708013,ratio,frozen development,Complete component; MC pending
