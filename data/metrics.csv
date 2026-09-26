@@ -4960,3 +4960,50 @@ exp_20260926_qwen8b_parallel_readback,Qwen/Qwen3-8B,4,dense_lr1e-4 C4 teacher KL
 exp_20260926_qwen8b_parallel_readback,Qwen/Qwen3-8B,5,dense_lr1e-4 GSM correct / 1024,664,items,development,Quality measured; bytes projected
 exp_20260926_qwen8b_parallel_readback,Qwen/Qwen3-8B,6,native_lr3e-5 C4 teacher KL,0.27775127184566706,nats/token,development,Quality measured; bytes projected
 exp_20260926_qwen8b_parallel_readback,Qwen/Qwen3-8B,7,native_lr1e-4 C4 teacher KL,0.2928322680356352,nats/token,development,Quality measured; bytes projected
+exp_20260926_noon_broad,allenai/OLMo-2-0325-32B-Instruct,0,ffn16_baseline GSM correct / 1024,390,items,frozen development,Complete component
+exp_20260926_noon_broad,allenai/OLMo-2-0325-32B-Instruct,1,ffn16_baseline C4 NLL,2.677635355966662,nats/token,frozen development,Complete component
+exp_20260926_noon_broad,allenai/OLMo-2-0325-32B-Instruct,2,ffn16_baseline Copy512 perplexity ratio,3.5152095732214823,ratio,frozen development,Complete component
+exp_20260926_noon_broad,allenai/OLMo-2-0325-32B-Instruct,3,ffn16_baseline Copy2048 perplexity ratio,28.184569191460564,ratio,frozen development,Complete component
+exp_20260926_noon_broad,allenai/OLMo-2-0325-32B-Instruct,4,ffn16_baseline MC correct / 6144,4639,items,frozen development,Complete component
+exp_20260926_noon_broad,allenai/OLMo-2-0325-32B-Instruct,5,ffn16_norms GSM correct / 1024,394,items,frozen development,Complete component
+exp_20260926_noon_broad,allenai/OLMo-2-0325-32B-Instruct,6,ffn16_norms C4 NLL,2.673052562503086,nats/token,frozen development,Complete component
+exp_20260926_noon_broad,allenai/OLMo-2-0325-32B-Instruct,7,ffn16_norms Copy512 perplexity ratio,1.5363610730626847,ratio,frozen development,Complete component
+exp_20260926_noon_broad,allenai/OLMo-2-0325-32B-Instruct,8,ffn16_norms Copy2048 perplexity ratio,2.2403106527561882,ratio,frozen development,Complete component
+exp_20260926_noon_broad,allenai/OLMo-2-0325-32B-Instruct,9,ffn16_norms MC correct / 6144,4619,items,frozen development,Complete component
+exp_20260926_noon_broad,allenai/OLMo-2-0325-32B-Instruct,10,ffn16_lora GSM correct / 1024,488,items,frozen development,Complete component
+exp_20260926_noon_broad,allenai/OLMo-2-0325-32B-Instruct,11,ffn16_lora C4 NLL,2.667813911901077,nats/token,frozen development,Complete component
+exp_20260926_noon_broad,allenai/OLMo-2-0325-32B-Instruct,12,ffn16_lora Copy512 perplexity ratio,0.9905303305178756,ratio,frozen development,Complete component
+exp_20260926_noon_broad,allenai/OLMo-2-0325-32B-Instruct,13,ffn16_lora Copy2048 perplexity ratio,0.9625044396624027,ratio,frozen development,Complete component
+exp_20260926_noon_broad,allenai/OLMo-2-0325-32B-Instruct,14,ffn16_lora MC correct / 6144,4674,items,frozen development,Complete component
+exp_20260926_noon_broad,allenai/OLMo-2-0325-32B-Instruct,15,ffn32_baseline GSM correct / 1024,7,items,frozen development,Complete component
+exp_20260926_noon_broad,allenai/OLMo-2-0325-32B-Instruct,16,ffn32_baseline C4 NLL,3.1600761461384934,nats/token,frozen development,Complete component
+exp_20260926_noon_broad,allenai/OLMo-2-0325-32B-Instruct,17,ffn32_baseline Copy512 perplexity ratio,185133.19715828903,ratio,frozen development,Complete component
+exp_20260926_noon_broad,allenai/OLMo-2-0325-32B-Instruct,18,ffn32_baseline Copy2048 perplexity ratio,3092842.882708013,ratio,frozen development,Complete component
+exp_20260926_noon_broad,allenai/OLMo-2-0325-32B-Instruct,19,ffn32_baseline MC correct / 6144,3447,items,frozen development,Complete component
+exp_20260926_noon_broad,allenai/OLMo-2-0325-32B-Instruct,20,ffn32_norms GSM correct / 1024,9,items,frozen development,Complete component
+exp_20260926_noon_broad,allenai/OLMo-2-0325-32B-Instruct,21,ffn32_norms C4 NLL,3.157831177547697,nats/token,frozen development,Complete component
+exp_20260926_noon_broad,allenai/OLMo-2-0325-32B-Instruct,22,ffn32_norms Copy512 perplexity ratio,87553.0899286269,ratio,frozen development,Complete component
+exp_20260926_noon_broad,allenai/OLMo-2-0325-32B-Instruct,23,ffn32_norms Copy2048 perplexity ratio,990891.0838993988,ratio,frozen development,Complete component
+exp_20260926_noon_broad,allenai/OLMo-2-0325-32B-Instruct,24,ffn32_lora GSM correct / 1024,15,items,frozen development,Complete component
+exp_20260926_noon_broad,allenai/OLMo-2-0325-32B-Instruct,25,ffn32_lora C4 NLL,3.1519869031680114,nats/token,frozen development,Complete component
+exp_20260926_noon_broad,allenai/OLMo-2-0325-32B-Instruct,26,ffn32_lora Copy512 perplexity ratio,1.7316226162897104,ratio,frozen development,Complete component
+exp_20260926_noon_broad,allenai/OLMo-2-0325-32B-Instruct,27,ffn32_lora Copy2048 perplexity ratio,1.9318868678540162,ratio,frozen development,Complete component
+exp_20260926_noon_qwen8b,Qwen/Qwen3-8B,0,parent_rec_lr3e-5 C4 teacher KL,0.045454662207551955,nats/token,frozen development,Measured quality; projected cost
+exp_20260926_noon_qwen8b,Qwen/Qwen3-8B,1,parent_rec_lr3e-5 GSM correct / 1024,935,items,frozen development,Measured quality; projected cost
+exp_20260926_noon_qwen8b,Qwen/Qwen3-8B,2,dense_lr3e-5 C4 teacher KL,0.29524583306314567,nats/token,frozen development,Measured quality; projected cost
+exp_20260926_noon_qwen8b,Qwen/Qwen3-8B,3,dense_lr3e-5 GSM correct / 1024,744,items,frozen development,Measured quality; projected cost
+exp_20260926_noon_qwen8b,Qwen/Qwen3-8B,4,dense_lr1e-4 C4 teacher KL,0.314392859641402,nats/token,frozen development,Measured quality; projected cost
+exp_20260926_noon_qwen8b,Qwen/Qwen3-8B,5,dense_lr1e-4 GSM correct / 1024,664,items,frozen development,Measured quality; projected cost
+exp_20260926_noon_qwen8b,Qwen/Qwen3-8B,6,native_lr3e-5 C4 teacher KL,0.27775127184566706,nats/token,frozen development,Measured quality; projected cost
+exp_20260926_noon_qwen8b,Qwen/Qwen3-8B,7,native_lr3e-5 GSM correct / 1024,780,items,frozen development,Measured quality; projected cost
+exp_20260926_noon_qwen8b,Qwen/Qwen3-8B,8,native_lr1e-4 C4 teacher KL,0.2928322680356352,nats/token,frozen development,Measured quality; projected cost
+exp_20260926_noon_qwen8b,Qwen/Qwen3-8B,9,native_lr1e-4 GSM correct / 1024,686,items,frozen development,Measured quality; projected cost
+exp_20260926_noon_olmo7b,allenai/OLMo-2-1124-7B-Instruct,0,native GSM,743,items,frozen development,Measured GSM; projected size
+exp_20260926_noon_olmo7b,allenai/OLMo-2-1124-7B-Instruct,1,dense GSM,639,items,frozen development,Measured GSM; projected size
+exp_20260926_noon_olmo7b,allenai/OLMo-2-1124-7B-Instruct,2,parent_rec GSM,857,items,frozen development,Measured GSM; projected size
+exp_20260926_noon_olmo7b,allenai/OLMo-2-1124-7B-Instruct,3,native_ei256 GSM,724,items,frozen development,Measured GSM; projected size
+exp_20260926_noon_olmo7b,allenai/OLMo-2-1124-7B-Instruct,4,native_ei1024 GSM,694,items,frozen development,Measured GSM; projected size
+exp_20260926_noon_olmo7b,allenai/OLMo-2-1124-7B-Instruct,5,span1_ei GSM,635,items,frozen development,Measured GSM; projected size
+exp_20260926_noon_olmo7b,allenai/OLMo-2-1124-7B-Instruct,6,span2_ei GSM,688,items,frozen development,Measured GSM; projected size
+exp_20260926_noon_olmo7b,allenai/OLMo-2-1124-7B-Instruct,7,dense_lr3e-5 GSM,667,items,frozen development,Measured GSM; projected size
+exp_20260926_noon_olmo7b,allenai/OLMo-2-1124-7B-Instruct,8,native_16M GSM,719,items,frozen development,Measured GSM; projected size
