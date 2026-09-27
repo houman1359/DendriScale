@@ -5018,3 +5018,22 @@ exp_20260926_afternoon_control_connectivity,Multiple separate model cohorts,7,na
 exp_20260926_afternoon_control_connectivity,Multiple separate model cohorts,8,native_fixed1024_lr3e-5 Copy2048 teacher KL,0.013967970475478559,nats/token,held windows,Measured diagnostic; projected byte cost
 exp_20260926_evening_connectivity_gsm,Qwen/Qwen3-8B,0,native_dts2048_lr3e-5 GSM,772,items,frozen development,"Measured GSM, projected low-bit format cost"
 exp_20260926_evening_connectivity_gsm,Qwen/Qwen3-8B,1,native_fixed1024_lr3e-5 GSM,764,items,frozen development,"Measured GSM, projected low-bit format cost"
+exp_20260927_recovery_results,"Qwen3-8B and OLMo2-32B, separate cohorts",0,native_lr3e-5@67108864 GSM,780,items,frozen development,"Measured GSM, projected byte cost"
+exp_20260927_recovery_results,"Qwen3-8B and OLMo2-32B, separate cohorts",1,dense_lr3e-5@67108864 GSM,744,items,frozen development,"Measured GSM, projected byte cost"
+exp_20260927_recovery_results,"Qwen3-8B and OLMo2-32B, separate cohorts",2,native_rewire2048_lr3e-5@67108864 GSM,776,items,frozen development,"Measured GSM, projected byte cost"
+exp_20260927_recovery_results,"Qwen3-8B and OLMo2-32B, separate cohorts",3,native_dts1024_lr3e-5@67108864 GSM,770,items,frozen development,"Measured GSM, projected byte cost"
+exp_20260927_recovery_results,"Qwen3-8B and OLMo2-32B, separate cohorts",4,native_lr3e-5_cont@16777216 GSM,717,items,frozen development,"Measured GSM, projected byte cost"
+exp_20260927_recovery_results,"Qwen3-8B and OLMo2-32B, separate cohorts",5,native_lr3e-5_cont@33554432 GSM,763,items,frozen development,"Measured GSM, projected byte cost"
+exp_20260927_recovery_results,"Qwen3-8B and OLMo2-32B, separate cohorts",6,native_lr3e-5_full_base5e-6@16777216 GSM,724,items,frozen development,"Measured GSM, projected byte cost"
+exp_20260927_recovery_results,"Qwen3-8B and OLMo2-32B, separate cohorts",7,native_lr3e-5_full_base5e-6@33554432 GSM,753,items,frozen development,"Measured GSM, projected byte cost"
+exp_20260927_recovery_results,"Qwen3-8B and OLMo2-32B, separate cohorts",8,native_lr3e-5_full_base1e-6@16777216 GSM,724,items,frozen development,"Measured GSM, projected byte cost"
+exp_20260927_recovery_results,"Qwen3-8B and OLMo2-32B, separate cohorts",9,native_lr3e-5_scales_lr1e-4@33554432 GSM,794,items,frozen development,"Measured GSM, projected byte cost"
+exp_20260927_recovery_results,"Qwen3-8B and OLMo2-32B, separate cohorts",10,dense_lr3e-5_cont@4194304 GSM,708,items,frozen development,"Measured GSM, projected byte cost"
+exp_20260927_recovery_results,"Qwen3-8B and OLMo2-32B, separate cohorts",11,dense_lr3e-5_cont@16777216 GSM,703,items,frozen development,"Measured GSM, projected byte cost"
+exp_20260927_recovery_results,"Qwen3-8B and OLMo2-32B, separate cohorts",12,dense_lr3e-5_cont@33554432 GSM,724,items,frozen development,"Measured GSM, projected byte cost"
+exp_20260927_recovery_results,"Qwen3-8B and OLMo2-32B, separate cohorts",13,dense_lr3e-5_full_base5e-6@4194304 GSM,693,items,frozen development,"Measured GSM, projected byte cost"
+exp_20260927_recovery_results,"Qwen3-8B and OLMo2-32B, separate cohorts",14,dense_lr3e-5_full_base5e-6@16777216 GSM,668,items,frozen development,"Measured GSM, projected byte cost"
+exp_20260927_recovery_results,"Qwen3-8B and OLMo2-32B, separate cohorts",15,dense_lr3e-5_full_base5e-6@33554432 GSM,716,items,frozen development,"Measured GSM, projected byte cost"
+exp_20260927_recovery_results,"Qwen3-8B and OLMo2-32B, separate cohorts",16,dense_671m@268435456 GSM,783,items,frozen development,"Measured GSM, projected byte cost"
+exp_20260927_recovery_results,"Qwen3-8B and OLMo2-32B, separate cohorts",17,ffn32_norms MC,3459,items,frozen development,Measured whole-model registered bytes
+exp_20260927_recovery_results,"Qwen3-8B and OLMo2-32B, separate cohorts",18,ffn32_lora MC,3446,items,frozen development,Measured whole-model registered bytes
