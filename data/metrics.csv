@@ -5037,3 +5037,10 @@ exp_20260927_recovery_results,"Qwen3-8B and OLMo2-32B, separate cohorts",15,dens
 exp_20260927_recovery_results,"Qwen3-8B and OLMo2-32B, separate cohorts",16,dense_671m@268435456 GSM,783,items,frozen development,"Measured GSM, projected byte cost"
 exp_20260927_recovery_results,"Qwen3-8B and OLMo2-32B, separate cohorts",17,ffn32_norms MC,3459,items,frozen development,Measured whole-model registered bytes
 exp_20260927_recovery_results,"Qwen3-8B and OLMo2-32B, separate cohorts",18,ffn32_lora MC,3446,items,frozen development,Measured whole-model registered bytes
+exp_20260927_qwen_breadth_and_recovery,Qwen3-8B and local Bonsai 8B references,0,native_lr3e-5_full_base1e-6 GSM,768,items,frozen development,Complete GSM; projected whole-model cost
+exp_20260927_qwen_breadth_and_recovery,Qwen3-8B and local Bonsai 8B references,1,bonsai_8b MC,4416,items,frozen development,Prism-reported packed 1.15 GB
+exp_20260927_qwen_breadth_and_recovery,Qwen3-8B and local Bonsai 8B references,2,dense_lr3e-5 MC,4234,items,frozen development,Projected low-bit format; packed_export_verified=false
+exp_20260927_qwen_breadth_and_recovery,Qwen3-8B and local Bonsai 8B references,3,parent_rec_lr3e-5 MC,4907,items,frozen development,Projected low-bit format; packed_export_verified=false
+exp_20260927_qwen_breadth_and_recovery,Qwen3-8B and local Bonsai 8B references,4,qwen3_8b MC,4942,items,frozen development,BF16 byte ledger
+exp_20260927_qwen_breadth_and_recovery,Qwen3-8B and local Bonsai 8B references,5,qwen3_8b_rtn_int4 MC,4820,items,frozen development,RTN INT4 g128 + INT8 tables byte ledger
+exp_20260927_qwen_breadth_and_recovery,Qwen3-8B and local Bonsai 8B references,6,ternary_bonsai_8b MC,4644,items,frozen development,"Prism-reported packed 2.18 GB, ideal 1.75 GB"
