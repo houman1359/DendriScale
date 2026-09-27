@@ -5044,3 +5044,5 @@ exp_20260927_qwen_breadth_and_recovery,Qwen3-8B and local Bonsai 8B references,3
 exp_20260927_qwen_breadth_and_recovery,Qwen3-8B and local Bonsai 8B references,4,qwen3_8b MC,4942,items,frozen development,BF16 byte ledger
 exp_20260927_qwen_breadth_and_recovery,Qwen3-8B and local Bonsai 8B references,5,qwen3_8b_rtn_int4 MC,4820,items,frozen development,RTN INT4 g128 + INT8 tables byte ledger
 exp_20260927_qwen_breadth_and_recovery,Qwen3-8B and local Bonsai 8B references,6,ternary_bonsai_8b MC,4644,items,frozen development,"Prism-reported packed 2.18 GB, ideal 1.75 GB"
+exp_20260927_native_qwen_breadth,Qwen3-8B and local Bonsai 8B references,0,native_lr3e-5 MC,4286,items,frozen development,Full6144 choice items; projected whole-model bytes
+exp_20260927_native_qwen_breadth,Qwen3-8B and local Bonsai 8B references,1,native_lr3e-5_cont MC,4285,items,frozen development,Full6144 choice items; projected whole-model bytes
