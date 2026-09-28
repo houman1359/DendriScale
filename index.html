@@ -4,21 +4,33 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="description" content="Compare final model size and benchmark performance across dendritic networks, quantization, and hybrid compression.">
 <title>DendriScale · Model compression explorer</title>
-<link rel="stylesheet" href="styles.css?v=benchmark-bars-20260928"><link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="styles.css?v=benchmark-cards-20260928"><link rel="icon" href="favicon.svg" type="image/svg+xml">
 </head>
 <body>
-<a class="skip" href="#explorer">Skip to the main chart</a>
+<a class="skip" href="#benchmark-bars">Skip to benchmark results</a>
 <header class="site-header"><nav aria-label="Main navigation">
 <a class="brand" href="./"><img src="favicon.svg" width="28" height="28" alt="">DendriScale</a>
-<div class="nav-links"><a href="#explorer">Explore</a><a href="#method-comparison">Compare methods</a><a href="#pooled">All models</a><a href="#benchmark-bars">Benchmark bars</a><a href="#records">Results &amp; records</a><a class="external-link" href="https://github.com/houman1359/DendriScale">GitHub ↗</a></div>
+<div class="nav-links"><a href="#benchmark-bars">Benchmarks</a><a href="#explorer">Size vs. quality</a><a href="#method-comparison">Compare methods</a><a href="#pooled">All models</a><a href="#records">Results &amp; records</a><a class="external-link" href="https://github.com/houman1359/DendriScale">GitHub ↗</a></div>
 </nav></header>
 <main>
-<header class="intro"><div><p class="eyebrow">DENDRITIC NETWORKS · QUANTIZATION · HYBRIDS</p><h1>Explore model compression.</h1><p class="intro-copy">Compare final model size and benchmark performance. Find what gets smaller, what holds up, and where quality changes.</p></div><div class="snapshot-meta"><span class="snapshot-label">Experiment snapshot</span><p id="updated">Loading…</p><a href="METHODS.md">How to read the results ↗</a></div></header>
+<header class="intro"><div><p class="eyebrow">DENDRITIC NETWORKS · QUANTIZATION · HYBRIDS</p><h1>Smaller models. Measured performance.</h1><p class="intro-copy">Start with benchmark scores. Then explore how dendritic replacement, quantization and their combinations change model size and quality.</p></div><div class="snapshot-meta"><span class="snapshot-label">Experiment snapshot</span><p id="updated">Loading…</p><a href="METHODS.md">How to read the results ↗</a></div></header>
 <p id="loadError" class="notice" role="alert" hidden></p><noscript><p class="notice">The charts need JavaScript. <a href="#downloads">Download the aggregate results</a> to explore them offline.</p></noscript>
+<section class="card benchmark-overview" id="benchmark-bars" aria-labelledby="barsTitle">
+<div class="section-heading"><div><p class="eyebrow">01 / BENCHMARK RESULTS</p><h2 id="barsTitle">How well do compressed models perform?</h2><p class="section-copy">All benchmarks below, grouped by task. Each bar shows a model’s score, compression method and whole-model size.</p></div></div>
+<div class="benchmark-toolbar"><label class="search-control">Find a model or method<input id="barsSearch" type="search" placeholder="Qwen, OLMo, dendritic, Prism…"></label><div class="evidence-buttons" role="group" aria-label="Benchmark evidence"><button type="button" data-evidence="all" aria-pressed="true">All evidence</button><button type="button" data-evidence="measured" aria-pressed="false">Our measurements</button><button type="button" data-evidence="published" aria-pressed="false">Published comparisons</button></div><label class="check"><input id="barsMonochrome" type="checkbox">Monochrome</label></div>
+<p class="small muted benchmark-reading">Higher bars mean better scores. Colors, patterns and labels identify methods. GB is whole-model size; <b>projected</b> and <b>published</b> sizes are labeled. A check mark means the recorded development gates passed, not every benchmark on this page.</p>
+<div id="barsMethodLegend" class="legend" aria-label="Bar method legend"></div>
+<nav id="barsJump" class="benchmark-jump" aria-label="Benchmark categories"></nav>
+<p id="barsCount" class="small muted" aria-live="polite"></p>
+<div id="barsGrid"></div>
+<dialog id="barsDetails" class="bar-dialog" aria-labelledby="barDialogTitle"><div class="dialog-heading"><h2 id="barDialogTitle">Result details</h2><button type="button" id="barsClose">Close ×</button></div><div id="barsDetail"></div></dialog>
+<details class="reading-note"><summary>Current research: DendriNet first, quantization afterward</summary><p class="small">Replace layers with DendriNet, recover and benchmark the whole model at the original value precision, then quantify additional gains from quantization. Pending benchmarks are never shown as zero. <a href="LARGE_MODEL_CAMPAIGN.md">Campaign scope and progress ↗</a></p></details>
+</section>
+
 <div id="stats" class="stats overview" aria-label="Snapshot coverage"></div>
 
 <section class="card explorer-card" id="explorer" aria-labelledby="explorerTitle">
-<div class="section-heading"><div><p class="eyebrow">01 / EXPLORE A MODEL</p><h2 id="explorerTitle">Model size vs. performance</h2><p class="section-copy">Compare results with the same original model and evaluation conditions.</p></div><span id="outcomeScope" class="badge neutral">All outcomes included</span></div>
+<div class="section-heading"><div><p class="eyebrow">02 / EXPLORE A MODEL</p><h2 id="explorerTitle">Model size vs. performance</h2><p class="section-copy">Compare results with the same original model and evaluation conditions.</p></div><span id="outcomeScope" class="badge neutral">All outcomes included</span></div>
 <div class="controls primary-controls">
 <label>Original model<select id="model"></select></label>
 <label>Result type<select id="level"><option value="curated">Whole-model benchmarks</option><option value="local">Local fitting diagnostics</option><option value="registry-reported">Other recorded measurements</option><option value="external-reported">Externally reported results</option></select></label>
@@ -43,7 +55,7 @@
 </section>
 
 <section class="card" id="method-comparison" aria-labelledby="comparisonTitle">
-<div class="section-heading"><div><p class="eyebrow">02 / COMPARE METHODS</p><h2 id="comparisonTitle">Dendritic and conventional compression</h2><p class="section-copy">Whole-model results under matched conditions, including quantization, pruning, and layer removal.</p></div></div>
+<div class="section-heading"><div><p class="eyebrow">03 / COMPARE METHODS</p><h2 id="comparisonTitle">Dendritic and conventional compression</h2><p class="section-copy">Whole-model results under matched conditions, including quantization, pruning, and layer removal.</p></div></div>
 <div class="controls comparison-controls"><label>Model &amp; evaluation cohort<select id="comparisonCohort"></select></label><label>Development verdict<select id="comparisonGate"><option value="all">All measured outcomes</option><option value="passed">Passing development gates</option><option value="failed">Failed or stopped</option></select></label></div>
 <div id="comparisonBest" class="stats comparison-cards"></div><p class="small muted">Cards show the most compressed passing artifact in each group, within the selected cohort. The pass-only filter also applies to this table. All measured outcomes, including failures, remain in the archive.</p>
 <div class="scroll"><table><thead><tr><th>Candidate</th><th>Method</th><th>Compression</th><th>Model GB</th><th>GSM8K</th><th>Multiple choice</th><th>Development verdict</th></tr></thead><tbody id="comparisonRows"></tbody></table></div>
@@ -52,7 +64,7 @@
 </section>
 
 <section class="card" id="pooled" aria-labelledby="pooledTitle">
-<div class="section-heading"><div><p class="eyebrow">03 / COMPARE MODEL SCALES</p><h2 id="pooledTitle">All models, one size axis</h2><p class="section-copy">Explore each benchmark against absolute whole-model size in GB.</p></div><span class="badge neutral">Original protocols retained</span></div>
+<div class="section-heading"><div><p class="eyebrow">04 / COMPARE MODEL SCALES</p><h2 id="pooledTitle">All models, one size axis</h2><p class="section-copy">Explore each benchmark against absolute whole-model size in GB.</p></div><span class="badge neutral">Original protocols retained</span></div>
 <div class="controls"><label>Benchmark<select id="pooledBenchmark"></select></label><label>Original model<select id="pooledModel"></select></label><label>Minimum score (%)<input type="number" id="pooledMinimum" min="0" max="100" step="1" value="10" aria-describedby="pooledFilterNote"></label></div>
 <div class="plot-toolbar"><label class="check pass-filter"><input id="pooledPassOnly" type="checkbox">Passes all benchmarks only</label><label class="check"><input type="checkbox" id="pooledShowLow">Show near-zero results</label><label class="check"><input type="checkbox" id="pooledLog">Log size axis</label><label class="check"><input type="checkbox" id="pooledLabels" checked>Model labels</label><button id="pooledExport" class="export-button" type="button">Download SVG ↓</button></div>
 <p id="pooledCount" class="small muted"></p><div id="pooledModelLegend" class="legend" aria-label="Original models"></div><p id="pooledHighlight" class="small" aria-live="polite"></p>
@@ -65,15 +77,7 @@
 <details class="result-table"><summary>Results in this all-model chart</summary><div class="scroll"><table><thead><tr><th>Candidate</th><th>Model</th><th>Model GB</th><th>Score</th><th>Sample size</th><th>Original verdict</th><th>Cohort</th></tr></thead><tbody id="pooledRows"></tbody></table></div></details>
 </section>
 
-<section class="card" id="benchmark-bars" aria-labelledby="barsTitle">
-<div class="section-heading"><div><p class="eyebrow">04 / BENCHMARK SCORES</p><h2 id="barsTitle">Performance, method &amp; model size</h2><p class="section-copy">Compare benchmark scores as bars. Colors and patterns identify compression methods; every label includes the recorded model size.</p></div></div>
-<div class="controls"><label>Benchmark<select id="barsBenchmark"></select></label><label>Evidence<select id="barsSource"><option value="all">All recorded evidence</option><option value="measured">Measured by DendriScale</option><option value="published">Published references · including Prism</option></select></label><label class="benchmark-control">Evaluation protocol<select id="barsProtocol"></select></label></div>
-<div class="plot-toolbar"><label class="search-control">Find models or methods<input id="barsSearch" type="search" placeholder="27B, Qwen, dendritic, INT4…"></label><button id="barsPrevious" type="button">← Previous</button><button id="barsNext" type="button">Next →</button><span id="barsCount" class="small muted" aria-live="polite"></span><button id="barsExport" type="button">Download bars SVG ↓</button></div>
-<p id="barsProtocolNote" class="notice small"></p>
-<details class="reading-note"><summary>Campaign priority · DendriNet first, quantization afterward</summary><p class="small">The primary sequence is <b>DendriNet replacement → whole-model recovery → benchmarks at the original value precision → optional quantization → benchmarks again</b>. Report native structural savings separately from the additional low-bit reduction.</p><p class="small">Six Qwen3-8B whole-model runs replace 8, 18 or all 36 FFNs at 25% or 50% active-value budgets, with the original BF16 backbone retained. The GPU canary passed and recovery has started. The parallel 235B campaign now has 48 BF16-value expert pilots covering 12.5–75% budgets and deeper morphologies. Its 5× target remains unachieved; local fits are not whole-model benchmark results.</p><p class="small">Prism and other conventional compression results remain controls. Existing published and measured results keep their original labels. <a href="LARGE_MODEL_CAMPAIGN.md">Campaign scope and benchmark coverage ↗</a></p></details><p class="small muted">This view includes failed and passing outcomes. The scatter plots’ pass-only filter does not hide benchmark bars. Use the global Monochrome option for black-and-white patterns. Swipe or scroll horizontally for wide charts.</p>
-<div class="plot-scroll"><svg id="barsPlot" role="group" aria-label="Benchmark scores by model and compression method"></svg></div>
-<details id="barsDetails" class="reading-note"><summary>Selected bar · evidence and protocol</summary><div id="barsDetail">Select a bar for its size accounting, conditions and original verdict.</div></details>
-</section>
+
 
 <section id="records" aria-labelledby="recordsTitle"><div class="section-heading records-heading"><div><p class="eyebrow">05 / BROWSE THE EVIDENCE</p><h2 id="recordsTitle">Results &amp; experiment records</h2><p class="section-copy">The complete record, including unsuccessful runs and models awaiting evaluation.</p></div></div>
 <div class="card" id="candidate-register"><h3>Model results</h3><p class="small muted">A candidate may appear in separate cohorts or measurement scopes. The pass-only filter above also applies here. Missing measurements are never treated as zero.</p><div class="controls"><label class="search-control">Find a result<input id="candidateSearch" type="search" placeholder="Model, method, layer, benchmark…"></label><label>Verdict<select id="candidateGate"><option value="all">All outcomes</option><option value="failed">Failed or stopped</option><option value="passed">Passed</option><option value="other">Pending, local or unclassified</option></select></label></div><p id="candidateCount" class="small muted"></p><div class="scroll"><table><thead><tr><th>Candidate</th><th>Model / scope</th><th>Recorded sizes</th><th>Benchmarks</th><th>Verdict / failed gates</th></tr></thead><tbody id="candidates"></tbody></table></div></div>

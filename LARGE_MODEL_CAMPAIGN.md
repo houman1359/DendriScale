@@ -40,3 +40,6 @@ Extensions: GPQA Diamond, MATH-500, MBPP+, IFBench, AA-LCR, AIME 2025/2026, Live
 Thinking budgets, prompting, scorer, sample count, hardware and provenance remain attached to each result. Prism’s rules-plus-judge numbers are not silently equated with rules-only results. Missing scores remain pending, failed measured outcomes stay visible, and no 5× claim is made before a reloadable complete artifact is evaluated.
 
 Sources: [Qwen235 model card](https://huggingface.co/Qwen/Qwen3-235B-A22B-Instruct-2507), [GPT-OSS-120B](https://huggingface.co/openai/gpt-oss-120b), [GLM-4.5-Air](https://huggingface.co/zai-org/GLM-4.5-Air), [Mixtral](https://huggingface.co/mistralai/Mixtral-8x22B-Instruct-v0.1), [Prism Bonsai 2 27B](https://prismml.com/news/bonsai-2-27b).
+
+
+Update, September 28 afternoon: three of six native-only recoveries have completed training and entered whole-model evaluation; the remaining three are training. Their final capability batteries are pending. The >100B downloads verified 106 of 133 files; 27 failed on a network route error and have been resubmitted, with capture/pilots/IFEval queued behind the repair. No large-model quality result is implied.

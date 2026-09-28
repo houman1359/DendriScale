@@ -28,3 +28,50 @@
 .bar-facts dt {font-weight:650;}
 .bar-facts dd {margin:0;overflow-wrap:anywhere;}
 @media(max-width:640px){.bar-facts {grid-template-columns:1fr}.bar-facts dd{margin-bottom:.7rem}}
+
+/* Benchmark overview: all benchmark types visible, matched groups within each card. */
+.benchmark-overview{padding:26px;}
+.benchmark-toolbar{display:flex;align-items:end;gap:18px;flex-wrap:wrap;margin:20px 0 12px;}
+.benchmark-toolbar .search-control{flex:1;min-width:230px;}
+.evidence-buttons{display:flex;gap:5px;flex-wrap:wrap;}
+.evidence-buttons button{font-size:12px;}
+.evidence-buttons button[aria-pressed=true]{background:#193d56;color:#fff;border-color:#193d56;}
+.benchmark-reading{line-height:1.65;max-width:1000px;}
+.benchmark-jump{display:flex;gap:7px;flex-wrap:wrap;padding:13px 0;margin:10px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+.benchmark-jump a{font-size:12px;text-decoration:none;padding:7px 11px;border-radius:18px;background:#edf3f7;color:#214e6b;}
+.benchmark-category{margin:25px 0 32px;scroll-margin-top:25px;}
+.benchmark-category>h3{font-size:21px;margin:0 0 14px;}
+.benchmark-card-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;}
+.benchmark-card{min-width:0;border:1px solid var(--border);border-radius:10px;padding:16px;background:#fff;}
+.benchmark-card-heading{display:flex;align-items:flex-start;gap:9px;justify-content:space-between;flex-wrap:wrap;}
+.benchmark-card h4{font-size:18px;line-height:1.3;margin:0;}
+.benchmark-card .badge{font-size:10px;}
+.published-badge{background:#f7f2e8;border-color:#bda474;color:#684d1c;}
+.bar-cohort{font-size:11px;color:var(--muted);line-height:1.5;margin:9px 0 0;overflow-wrap:anywhere;}
+.benchmark-card svg{max-width:none;font-family:inherit;display:block;}
+.benchmark-card .plot-scroll{max-width:100%;overflow-x:auto;overscroll-behavior-x:contain;}
+.benchmark-card svg [role=button]{cursor:pointer;}
+.benchmark-card svg [role=button]:focus rect,.benchmark-card svg [role=button]:hover rect{stroke:#111;stroke-width:2.5;}
+.bar-card-controls{display:flex;align-items:center;gap:7px;border-top:1px solid #e7edf2;padding:9px 0 0;}
+.bar-card-controls>span{margin-right:auto;font-size:11px;}
+.bar-card-controls button{min-height:30px;padding:4px 8px;font-size:11px;}
+.bar-protocols{margin-top:10px;}
+.bar-protocols summary{font-size:11px;}
+.protocol-buttons{display:grid;gap:7px;max-height:260px;overflow:auto;margin-top:9px;}
+.protocol-buttons button{text-align:left;font-size:11px;line-height:1.5;overflow-wrap:anywhere;}
+.protocol-buttons button[aria-pressed=true]{border:2px solid #155e8c;background:#edf5fa;}
+.bar-method-key{display:inline-flex;align-items:center;gap:6px;font-size:11px;color:#263746;}
+.bar-swatch{height:15px;width:20px;display:inline-block;background-color:var(--method-color);border:1px solid #405160;}
+.bar-swatch.diagonal{background-image:repeating-linear-gradient(135deg,transparent 0 5px,#ffffffa0 5px 6px);}
+.bar-swatch.cross{background-image:repeating-linear-gradient(45deg,transparent 0 5px,#ffffff90 5px 6px),repeating-linear-gradient(135deg,transparent 0 5px,#ffffff90 5px 6px);}
+.bar-swatch.horizontal{background-image:repeating-linear-gradient(0deg,transparent 0 5px,#ffffffa0 5px 6px);}
+.bar-swatch.vertical{background-image:repeating-linear-gradient(90deg,transparent 0 5px,#ffffffa0 5px 6px);}
+.bar-swatch.dots{background-image:radial-gradient(white 1px,transparent 1px);background-size:6px 6px;}
+.bar-dialog{border:1px solid #adbdc9;border-radius:12px;max-width:760px;width:calc(100% - 32px);max-height:85vh;overflow:auto;padding:24px;color:var(--ink);}
+.bar-dialog::backdrop{background:#102c4480;}
+.dialog-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;}
+.dialog-heading h2{font-size:21px;}
+.bar-dialog .bar-facts{grid-template-columns:130px minmax(0,1fr);}
+@media(max-width:980px){.benchmark-card-grid{grid-template-columns:1fr;}}
+@media(max-width:650px){.benchmark-overview{padding:18px 12px;}.benchmark-toolbar{gap:12px;}.benchmark-toolbar .search-control{width:100%;}.evidence-buttons button{font-size:11px;padding:7px;}.benchmark-card{padding:12px;}.benchmark-jump{padding:10px 0;}.benchmark-jump a{font-size:11px;}.benchmark-card h4{font-size:17px;}.bar-dialog .bar-facts{grid-template-columns:1fr;}}
+.bar-protocol-preview{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;color:#657484;font-size:10px;margin-top:4px;}

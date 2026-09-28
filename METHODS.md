@@ -226,3 +226,10 @@ A protocol is selected by default. The explicit “All protocols” option is de
 ## Native-first accounting · September 28, 2026
 
 New primary studies measure DendriNet replacement and whole-model recovery at the original value precision before low-bit quantization. Report original/native byte reduction, native/quantized-native reduction and original/final reduction separately, using exact artifact lineage and identical byte scopes. A hybrid’s total reduction is not labeled as DendriNet’s standalone contribution. Existing hybrid and conventional observations remain visible with their original evidence.
+
+
+## Benchmark overview · September 28 update
+
+Benchmark cards now lead the page. Task categories organize reasoning, knowledge, coding, instruction following, vision and diagnostics. Every available benchmark type is visible without a benchmark selector. Measured scores and provider-published scores occupy separate cards. Within a card, each view uses one recorded evaluation cohort; protocol buttons expose the other cohorts, and pagination retains every result. Defaults use model identity and record count, never a pass or performance filter. Models, methods and ascending model size determine bar order. The original matched scatter plots remain below.
+
+The new local IFEval results use all 541 official prompts and 834 instructions, explicit greedy nonthinking generation with a 4,096-token output budget, and the average of prompt-strict and instruction-strict accuracy. These are our measurements, not reproductions of Prism’s serving stack. The Bonsai packed sizes remain provider-reported; evaluation uses unpacked weights. No full-suite or significance claim follows from this single benchmark.

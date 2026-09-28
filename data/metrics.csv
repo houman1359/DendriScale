@@ -5077,3 +5077,6 @@ exp_20260928_qwen_allocation,Qwen3-8B and local Bonsai 8B references,7,native268
 exp_20260928_qwen_allocation,Qwen3-8B and local Bonsai 8B references,8,native268m_traces_int4t_lr1e-4 MC,4329,items,frozen development,Projected whole-model low-bit cost
 exp_20260928_qwen_allocation,Qwen3-8B and local Bonsai 8B references,9,parent_rec_lr3e-5 MC,4907,items,frozen development,Projected whole-model low-bit cost
 exp_20260928_qwen_allocation,Qwen3-8B and local Bonsai 8B references,10,dense_268m MC,4323,items,frozen development,Projected whole-model low-bit cost
+exp_20260928_ifeval_full_v2,Qwen3-8B and Bonsai 8B,0,qwen3_8b IFEval strict average,84.27804891022487,percent,official full541,Full model benchmark; projected or reported byte axis
+exp_20260928_ifeval_full_v2,Qwen3-8B and Bonsai 8B,1,ternary_bonsai_8b IFEval strict average,84.43540915880973,percent,official full541,Full model benchmark; projected or reported byte axis
+exp_20260928_ifeval_full_v2,Qwen3-8B and Bonsai 8B,2,bonsai_8b IFEval strict average,82.94414376077697,percent,official full541,Full model benchmark; projected or reported byte axis
