@@ -221,3 +221,8 @@ harness is a separate, pending experiment.
 The additional benchmark-bar view uses method colors, patterns and explicit method labels. X-axis labels show the model/candidate and decimal GB with its accounting basis: registered model, projected format, delivered weight files or provider-published size. Count scores are converted to percentages only when a sample denominator is recorded. Loss diagnostics and unresolved counts are not converted into accuracy.
 
 A protocol is selected by default. The explicit “All protocols” option is descriptive only: heterogeneous prompting, reasoning budgets and evaluation procedures prevent a matched ranking. Published Prism scores remain marked as unreplicated. Failed measured outcomes stay eligible; pagination changes the visible page without deleting records. Scatter-plot pass-only filters do not hide these bars. Monochrome and SVG exports preserve method patterns and labels.
+
+
+## Native-first accounting · September 28, 2026
+
+New primary studies measure DendriNet replacement and whole-model recovery at the original value precision before low-bit quantization. Report original/native byte reduction, native/quantized-native reduction and original/final reduction separately, using exact artifact lineage and identical byte scopes. A hybrid’s total reduction is not labeled as DendriNet’s standalone contribution. Existing hybrid and conventional observations remain visible with their original evidence.

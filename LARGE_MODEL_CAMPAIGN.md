@@ -1,6 +1,12 @@
-# Large-model compression campaign · September 28, 2026
+# DendriNet-first compression campaign · September 28, 2026
 
-Target: at least **5× complete-model compression** of **Qwen3-235B-A22B-Instruct-2507**, preserving useful benchmark performance. This is a target, not an achieved result.
+Primary objective: find the largest useful **native DendriNet structural compression**, recover the complete model and benchmark it at the original value precision. Then quantize that exact native model and benchmark it again. The >100B campaign retains its **at least 5× complete-model target**; no such achieved result is claimed.
+
+The native-only factor is original bytes divided by recovered native bytes. The additional quantization factor is those native bytes divided by the quantized native artifact’s bytes. Their product is meaningful only for the same parent-child artifacts and accounting scope. Active values, connectivity, complete artifact bytes and resident memory are reported separately.
+
+Six whole-model Qwen3-8B recoveries have been submitted: 8, 18 or all 36 FFNs, each at 25% or 50% retained active-value budgets. The pretrained backbone remains BF16; cells and counted surrounding adapters/norms train, and dendritic nonlinearities are learnable. Each receives 8.39M recovery target presentations, followed by full GSM1024, MC6144 and C4/copy evaluation. A fresh explicit-greedy teacher reference is included. The GPU training/cold-reload canary passed and all six recoveries started. Low-bit quantization is deferred on these branches.
+
+Final native values are assessed at BF16; the current recovery/evaluation engine uses FP32 arithmetic inside cells and FP32 norms. Runtime memory is therefore not inferred from BF16 stored-value bytes. Physical mask-free whole-model exports must still be qualified before a deployed-size claim.
 
 The reference has 235,093,634,560 BF16 values (470.187 GB). Its MoE activates about 22B parameters per token. The target artifact must fit below 94.037 GB, including executable connectivity, quantization metadata, routing, retained weights and adapters. File bytes, resident memory and inference speed will be reported separately.
 
@@ -8,7 +14,7 @@ The reference has 235,093,634,560 BF16 values (470.187 GB). Its MoE activates ab
 
 | Model | Role | Current state |
 | --- | --- | --- |
-| Qwen3-235B-A22B-Instruct-2507 | >100B teacher and dendritic + quantization target | Pinned download started; four-GPU qualification, teacher-context capture, 24 expert pilots and full IFEval submitted |
+| Qwen3-235B-A22B-Instruct-2507 | >100B teacher and dendritic + quantization target | Pinned download started; four-GPU qualification, teacher-context capture, 48 BF16-value expert pilots and full IFEval submitted |
 | GPT-OSS-120B | Nearby-size MoE comparator; native MXFP4 | Canonical 65.249 GB weight files staging; benchmark port pending |
 | GLM-4.5-Air | 106B / 12B-active MoE comparator | Source revision and metadata pinned; weights and runtime pending |
 | Mixtral-8×22B-Instruct | About 141B total MoE comparator | Source revision and metadata pinned; weights and runtime pending |
@@ -19,9 +25,11 @@ Total parameters, active parameters and bytes are different measurements. A 235B
 
 ## Native and conventional controls
 
-The first native pilots use the existing PopulationNetwork teacher-parity implementation, teacher-derived per-neuron supports and independent expert cells. They compare 25% and 50% active projection-value budgets, `[2,2]` and `[2,2,2,2]` trees, and matched-value dense replacements at early, middle and late layers. These are local qualification experiments, not whole-model benchmarks.
+The >100B native pilots use the existing PopulationNetwork teacher-parity implementation, teacher-derived per-neuron supports and independent expert cells. The pending INT4-QAT pilot array was cancelled before starting and replaced by an unquantized study: 12.5%, 25%, 50% and 75% active projection-value budgets, including `[2,2]`, `[2,2,2,2]`, `[3,3,3]` and `[2,2,2,2,2]` trees. Matched-value dense controls remain secondary. Early, middle and late expert sites are represented. These local fits support engineering and allocation; whole-model composition, recovery and benchmarks remain the decisive steps.
 
-Planned whole-model compositions span 25–100% expert coverage, with attention and tables also quantized. Routers and residual structure are retained. Arithmetic examples are 5.07× for INT3 projections with INT8 tables, and about 5.06–5.65× for INT4 plus 25%-value native cells at 37.5–50% expert coverage. These exclude final serialization overhead and have **no measured quality yet**. Complete exports and whole-model evaluation must replace the projections.
+At BF16 values, replacing every Qwen235 expert projects to about 3.36× at a 25%-value budget or 6.03× at a 12.5%-value budget, with retained attention/tables/routers and a connectivity allowance. Both are **arithmetic projections without measured quality or physical complete exports**. Coverage, cell size, larger chunks and attention are the main native compression variables. Quantization is a subsequent complementary stage, not the source of the headline native factor.
+
+Prior hybrid results and conventional quantization comparisons remain in the evidence record. Useful existing runs continue; the priority change does not retroactively relabel their savings.
 
 ## Benchmarks and comparability
 
