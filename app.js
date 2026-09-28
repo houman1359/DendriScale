@@ -218,6 +218,7 @@ selectPanels();
 if(params.has('panel')&&[...byId('panel').options].some(o=>o.value===params.get('panel'))){byId('panel').value=params.get('panel');selectDose();}
 coverage();candidateRegister();comparisonTable();
 window.DendriScalePooled(DATA,{el,se,shapeMark,methodIcon,methodLabel,outcome,openComparison,onlyPass});
+window.DendriScaleBars(DATA,{el,se});
 byId('comparisonCohort').addEventListener('change',comparisonTable);byId('comparisonGate').addEventListener('change',comparisonTable);byId('monochrome').addEventListener('change',comparisonTable);
 for(const id of ['model','level','panel']) byId(id).addEventListener('change',()=>{const q=new URLSearchParams();for(const key of ['model','level','panel'])q.set(key,byId(key).value);history.replaceState(null,'','?'+q.toString());});
 byId('loadError').hidden=true;

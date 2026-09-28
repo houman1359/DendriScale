@@ -214,3 +214,10 @@ from the matched comparison table and from the pooled all-model plot, because
 no DendriScale measurement shares their teacher, benchmarks or protocol. A
 reported score is not a DendriScale verdict. Reproducing these baselines in one
 harness is a separate, pending experiment.
+
+
+## Benchmark bars
+
+The additional benchmark-bar view uses method colors, patterns and explicit method labels. X-axis labels show the model/candidate and decimal GB with its accounting basis: registered model, projected format, delivered weight files or provider-published size. Count scores are converted to percentages only when a sample denominator is recorded. Loss diagnostics and unresolved counts are not converted into accuracy.
+
+A protocol is selected by default. The explicit “All protocols” option is descriptive only: heterogeneous prompting, reasoning budgets and evaluation procedures prevent a matched ranking. Published Prism scores remain marked as unreplicated. Failed measured outcomes stay eligible; pagination changes the visible page without deleting records. Scatter-plot pass-only filters do not hide these bars. Monochrome and SVG exports preserve method patterns and labels.

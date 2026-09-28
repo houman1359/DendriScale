@@ -18,3 +18,13 @@
 
 /* Recorded pass filters and cohort-bound visual allowances. */
 .pass-filter{font-weight:650}.threshold-choice{display:flex;align-items:center;gap:7px;font-size:11px;color:var(--muted)}.threshold-choice select{min-height:30px;padding:4px 24px 4px 8px;font-size:11px;max-width:145px}.threshold-choice select:disabled{opacity:.55}.zoom-toolbar .check{font-size:11px}.threshold-note{margin:6px 0 0;line-height:1.55;max-width:1050px}.threshold-shading{pointer-events:none}@media(max-width:650px){.pass-filter{width:100%}.threshold-choice{flex-wrap:wrap}}
+
+/* Benchmark bars preserve absolute sizes and explicit protocols. */
+#barsPlot {max-width:none; font-family:inherit;}
+#barsPlot [role="button"] {cursor:pointer;}
+#barsPlot [role="button"]:focus {outline:none;}
+#barsPlot [role="button"]:focus rect,#barsPlot [role="button"]:hover rect {stroke:#111;stroke-width:3;}
+.bar-facts {display:grid;grid-template-columns:150px minmax(0,1fr);gap:.6rem 1rem;font-size:.88rem;}
+.bar-facts dt {font-weight:650;}
+.bar-facts dd {margin:0;overflow-wrap:anywhere;}
+@media(max-width:640px){.bar-facts {grid-template-columns:1fr}.bar-facts dd{margin-bottom:.7rem}}
