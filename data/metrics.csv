@@ -5066,3 +5066,14 @@ exp_20260927_qwen_evening,Qwen3-8B and local Bonsai 8B references,16,dense_lr3e-
 exp_20260927_qwen_evening,Qwen3-8B and local Bonsai 8B references,17,native_lr3e-5_scales_lr1e-4 MC,4309,items,frozen development,Six frozen tasks; quality-state hash matched to GSM
 exp_20260927_qwen_evening,Qwen3-8B and local Bonsai 8B references,18,native_268m MC,4346,items,frozen development,Six frozen tasks; quality-state hash matched to GSM
 exp_20260927_qwen_evening,Qwen3-8B and local Bonsai 8B references,19,dense_268m MC,4323,items,frozen development,Six frozen tasks; quality-state hash matched to GSM
+exp_20260928_qwen_allocation,Qwen3-8B and local Bonsai 8B references,0,parent_int4t MC,4872,items,frozen development,Projected whole-model low-bit cost
+exp_20260928_qwen_allocation,Qwen3-8B and local Bonsai 8B references,1,native8_int4t MC,4708,items,frozen development,Projected whole-model low-bit cost
+exp_20260928_qwen_allocation,Qwen3-8B and local Bonsai 8B references,2,dense_671m MC,4380,items,frozen development,Projected whole-model low-bit cost
+exp_20260928_qwen_allocation,Qwen3-8B and local Bonsai 8B references,3,native_lr3e-5_traces_lr1e-4 MC,4263,items,frozen development,Projected whole-model low-bit cost
+exp_20260928_qwen_allocation,Qwen3-8B and local Bonsai 8B references,4,native_lr3e-5_traces_int4t_lr1e-4 MC,4291,items,frozen development,Projected whole-model low-bit cost
+exp_20260928_qwen_allocation,Qwen3-8B and local Bonsai 8B references,5,dense_lr3e-5_traces_lr1e-4 MC,4199,items,frozen development,Projected whole-model low-bit cost
+exp_20260928_qwen_allocation,Qwen3-8B and local Bonsai 8B references,6,dense_lr3e-5_traces_int4t_lr1e-4 MC,4211,items,frozen development,Projected whole-model low-bit cost
+exp_20260928_qwen_allocation,Qwen3-8B and local Bonsai 8B references,7,native268m_traces_lr1e-4 MC,4326,items,frozen development,Projected whole-model low-bit cost
+exp_20260928_qwen_allocation,Qwen3-8B and local Bonsai 8B references,8,native268m_traces_int4t_lr1e-4 MC,4329,items,frozen development,Projected whole-model low-bit cost
+exp_20260928_qwen_allocation,Qwen3-8B and local Bonsai 8B references,9,parent_rec_lr3e-5 MC,4907,items,frozen development,Projected whole-model low-bit cost
+exp_20260928_qwen_allocation,Qwen3-8B and local Bonsai 8B references,10,dense_268m MC,4323,items,frozen development,Projected whole-model low-bit cost
