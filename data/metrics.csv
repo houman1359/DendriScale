@@ -5046,3 +5046,23 @@ exp_20260927_qwen_breadth_and_recovery,Qwen3-8B and local Bonsai 8B references,5
 exp_20260927_qwen_breadth_and_recovery,Qwen3-8B and local Bonsai 8B references,6,ternary_bonsai_8b MC,4644,items,frozen development,"Prism-reported packed 2.18 GB, ideal 1.75 GB"
 exp_20260927_native_qwen_breadth,Qwen3-8B and local Bonsai 8B references,0,native_lr3e-5 MC,4286,items,frozen development,Full6144 choice items; projected whole-model bytes
 exp_20260927_native_qwen_breadth,Qwen3-8B and local Bonsai 8B references,1,native_lr3e-5_cont MC,4285,items,frozen development,Full6144 choice items; projected whole-model bytes
+exp_20260927_qwen_evening,Qwen3-8B and local Bonsai 8B references,0,native_lr3e-5@67108864 GSM,780,items,frozen development,Whole-model quality; low-bit size projection only
+exp_20260927_qwen_evening,Qwen3-8B and local Bonsai 8B references,1,dense_lr3e-5@67108864 GSM,744,items,frozen development,Whole-model quality; low-bit size projection only
+exp_20260927_qwen_evening,Qwen3-8B and local Bonsai 8B references,2,native_lr3e-5_cont@33554432 GSM,763,items,frozen development,Whole-model quality; low-bit size projection only
+exp_20260927_qwen_evening,Qwen3-8B and local Bonsai 8B references,3,dense_lr3e-5_cont@33554432 GSM,724,items,frozen development,Whole-model quality; low-bit size projection only
+exp_20260927_qwen_evening,Qwen3-8B and local Bonsai 8B references,4,native_lr3e-5_scales_lr1e-4@33554432 GSM,794,items,frozen development,Whole-model quality; low-bit size projection only
+exp_20260927_qwen_evening,Qwen3-8B and local Bonsai 8B references,5,native_lr3e-5_scales_lr1e-3@33554432 GSM,781,items,frozen development,Whole-model quality; low-bit size projection only
+exp_20260927_qwen_evening,Qwen3-8B and local Bonsai 8B references,6,dense_lr3e-5_scales_lr1e-4@33554432 GSM,730,items,frozen development,Whole-model quality; low-bit size projection only
+exp_20260927_qwen_evening,Qwen3-8B and local Bonsai 8B references,7,native_lr3e-5_traces_lr1e-4@33554432 GSM,822,items,frozen development,Whole-model quality; low-bit size projection only
+exp_20260927_qwen_evening,Qwen3-8B and local Bonsai 8B references,8,native_lr3e-5_traces_int4t_lr1e-4@33554432 GSM,814,items,frozen development,Whole-model quality; low-bit size projection only
+exp_20260927_qwen_evening,Qwen3-8B and local Bonsai 8B references,9,dense_lr3e-5_traces_lr1e-4@33554432 GSM,804,items,frozen development,Whole-model quality; low-bit size projection only
+exp_20260927_qwen_evening,Qwen3-8B and local Bonsai 8B references,10,dense_lr3e-5_traces_int4t_lr1e-4@33554432 GSM,792,items,frozen development,Whole-model quality; low-bit size projection only
+exp_20260927_qwen_evening,Qwen3-8B and local Bonsai 8B references,11,native268m_traces_lr1e-4@33554432 GSM,812,items,frozen development,Whole-model quality; low-bit size projection only
+exp_20260927_qwen_evening,Qwen3-8B and local Bonsai 8B references,12,native268m_traces_int4t_lr1e-4@33554432 GSM,810,items,frozen development,Whole-model quality; low-bit size projection only
+exp_20260927_qwen_evening,Qwen3-8B and local Bonsai 8B references,13,native_671m@268435456 GSM,772,items,frozen development,Whole-model quality; low-bit size projection only
+exp_20260927_qwen_evening,Qwen3-8B and local Bonsai 8B references,14,dense_671m@268435456 GSM,783,items,frozen development,Whole-model quality; low-bit size projection only
+exp_20260927_qwen_evening,Qwen3-8B and local Bonsai 8B references,15,native_lr3e-5 MC,4286,items,frozen development,Six frozen tasks; quality-state hash matched to GSM
+exp_20260927_qwen_evening,Qwen3-8B and local Bonsai 8B references,16,dense_lr3e-5 MC,4234,items,frozen development,Six frozen tasks; quality-state hash matched to GSM
+exp_20260927_qwen_evening,Qwen3-8B and local Bonsai 8B references,17,native_lr3e-5_scales_lr1e-4 MC,4309,items,frozen development,Six frozen tasks; quality-state hash matched to GSM
+exp_20260927_qwen_evening,Qwen3-8B and local Bonsai 8B references,18,native_268m MC,4346,items,frozen development,Six frozen tasks; quality-state hash matched to GSM
+exp_20260927_qwen_evening,Qwen3-8B and local Bonsai 8B references,19,dense_268m MC,4323,items,frozen development,Six frozen tasks; quality-state hash matched to GSM
