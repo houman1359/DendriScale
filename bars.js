@@ -36,6 +36,14 @@ window.DendriScaleBars = function(DATA,{el,se}) {
   else if(p.yunit!=='percent'){
    n=UI.countDenominator(p);
    if(!n){const m=p.ylabel.match(/\/\s*([\d,]+)$/);if(m)n=Number(m[1].replaceAll(',',''));}
+   if(!n&&/^(GSM|MC) correct\b/i.test(p.ylabel)){
+    const family=/^GSM/i.test(p.ylabel)?'GSM(?:8K)?':'MC',cohort=String(p.cohort||'');
+    // Explicit cohort counts only; never derive n from the observed score or model name.
+    const forward=new RegExp('\\b'+family+'\\s*(?:(?:train[- ]dev|train development|development|dev|test)\\s*)?[:=-]?\\s*(\\d[\\d,]*)\\b','i');
+    const reverse=new RegExp('\\b(\\d[\\d,]*)\\s*'+family+'\\b(?!\\s*tasks)','i');
+    const m=cohort.match(forward)||cohort.match(reverse)||cohort.match(/\bn\s*=\s*(\d[\d,]*)\b/i);
+    if(m)n=Number(m[1].replaceAll(',',''));
+   }
    if(!(n>0&&y>=0&&y<=n))continue;
    y=100*y/n;
   }
