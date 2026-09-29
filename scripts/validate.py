@@ -28,6 +28,20 @@ class PublicContract(unittest.TestCase):
             self.assertTrue(row['label'] and row['summary'] and row['items'])
             self.assertFalse({'score','y','pass_at_1'} & row.keys())
 
+    def test_variant_aliases_are_single_checkpoints(self):
+        groups=json.loads((ROOT/'data/variant_aliases.json').read_text())['groups']
+        measured=[p for panel in DATA['panels'] if panel['source_level']!='external-reported' for p in panel['points']]
+        seen=set()
+        for group in groups:
+            self.assertTrue(group['variant'] and group['checkpoint'] and len(group['labels'])>=2)
+            keys={(group['model'],label) for label in group['labels']}
+            self.assertFalse(keys&seen);seen|=keys
+            for label in group['labels']:
+                self.assertTrue(any((p['model'],p['label'])==(group['model'],label) for p in measured),label)
+            # Every registration carrying one of these labels must be a listed registration of this checkpoint.
+            prefixes={re.sub('__whole_percent$','',p['id']).split('__')[0] for p in measured if (p['model'],p['label']) in keys}
+            self.assertEqual(prefixes,set(group['id_prefixes']))
+
     def test_matched_non_dendritic_baselines(self):
         for arm,values in [('parent_both',(17127983360,918,5260)),('parent_head',(17641584896,919,5254))]:
             found=[p for panel in DATA['panels'] for p in panel['points'] if p['id'].startswith('native_wave_'+arm+'__') and p['xunit']=='bytes']

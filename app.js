@@ -2,9 +2,10 @@
 'use strict';
 (async function start() {
 try {
-const [response,sizeResponse,coverageResponse] = await Promise.all([fetch('data/snapshot.json'),fetch('data/benchmark_size_notes.json').catch(()=>null),fetch('data/benchmark_evaluation_coverage.json').catch(()=>null)]);
+const [response,sizeResponse,coverageResponse,aliasResponse] = await Promise.all([fetch('data/snapshot.json'),fetch('data/benchmark_size_notes.json').catch(()=>null),fetch('data/benchmark_evaluation_coverage.json').catch(()=>null),fetch('data/variant_aliases.json').catch(()=>null)]);
 const sizeNotes=sizeResponse?.ok?(await sizeResponse.json()).entries:[];
 const benchmarkCoverage=coverageResponse?.ok?await coverageResponse.json():null;
+const variantAliases=aliasResponse?.ok?await aliasResponse.json():null;
 if (!response.ok) throw new Error('Snapshot could not be loaded');
 const DATA=await response.json(),byId=id=>document.getElementById(id);
 byId('updated').textContent=new Date(DATA.updated_at_utc).toLocaleString(undefined,{timeZoneName:'short'});
@@ -220,7 +221,7 @@ selectPanels();
 if(params.has('panel')&&[...byId('panel').options].some(o=>o.value===params.get('panel'))){byId('panel').value=params.get('panel');selectDose();}
 coverage();candidateRegister();comparisonTable();
 window.DendriScalePooled(DATA,{el,se,shapeMark,methodIcon,methodLabel,outcome,openComparison,onlyPass});
-window.DendriScaleBars(DATA,{el,se,sizeNotes,benchmarkCoverage});
+window.DendriScaleBars(DATA,{el,se,sizeNotes,benchmarkCoverage,variantAliases});
 byId('comparisonCohort').addEventListener('change',comparisonTable);byId('comparisonGate').addEventListener('change',comparisonTable);byId('monochrome').addEventListener('change',comparisonTable);
 for(const id of ['model','level','panel']) byId(id).addEventListener('change',()=>{const q=new URLSearchParams();for(const key of ['model','level','panel'])q.set(key,byId(key).value);history.replaceState(null,'','?'+q.toString());});
 byId('loadError').hidden=true;

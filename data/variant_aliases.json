@@ -1,0 +1,219 @@
+{
+ "schema": "dendriscale/variant-aliases-v1",
+ "updated_at_utc": "2026-09-29T04:10:13.746020+00:00",
+ "note": "Different registrations gave some checkpoints different labels. The benchmark overview and coverage grid show each group as one model variant; the register, scatter views and downloads keep the registered labels. A group holds only registrations of one checkpoint (same run and recovery dose); published references are never merged.",
+ "groups": [
+  {
+   "model": "Qwen/Qwen3-8B",
+   "variant": "Qwen3-8B teacher (BF16)",
+   "labels": [
+    "Qwen3-8B teacher (BF16)",
+    "Teacher reference"
+   ],
+   "checkpoint": "Original BF16 teacher; no training",
+   "id_prefixes": [
+    "ifeval20260928_v2_qwen3_8b",
+    "nativefirst20260928_teacher_MC",
+    "qwen8b_choice20260927_qwen3_8b"
+   ]
+  },
+  {
+   "model": "Qwen/Qwen3-8B",
+   "variant": "Recovered INT4 projections and tables; no cells",
+   "labels": [
+    "Recovered INT4 projections and tables; no cells",
+    "Recovered INT4 parent; no dendritic cells"
+   ],
+   "checkpoint": "e2e/parent_int4t @ 67,108,864 targets",
+   "id_prefixes": [
+    "ifeval20260928_v2_parent_int4t",
+    "qwen8b_allocation20260928_parent_int4t",
+    "qwen8b_choice20260927_parent_int4t"
+   ]
+  },
+  {
+   "model": "Qwen/Qwen3-8B",
+   "variant": "Recovered INT4 parent, 67.1M targets",
+   "labels": [
+    "Recovered INT4 parent, 67.1M targets",
+    "parent rec lr3e-5"
+   ],
+   "checkpoint": "e2e/parent_rec_lr3e-5 @ 67,108,864 targets",
+   "id_prefixes": [
+    "qwen8b64M_parent_rec_lr3e-5",
+    "qwen8b_choice20260927_parent_rec_lr3e-5"
+   ]
+  },
+  {
+   "model": "Qwen/Qwen3-8B",
+   "variant": "18 native dendritic FFNs, 67.1M targets",
+   "labels": [
+    "18 native dendritic FFNs, 67.1M targets",
+    "native lr3e-5",
+    "native; 67.1M total"
+   ],
+   "checkpoint": "e2e/native_lr3e-5 @ 67,108,864 targets",
+   "id_prefixes": [
+    "qwen8b64M_native_lr3e-5",
+    "qwen8b_choice20260927_native_lr3e-5",
+    "qwen8b_recovery20260927_native_lr3e-5@67108864"
+   ]
+  },
+  {
+   "model": "Qwen/Qwen3-8B",
+   "variant": "18 dense FFN replacements, 67.1M targets",
+   "labels": [
+    "18 dense FFN replacements, 67.1M targets",
+    "dense lr3e-5",
+    "dense; 67.1M total"
+   ],
+   "checkpoint": "e2e/dense_lr3e-5 @ 67,108,864 targets",
+   "id_prefixes": [
+    "qwen8b64M_dense_lr3e-5",
+    "qwen8b_choice20260927_dense_lr3e-5",
+    "qwen8b_recovery20260927_dense_lr3e-5@67108864"
+   ]
+  },
+  {
+   "model": "Qwen/Qwen3-8B",
+   "variant": "Learned block top-k, 1024 contacts",
+   "labels": [
+    "Learned block top-k,1024 contacts",
+    "native dts1024; 67.1M total"
+   ],
+   "checkpoint": "e2e/native_dts1024_lr3e-5 @ 67,108,864 targets",
+   "id_prefixes": [
+    "qwen8b64M_native_dts1024_lr3e-5",
+    "qwen8b_recovery20260927_native_dts1024_lr3e-5@67108864"
+   ]
+  },
+  {
+   "model": "Qwen/Qwen3-8B",
+   "variant": "Learned block top-k, 2048 contacts",
+   "labels": [
+    "Learned block top-k,2048 contacts",
+    "Learned block top-k, 2048 contacts"
+   ],
+   "checkpoint": "e2e/native_dts2048_lr3e-5 @ 67,108,864 targets",
+   "id_prefixes": [
+    "qwen8b64M_native_dts2048_lr3e-5"
+   ]
+  },
+  {
+   "model": "Qwen/Qwen3-8B",
+   "variant": "Fixed support, 1024 contacts",
+   "labels": [
+    "Fixed support,1024 contacts",
+    "Fixed support, 1024 contacts"
+   ],
+   "checkpoint": "e2e/native_fixed1024_lr3e-5 @ 67,108,864 targets",
+   "id_prefixes": [
+    "qwen8b64M_native_fixed1024_lr3e-5"
+   ]
+  },
+  {
+   "model": "Qwen/Qwen3-8B",
+   "variant": "Rewiring, 2048 contacts",
+   "labels": [
+    "Rewiring,2048 contacts",
+    "native rewire2048; 67.1M total"
+   ],
+   "checkpoint": "e2e/native_rewire2048_lr3e-5 @ 67,108,864 targets",
+   "id_prefixes": [
+    "qwen8b64M_native_rewire2048_lr3e-5",
+    "qwen8b_recovery20260927_native_rewire2048_lr3e-5@67108864"
+   ]
+  },
+  {
+   "model": "Qwen/Qwen3-8B",
+   "variant": "18 native dendritic FFNs, 67.1M + 33.6M continuation",
+   "labels": [
+    "18 native dendritic FFNs, 67.1M + 33.6M continuation",
+    "native cont; 33.6M additional"
+   ],
+   "checkpoint": "e2e/native_lr3e-5_cont @ 33,554,432 additional targets",
+   "id_prefixes": [
+    "qwen8b_choice20260927_native_lr3e-5_cont",
+    "qwen8b_recovery20260927_native_lr3e-5_cont@33554432"
+   ]
+  },
+  {
+   "model": "Qwen/Qwen3-8B",
+   "variant": "Native; 33.6M scale recovery at LR 1e-4",
+   "labels": [
+    "Native; 33.6M scale recovery at LR 1e-4",
+    "native scales lr1e-4; 33.6M additional"
+   ],
+   "checkpoint": "e2e/native_lr3e-5_scales_lr1e-4 @ 33,554,432 targets",
+   "id_prefixes": [
+    "qwen8b_choice20260927_native_lr3e-5_scales_lr1e-4",
+    "qwen8b_recovery20260927_native_lr3e-5_scales_lr1e-4@33554432"
+   ]
+  },
+  {
+   "model": "Qwen/Qwen3-8B",
+   "variant": "18 native FFNs + reasoning recovery; INT4 tables",
+   "labels": [
+    "18 native FFNs + reasoning recovery; INT4 tables",
+    "Native + reasoning recovery; INT4 tables"
+   ],
+   "checkpoint": "e2e/native_lr3e-5_traces_int4t_lr1e-4 @ 33,554,432 targets",
+   "id_prefixes": [
+    "qwen8b_choice20260927_native_lr3e-5_traces_int4t_lr1e-4",
+    "qwen8b_recovery20260927_native_lr3e-5_traces_int4t_lr1e-4@33554432"
+   ]
+  },
+  {
+   "model": "Qwen/Qwen3-8B",
+   "variant": "18 native FFNs + reasoning recovery; INT8 tables",
+   "labels": [
+    "18 native FFNs + reasoning recovery; INT8 tables",
+    "Native + reasoning recovery; INT8 tables"
+   ],
+   "checkpoint": "e2e/native_lr3e-5_traces_lr1e-4 @ 33,554,432 targets",
+   "id_prefixes": [
+    "qwen8b_choice20260927_native_lr3e-5_traces_lr1e-4",
+    "qwen8b_recovery20260927_native_lr3e-5_traces_lr1e-4@33554432"
+   ]
+  },
+  {
+   "model": "Qwen/Qwen3-8B",
+   "variant": "18 dense FFNs + reasoning recovery; INT4 tables",
+   "labels": [
+    "18 dense FFNs + reasoning recovery; INT4 tables",
+    "Dense + reasoning recovery; INT4 tables"
+   ],
+   "checkpoint": "e2e/dense_lr3e-5_traces_int4t_lr1e-4 @ 33,554,432 targets",
+   "id_prefixes": [
+    "qwen8b_choice20260927_dense_lr3e-5_traces_int4t_lr1e-4",
+    "qwen8b_recovery20260927_dense_lr3e-5_traces_int4t_lr1e-4@33554432"
+   ]
+  },
+  {
+   "model": "Qwen/Qwen3-8B",
+   "variant": "18 dense FFNs + reasoning recovery; INT8 tables",
+   "labels": [
+    "18 dense FFNs + reasoning recovery; INT8 tables",
+    "Dense + reasoning recovery; INT8 tables"
+   ],
+   "checkpoint": "e2e/dense_lr3e-5_traces_lr1e-4 @ 33,554,432 targets",
+   "id_prefixes": [
+    "qwen8b_choice20260927_dense_lr3e-5_traces_lr1e-4",
+    "qwen8b_recovery20260927_dense_lr3e-5_traces_lr1e-4@33554432"
+   ]
+  },
+  {
+   "model": "Qwen/Qwen3-8B",
+   "variant": "18 dense FFNs; 268.4M cumulative targets",
+   "labels": [
+    "18 dense FFNs; 268.4M cumulative targets",
+    "dense 671m; 268.4M total"
+   ],
+   "checkpoint": "e2e/dense_671m @ 268,435,456 targets",
+   "id_prefixes": [
+    "qwen8b_choice20260927_dense_268m",
+    "qwen8b_recovery20260927_dense_671m@268435456"
+   ]
+  }
+ ]
+}

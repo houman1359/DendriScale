@@ -18,7 +18,7 @@ window.DendriScaleBarFront = rows => {
   (eligible.includes(r) && !groups.get(key(r)).some(q=>dominates(q,r))));
 };
 
-window.DendriScaleBars = function(DATA,{el,se,sizeNotes=[],benchmarkCoverage=null}) {
+window.DendriScaleBars = function(DATA,{el,se,sizeNotes=[],benchmarkCoverage=null,variantAliases=null}) {
  const UI=window.DendriScaleUI,byId=id=>document.getElementById(id);
  const styles={teacher:['Original / teacher','#222222','none'],dendritic:['Dendritic','#0072B2','diagonal'],
   hybrid:['Dendritic + quantization','#E69F00','cross'],control:['Quantization / pruning / deletion','#CC79A7','dots'],
@@ -70,6 +70,13 @@ window.DendriScaleBars = function(DATA,{el,se,sizeNotes=[],benchmarkCoverage=nul
    :'This historical record does not identify a verified whole-model byte total.';
   return {bytes:null,basis:'GB not recorded',note};
  }
+ // Registrations that labeled one checkpoint differently display as one variant; the register keeps their labels.
+ const aliasGroups=new Map();
+ for(const g of variantAliases?.groups||[])for(const label of g.labels)aliasGroups.set(JSON.stringify([g.model,label]),g);
+ const variantOf=p=>{
+  const g=p.source_level==='external-reported'?null:aliasGroups.get(JSON.stringify([p.model,p.label]));
+  return g&&g.id_prefixes.includes(p.id.replace(/__whole_percent$/,'').split('__')[0])?g.variant:p.label;
+ };
  const seen=new Set(),rows=[];
  for(const panel of [...DATA.panels].sort((a,b)=>(a.xunit==='bytes'?0:1)-(b.xunit==='bytes'?0:1)))for(const p of panel.points){
   if(duplicateReferences.has(p.id))continue;
@@ -95,17 +102,17 @@ window.DendriScaleBars = function(DATA,{el,se,sizeNotes=[],benchmarkCoverage=nul
   if(!rawLoss&&(y<0||y>100))continue;
   const key=JSON.stringify([p.id.replace(/__whole_percent$/,''),p.model,p.cohort,p.ylabel,p.y]);
   if(seen.has(key))continue;seen.add(key);
-  rows.push({...p,score:y,scoreUnit,direction:p.ydirection,n,benchmark:metric(p),size:size(p),method:method(p),published:p.source_level==='external-reported'});
+  rows.push({...p,variant:variantOf(p),score:y,scoreUnit,direction:p.ydirection,n,benchmark:metric(p),size:size(p),method:method(p),published:p.source_level==='external-reported'});
  }
  const scoreLabel=r=>r.score.toFixed(r.scoreUnit==='nats/token'?3:2)+(r.scoreUnit==='%'?'%':r.scoreUnit==='ratio'?'×':' nats/token');
  function details(r){
-  const target=byId('barsDetail');target.replaceChildren(el('h3',UI.candidateName(r.label)),el('p',UI.modelName(r.model)));
+  const target=byId('barsDetail');target.replaceChildren(el('h3',UI.candidateName(r.variant)),el('p',UI.modelName(r.model)));
   const dl=el('dl');dl.className='bar-facts';
   for(const [k,v] of [['Benchmark',r.benchmark+' · '+scoreLabel(r)],['Method',styles[r.method][0]],
    ['Model size',r.size.bytes>0?(r.size.bytes/1e9).toFixed(3)+' GB · '+r.size.basis:r.size.basis],
    ['Size accounting',r.size.note],['Evidence',r.published?'Published result · not reproduced':'DendriScale measurement'],['Protocol',r.cohort],
-   ['Sample size',r.n||'See benchmark protocol'],['Original verdict',r.gate_status],['Conditions',r.conditions],['Limitations',r.limitations],['Source hashes',(r.source_hashes||[]).join(', ')]]){
-   if(k==='Size accounting'&&!v)continue;
+   ['Sample size',r.n||'See benchmark protocol'],['Registered label',r.variant===r.label?'':r.label],['Original verdict',r.gate_status],['Conditions',r.conditions],['Limitations',r.limitations],['Source hashes',(r.source_hashes||[]).join(', ')]]){
+   if((k==='Size accounting'||k==='Registered label')&&!v)continue;
    dl.append(el('dt',k),el('dd',String(v||'Not recorded')));
   }
   target.append(dl);byId('barsDetails').showModal();
@@ -165,7 +172,7 @@ window.DendriScaleBars = function(DATA,{el,se,sizeNotes=[],benchmarkCoverage=nul
  const compare=(a,b)=>familyOrder.indexOf(family(a))-familyOrder.indexOf(family(b))
   || familyOrder.indexOf(methodKey(a))-familyOrder.indexOf(methodKey(b))
   || sortSize(a)-sortSize(b) || shortModel(a).localeCompare(shortModel(b))
-  || a.cohort.localeCompare(b.cohort) || a.label.localeCompare(b.label) || a.id.localeCompare(b.id);
+  || a.cohort.localeCompare(b.cohort) || a.variant.localeCompare(b.variant) || a.id.localeCompare(b.id);
  function download(svg,name){
   const copy=svg.cloneNode(true);copy.setAttribute('xmlns','http://www.w3.org/2000/svg');
   const url=URL.createObjectURL(new Blob([new XMLSerializer().serializeToString(copy)],{type:'image/svg+xml'}));
@@ -235,13 +242,13 @@ window.DendriScaleBars = function(DATA,{el,se,sizeNotes=[],benchmarkCoverage=nul
     }
     const r=entry.r,[methodLabel,,pattern]=methodStyle(r),key=methodKey(r);
     const yy=y+(compact?48:7),labelWidth=compact?colWidth:colWidth*.44-16;
-    const g=se('g',{tabindex:0,role:'button','aria-label':r.label+', '+r.model+', '+scoreLabel(r)+', '+sizeLabel(r)+' · '+r.size.basis+', '+families[family(r)]+', '+code(r),
+    const g=se('g',{tabindex:0,role:'button','aria-label':r.variant+', '+r.model+', '+scoreLabel(r)+', '+sizeLabel(r)+' · '+r.size.basis+', '+families[family(r)]+', '+code(r),
      'data-point-id':r.id,'data-method':r.method,'data-family':family(r),'data-color-group':methodKey(r),'data-size-bytes':r.size.bytes??'','data-model':r.model,'data-provenance':r.published?'published':'measured','data-size-basis':r.size.basis,'data-cohort':r.cohort});
-    g.append(se('title',{},r.label+' · '+r.model+'\n'+methodLabel+' · '+sizeLabel(r)+' · '+r.size.basis+'\n'+code(r)+': '+r.cohort+'\n'+(r.published?'Published · not reproduced':'Measured by DendriScale')+'\n'+r.conditions));
+    g.append(se('title',{},r.variant+' · '+r.model+'\n'+methodLabel+' · '+sizeLabel(r)+' · '+r.size.basis+'\n'+code(r)+': '+r.cohort+'\n'+(r.published?'Published · not reproduced':'Measured by DendriScale')+'\n'+r.conditions));
     g.append(se('rect',{x,y:y-4,width:colWidth,height:rowHeight-5,fill:'transparent',class:'bar-hit',rx:4}));
     const first=shortModel(r)+' · '+sizeLabel(r)+(sizeNote(r)?' '+sizeNote(r):'');
     g.append(text(x,y+10,trim(first,labelWidth,12),{'font-weight':650}));
-    const second=UI.candidateName(r.label)+(!r.size.bytes&&r.xunit==='parameters'?' · '+(r.x/1e9).toFixed(2)+'B parameters':'');
+    const second=UI.candidateName(r.variant)+(!r.size.bytes&&r.xunit==='parameters'?' · '+(r.x/1e9).toFixed(2)+'B parameters':'');
     g.append(text(x,y+26,trim(second,labelWidth,11),{'font-size':11,fill:'#526476'}));
     const publishedProtocol=r.published?r.cohort.replace(/^PrismML /,''):'';
     const tags=code(r)+(publishedProtocol?' · '+publishedProtocol:'')+(r.n?' · n='+r.n.toLocaleString('en'):'')+(UI.allBenchmarksPass(r)?' · ✓ Development gates':'');
@@ -296,8 +303,8 @@ window.DendriScaleBars = function(DATA,{el,se,sizeNotes=[],benchmarkCoverage=nul
  // benchmark, including dominated ones, so an empty cell always means not measured.
  function coverageGrid(charted){
   const root=byId('barsCoverage');root.replaceChildren();
-  const labels=new Set(charted.map(r=>r.label));
-  const items=rows.filter(r=>modelOf(r)===selectedModel&&labels.has(r.label)&&(evidence==='all'||r.published===(evidence==='published')));
+  const labels=new Set(charted.map(r=>r.variant));
+  const items=rows.filter(r=>modelOf(r)===selectedModel&&labels.has(r.variant)&&(evidence==='all'||r.published===(evidence==='published')));
   if(!items.length)return;
   // Our 1,024-item development GSM is not Prism's GSM8K protocol: it gets its own column.
   const devGSM='GSM · our dev set (1,024)';
@@ -306,7 +313,7 @@ window.DendriScaleBars = function(DATA,{el,se,sizeNotes=[],benchmarkCoverage=nul
   const bench=[...prismBenchmarks,...extra.sort((a,b)=>(b===devGSM)-(a===devGSM)||metrics.indexOf(a)-metrics.indexOf(b))];
   const variants=new Map();
   for(const r of items.slice().sort(compare)){
-   const k=JSON.stringify([family(r),r.label]);if(!variants.has(k))variants.set(k,{r,cells:new Map()});
+   const k=JSON.stringify([family(r),r.variant]);if(!variants.has(k))variants.set(k,{r,cells:new Map()});
    const cells=variants.get(k).cells,c=column(r);if(!cells.has(c))cells.set(c,[]);cells.get(c).push(r);
   }
   const table=el('table');table.className='coverage-grid';
@@ -316,7 +323,7 @@ window.DendriScaleBars = function(DATA,{el,se,sizeNotes=[],benchmarkCoverage=nul
   const body=el('tbody');let missing=0,filled=0;
   for(const {r,cells} of variants.values()){
    const tr=el('tr');tr.dataset.family=family(r);
-   const name=el('th',UI.candidateName(r.label));name.scope='row';
+   const name=el('th',UI.candidateName(r.variant));name.scope='row';
    const tag=el('span',families[family(r)]);tag.className='coverage-family';name.append(tag);
    tr.append(name,el('td',sizeLabel(r)));
    for(const b of bench){
@@ -324,7 +331,7 @@ window.DendriScaleBars = function(DATA,{el,se,sizeNotes=[],benchmarkCoverage=nul
     if(!found){td.textContent='—';td.className='coverage-missing';td.title='Not measured yet';missing+=prismBenchmarks.includes(b);}
     else{
      filled+=prismBenchmarks.includes(b);
-     td.textContent=found.map(x=>scoreLabel(x)+(x.published?' P':'')).join(' · ');
+     td.textContent=[...new Set(found.map(x=>scoreLabel(x)+(x.published?' P':'')))].join(' · ');
      td.title=found.map(x=>code(x)+(x.published?' published':' measured')+': '+x.cohort).join('\n');
      if(found.every(x=>x.published))td.className='coverage-published';
     }
@@ -344,7 +351,7 @@ window.DendriScaleBars = function(DATA,{el,se,sizeNotes=[],benchmarkCoverage=nul
  function draw(){
   observer?.disconnect();
   const query=byId('barsSearch').value.trim().toLowerCase();
-  const filtered=fronts.filter(r=>modelOf(r)===selectedModel&&(evidence==='all'||r.published===(evidence==='published'))&&(!query||[r.model,r.label,r.benchmark,families[family(r)],styles[r.method][0]].join(' ').toLowerCase().includes(query)));
+  const filtered=fronts.filter(r=>modelOf(r)===selectedModel&&(evidence==='all'||r.published===(evidence==='published'))&&(!query||[r.model,r.variant,r.label,r.benchmark,families[family(r)],styles[r.method][0]].join(' ').toLowerCase().includes(query)));
   const root=byId('barsGrid'),jump=byId('barsJump');root.replaceChildren();jump.replaceChildren();legend();modelSwitcher();coverageGrid(filtered);
   byId('barsCount').textContent=UI.modelName(selectedModel)+' · '+filtered.length+' bars · '+new Set(filtered.map(r=>r.benchmark)).size+' benchmarks. Other original models: use the buttons above. Full experiment history in Size vs. quality below.';
   const cards=[];
