@@ -81,3 +81,26 @@
 .bar-evaluation-status ul { padding-left: 1.3rem; margin: .6rem 0; }
 .bar-evaluation-status[data-status="planned"] { border-left-style: dashed; background: #f6f6f6; }
 .bar-evaluation-status[data-status="not_applicable"] { border-left-color: #666; background: #f6f6f6; }
+/* By-model organization: model switcher and benchmark coverage grid */
+.model-switcher{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:14px 0 10px}
+.model-switcher-label{font-size:12px;font-weight:650;color:#526476;margin-right:4px}
+.model-switcher button{font-size:12px}
+.model-switcher button[aria-pressed=true]{background:#193d56;color:#fff;border-color:#193d56}
+.bar-coverage{margin:6px 0 18px}
+.bar-coverage h3{margin:10px 0 6px}
+.coverage-box summary{cursor:pointer;font-size:13px;font-weight:600}
+.coverage-scroll{overflow-x:auto;max-width:100%;border:1px solid #d6dee5;border-radius:6px;margin-top:8px}
+.coverage-grid{border-collapse:collapse;font-size:12px;min-width:100%}
+.coverage-grid th,.coverage-grid td{padding:5px 8px;border-bottom:1px solid #e5eaef;text-align:right;white-space:nowrap}
+.coverage-grid thead th{position:sticky;top:0;background:#f4f7fa;font-weight:650;text-align:center}
+.coverage-grid thead th.prism-benchmark{background:#e6f0f7;color:#124e73}
+.coverage-grid tbody th{position:sticky;left:0;background:#fff;text-align:left;font-weight:600;white-space:normal;min-width:220px;max-width:320px}
+.coverage-family{display:block;font-weight:400;font-size:11px;color:#526476}
+.coverage-grid td.coverage-missing{color:#9aa7b3;background:#fafbfc;text-align:center}
+.coverage-grid td.coverage-published{font-style:italic;color:#6b5a2e}
+.coverage-grid tr[data-family=teacher] th{border-left:4px solid #222}
+.coverage-grid tr[data-family=dendritic] th{border-left:4px solid #0072B2}
+.coverage-grid tr[data-family=hybrid] th{border-left:4px solid #E69F00}
+.coverage-grid tr[data-family=control] th{border-left:4px solid #CC79A7}
+.coverage-grid tr[data-family=published] th{border-left:4px solid #9D824B}
+@media (max-width:640px){.coverage-grid tbody th{min-width:150px}.model-switcher button{font-size:11px;padding:6px}}

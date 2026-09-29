@@ -124,6 +124,15 @@ window.DendriScaleBars = function(DATA,{el,se,sizeNotes=[],benchmarkCoverage=nul
  }
  const friendly={'Multiple choice':'Multiple choice · six tasks','arc_challenge accuracy':'ARC Challenge','arc_easy accuracy':'ARC Easy','boolq accuracy':'BoolQ','piqa accuracy':'PIQA','hellaswag accuracy':'HellaSwag','winogrande accuracy':'WinoGrande'};
  const fronts=window.DendriScaleBarFront(rows);
+ // Charts are organized by original model: comparisons stay within one teacher.
+ const modelOf=r=>UI.canonicalModelId(r.model);
+ const preferredModels=['Qwen/Qwen3-8B','allenai/OLMo-2-0325-32B-Instruct','Qwen/Qwen3.8-27B','Qwen/Qwen3.6-27B',
+  'allenai/OLMo-2-1124-7B-Instruct','allenai/OLMo-3-7B-Instruct','allenai/OLMo-2-0425-1B','Qwen/Qwen2.5-72B-Instruct'];
+ const modelCounts=new Map();for(const r of fronts)modelCounts.set(modelOf(r),(modelCounts.get(modelOf(r))||0)+1);
+ const rank=m=>{const i=preferredModels.indexOf(m);return i<0?preferredModels.length:i;};
+ const modelList=[...modelCounts.keys()].sort((a,b)=>rank(a)-rank(b)||modelCounts.get(b)-modelCounts.get(a)||a.localeCompare(b));
+ let selectedModel=modelList.includes('Qwen/Qwen3-8B')?'Qwen/Qwen3-8B':modelList[0];
+ const prismBenchmarks=['MMLU-Redux','GPQA Diamond','MuSR','IFEval','IFBench','GSM8K','MATH-500','HumanEval+','MBPP+','BFCL v3'];
  const families={teacher:'Original models',dendritic:'Dendritic',hybrid:'Dendritic + quantization',control:'Non-dendritic',published:'Published · not reproduced'};
  const methodKey=r=>['teacher','dendritic','hybrid'].includes(r.method)?r.method:'control';
  const family=r=>r.published?'published':methodKey(r);
@@ -274,13 +283,70 @@ window.DendriScaleBars = function(DATA,{el,se,sizeNotes=[],benchmarkCoverage=nul
   const redraw=width=>{if(Math.abs(width-lastWidth)<1)return;lastWidth=width;plot(chart,chosen,id,benchmark,width);};
   return {root,redraw,chart};
  }
+ function modelSwitcher(){
+  const root=byId('barsModels');root.replaceChildren();
+  const label=el('span','Original model');label.className='model-switcher-label';root.append(label);
+  for(const m of modelList){
+   const b=button(UI.modelName(m).replace(/-Instruct$/,''),()=>{selectedModel=m;draw();});
+   b.setAttribute('aria-pressed',String(m===selectedModel));b.dataset.model=m;
+   b.title=modelCounts.get(m)+' charted results';root.append(b);
+  }
+ }
+ // One row per charted variant of the selected model; cells hold every measured or published score for that
+ // benchmark, including dominated ones, so an empty cell always means not measured.
+ function coverageGrid(charted){
+  const root=byId('barsCoverage');root.replaceChildren();
+  const labels=new Set(charted.map(r=>r.label));
+  const items=rows.filter(r=>modelOf(r)===selectedModel&&labels.has(r.label)&&(evidence==='all'||r.published===(evidence==='published')));
+  if(!items.length)return;
+  // Our 1,024-item development GSM is not Prism's GSM8K protocol: it gets its own column.
+  const devGSM='GSM · our dev set (1,024)';
+  const column=r=>r.benchmark==='GSM8K'&&!r.published&&r.n===1024?devGSM:r.benchmark;
+  const extra=[...new Set(items.map(column))].filter(m=>!prismBenchmarks.includes(m));
+  const bench=[...prismBenchmarks,...extra.sort((a,b)=>(b===devGSM)-(a===devGSM)||metrics.indexOf(a)-metrics.indexOf(b))];
+  const variants=new Map();
+  for(const r of items.slice().sort(compare)){
+   const k=JSON.stringify([family(r),r.label]);if(!variants.has(k))variants.set(k,{r,cells:new Map()});
+   const cells=variants.get(k).cells,c=column(r);if(!cells.has(c))cells.set(c,[]);cells.get(c).push(r);
+  }
+  const table=el('table');table.className='coverage-grid';
+  const head=el('tr');head.append(el('th','Model variant'),el('th','Size'));
+  for(const b of bench){const th=el('th',friendly[b]||b);th.scope='col';if(prismBenchmarks.includes(b))th.className='prism-benchmark';head.append(th);}
+  const thead=el('thead');thead.append(head);table.append(thead);
+  const body=el('tbody');let missing=0,filled=0;
+  for(const {r,cells} of variants.values()){
+   const tr=el('tr');tr.dataset.family=family(r);
+   const name=el('th',UI.candidateName(r.label));name.scope='row';
+   const tag=el('span',families[family(r)]);tag.className='coverage-family';name.append(tag);
+   tr.append(name,el('td',sizeLabel(r)));
+   for(const b of bench){
+    const found=cells.get(b),td=el('td');
+    if(!found){td.textContent='—';td.className='coverage-missing';td.title='Not measured yet';missing+=prismBenchmarks.includes(b);}
+    else{
+     filled+=prismBenchmarks.includes(b);
+     td.textContent=found.map(x=>scoreLabel(x)+(x.published?' P':'')).join(' · ');
+     td.title=found.map(x=>code(x)+(x.published?' published':' measured')+': '+x.cohort).join('\n');
+     if(found.every(x=>x.published))td.className='coverage-published';
+    }
+    tr.append(td);
+   }
+   body.append(tr);
+  }
+  table.append(body);
+  const wrap=el('div');wrap.className='coverage-scroll';wrap.append(table);
+  const title=el('h3','Benchmark coverage · '+UI.modelName(selectedModel));
+  const note=el('p',filled+' of '+(filled+missing)+' Prism-benchmark cells are filled. — means not measured yet, never a zero. P marks a published score that we have not reproduced. Hover a cell for its protocol.');
+  note.className='small muted';
+  const box=el('details');box.open=true;box.className='coverage-box';box.append(el('summary','Coverage grid: what is measured and what is missing'),note,wrap);
+  root.append(title,box);
+ }
  let observer;
  function draw(){
   observer?.disconnect();
   const query=byId('barsSearch').value.trim().toLowerCase();
-  const filtered=fronts.filter(r=>(evidence==='all'||r.published===(evidence==='published'))&&(!query||[r.model,r.label,r.benchmark,families[family(r)],styles[r.method][0]].join(' ').toLowerCase().includes(query)));
-  const root=byId('barsGrid'),jump=byId('barsJump');root.replaceChildren();jump.replaceChildren();legend();
-  byId('barsCount').textContent=filtered.length+' bars · '+new Set(filtered.map(r=>r.benchmark)).size+' benchmarks · all selected bars shown. Full experiment history in Size vs. quality below.';
+  const filtered=fronts.filter(r=>modelOf(r)===selectedModel&&(evidence==='all'||r.published===(evidence==='published'))&&(!query||[r.model,r.label,r.benchmark,families[family(r)],styles[r.method][0]].join(' ').toLowerCase().includes(query)));
+  const root=byId('barsGrid'),jump=byId('barsJump');root.replaceChildren();jump.replaceChildren();legend();modelSwitcher();coverageGrid(filtered);
+  byId('barsCount').textContent=UI.modelName(selectedModel)+' · '+filtered.length+' bars · '+new Set(filtered.map(r=>r.benchmark)).size+' benchmarks. Other original models: use the buttons above. Full experiment history in Size vs. quality below.';
   const cards=[];
   for(const [id,title] of categories){
    const names=metrics.filter(m=>category(m)===id&&filtered.some(r=>r.benchmark===m));if(!names.length)continue;
