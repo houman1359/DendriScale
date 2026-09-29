@@ -1,6 +1,6 @@
 {
   "schema": "dendriscale/benchmark-evaluation-coverage-v1",
-  "updated_at_utc": "2026-09-29T15:03:39.721034+00:00",
+  "updated_at_utc": "2026-09-29T16:25:08.487709+00:00",
   "campaign": "Matched Qwen3-8B benchmark coverage · completed scores and continuing native evaluations",
   "request_sha256": "6854f6ca88677adc883f30aee9be61de894f99482c26e141058c26ae3dc00182",
   "submission_sha256": "4c1fd9bb4956d90591ac21510812fc4d897d05f9b2e0b5a6f9096866eed51d5c",
@@ -53,8 +53,8 @@
     {
       "benchmark": "MMLU-Redux",
       "status": "submitted",
-      "label": "Teacher within tolerance · waiting for both Bonsais",
-      "summary": "The teacher scores 81.6 against PrismML’s 83.0 (−1.4). Scores are published once both Bonsais are measured and also lie within 3 points of PrismML’s.",
+      "label": "Qualified · compressed-model runs continuing",
+      "summary": "Against PrismML’s reported scores: teacher 81.6 vs 83.0 (−1.4), ternary Bonsai 71.5 vs 72.6 (−1.1), 1-bit Bonsai 65.0 vs 65.7 (−0.7). Compressed models are appended as they finish.",
       "items": [
         "EvalScope 1.4.2 frozen requests, nonthinking generation and replay scoring on H100.",
         "MMLU-Redux 5,700; MuSR 756; GPQA Diamond 1,980 (10 samples); IFBench 300.",
@@ -67,8 +67,8 @@
     {
       "benchmark": "MuSR",
       "status": "submitted",
-      "label": "Teacher and ternary within tolerance · waiting for 1-bit Bonsai",
-      "summary": "Teacher 57.0 against PrismML’s 55.0 (+2.0); ternary Bonsai 58.2 against 56.2 (+2.0). Scores are published once the 1-bit Bonsai is measured and also lies within 3 points.",
+      "label": "Qualified · compressed-model runs continuing",
+      "summary": "Against PrismML’s reported scores: teacher 57.0 vs 55.0 (+2.0), ternary Bonsai 58.2 vs 56.2 (+2.0), 1-bit Bonsai 49.5 vs 50.0 (−0.5). Compressed models are appended as they finish.",
       "items": [
         "EvalScope 1.4.2 frozen requests, nonthinking generation and replay scoring on H100.",
         "MMLU-Redux 5,700; MuSR 756; GPQA Diamond 1,980 (10 samples); IFBench 300.",
@@ -125,12 +125,12 @@
     {
       "benchmark": "IFBench",
       "status": "submitted",
-      "label": "Teacher within tolerance · waiting for both Bonsais",
-      "summary": "On PrismML’s metric, the OLLM average (prompt strict + instruction strict)/2, the teacher scores 26.2 against PrismML’s 27.2 (−1.0). Scores are published once both Bonsais are measured and also lie within 3 points.",
+      "label": "Qualified · compressed-model runs continuing",
+      "summary": "On PrismML’s metric, the OLLM average (prompt strict + instruction strict)/2: teacher 26.2 vs 27.2 (−1.0), ternary Bonsai 23.5 vs 21.9 (+1.6), 1-bit Bonsai 21.0 vs 19.8 (+1.2). Compressed models are appended as they finish.",
       "items": [
         "EvalScope 1.4.2 frozen requests, nonthinking generation and replay scoring on H100.",
         "MMLU-Redux 5,700; MuSR 756; GPQA Diamond 1,980 (10 samples); IFBench 300.",
-        "A benchmark is published once the teacher and both Bonsais are measured and each lies within 3 points of PrismML’s score.",
+        "A benchmark was published once the teacher and both Bonsais are measured and each lies within 3 points of PrismML’s score.",
         "Scored with PrismML’s OLLM average (Appendix B.5.1), not prompt-level strict alone."
       ],
       "models": [
@@ -140,12 +140,12 @@
     {
       "benchmark": "BFCL v3",
       "status": "submitted",
-      "label": "Prompting-mode evaluation being recorded",
-      "summary": "Our first BFCL run used function-calling mode, which is not PrismML’s protocol. Those scores now have their own chart, “BFCL v3 · function-calling mode”; this chart keeps PrismML-comparable prompting-mode scores.",
+      "label": "PrismML protocol reproduced · more models running",
+      "summary": "Prompting mode, 13-subset macro-average. Against PrismML’s reported scores: teacher 80.98 vs 81.0 (−0.02), ternary Bonsai 71.9 vs 73.9 (−2.0), 1-bit Bonsai 66.3 vs 65.7 (+0.6). Compressed models are appended as they finish.",
       "items": [
-        "PrismML Appendix B.5.2: prompting mode (tools in the system prompt, is_fc_model=false, underscore_to_dot=false); macro-average of the 13 single-turn subsets.",
-        "Withdrawn on 29 Sep 2026: function-calling scores published earlier that day under this name as a sample-weighted accuracy.",
-        "In function-calling mode our local 1-bit and ternary Bonsai scored 10.9 and 3.9 points above PrismML’s reported BFCL (macro-average); the teacher was 0.7 below."
+        "PrismML Appendix B.5.2: prompting mode (tools in the system prompt, is_fc_model=false, underscore_to_dot=false); macro-average of the 13 single-turn subsets; 3,641 cases; greedy, 4,096-token cap.",
+        "Withdrawn on 29 Sep 2026: function-calling scores published earlier that day under this name as a sample-weighted accuracy. They now have their own chart, “BFCL v3 · function-calling mode”.",
+        "In function-calling mode the local 1-bit and ternary Bonsai had scored 10.9 and 3.9 points above PrismML’s reports; in prompting mode they are within 2.1 points."
       ],
       "models": [
         "Qwen/Qwen3-8B"
@@ -280,6 +280,6 @@
       ]
     }
   ],
-  "amended_at_utc": "2026-09-29T15:03:39.721034+00:00",
+  "amended_at_utc": "2026-09-29T16:25:08.487709+00:00",
   "amendment": "BFCL v3 notes corrected and the function-calling-mode chart added by claude_public_benchmarks_v1; suite teacher qualifications and PrismML gaps added."
 }
