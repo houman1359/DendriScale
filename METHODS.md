@@ -237,3 +237,12 @@ New primary studies measure DendriNet replacement and whole-model recovery at th
 ## Local IFEval measurements · September 28
 
 The new local IFEval results use all 541 official prompts and 834 instructions, explicit greedy nonthinking generation with a 4,096-token output budget, and the average of prompt-strict and instruction-strict accuracy. These are our measurements, not reproductions of Prism’s serving stack. The Bonsai packed sizes remain provider-reported; evaluation uses unpacked weights. No full-suite or significance claim follows from this single benchmark.
+
+
+## Historical size notes and contrast · September 28 follow-up
+
+The older BF16 OLMo-3-7B teacher record includes 14,596,022,784 complete-model registered bytes, but the generic registry importer classified `teacher_registered_bytes` as unqualified `registered_bytes`. The same benchmark score also appeared against the 270,532,608-byte layer cost. The overview now applies an audited size note to the complete-model row and folds the exact layer-cost duplicate into it. `data/benchmark_size_notes.json` binds the correction to point IDs, model, cohort, source hashes and the original byte value; mismatches fail closed. The full snapshot, raw metrics and register retain both original cost scopes.
+
+The older FP32 teacher characterization reports 7,298,011,136 parameters without a verified complete-model byte ledger. Its reference bars say **GB not recorded**, with the parameter count and the reason in the detail. This is an accounting gap, not a zero-size model. We do not infer registered bytes from model names, parameter counts, or a different precision.
+
+Method colors now use charcoal for originals, blue for dendritic replacements, amber for dendritic + quantization, and rose/magenta for non-dendritic methods. Wider spacing between pattern marks preserves the base colors; diagonal lines, crosses and dots provide redundant distinctions. Group headers carry colored strips and the legend has larger swatches. Monochrome retains visible patterns. The same three method colors apply to the matched scatter view; the pooled plot retains its separate model-color convention.

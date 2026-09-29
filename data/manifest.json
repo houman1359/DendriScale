@@ -6,6 +6,7 @@
     "candidates.csv": "363656023c3d88cf07044e7e807023afb848163e5cbbc261e740e935f3a85f2a",
     "coverage.csv": "ee6137a0505b211a3f74cde565247b47db8f8ac05ec9a76b002bb96bec7dc2d8",
     "metrics.csv": "d49674a2f08e3b21738efce141372d79b991798f8c6001e8be24bab6545b9f04",
-    "observations.csv": "99f3a008956424dfab47417ecf1c62fdc30c9f59ccdfde53d5009a73c20584b3"
+    "observations.csv": "99f3a008956424dfab47417ecf1c62fdc30c9f59ccdfde53d5009a73c20584b3",
+    "benchmark_size_notes.json": "79ec1f1f7c2874003608633ca8192e11f180f005256147c8de5c1dbd8940385c"
   }
 }

@@ -2,7 +2,8 @@
 'use strict';
 (async function start() {
 try {
-const response = await fetch('data/snapshot.json');
+const [response,sizeResponse] = await Promise.all([fetch('data/snapshot.json'),fetch('data/benchmark_size_notes.json').catch(()=>null)]);
+const sizeNotes=sizeResponse?.ok?(await sizeResponse.json()).entries:[];
 if (!response.ok) throw new Error('Snapshot could not be loaded');
 const DATA=await response.json(),byId=id=>document.getElementById(id);
 byId('updated').textContent=new Date(DATA.updated_at_utc).toLocaleString(undefined,{timeZoneName:'short'});
@@ -15,8 +16,8 @@ const svgNS='http://www.w3.org/2000/svg';
 // Presentation is independent of archived measurements and method classifications.
 const METHOD_STYLES={
  dendritic:{color:'#0072B2',shape:'circle',shapeLabel:'Circle'},
- hybrid:{color:'#B64A00',shape:'square',shapeLabel:'Square'},
- control:{color:'#6842A0',shape:'triangle',shapeLabel:'Triangle'},
+ hybrid:{color:'#E69F00',shape:'square',shapeLabel:'Square'},
+ control:{color:'#CC79A7',shape:'triangle',shapeLabel:'Triangle'},
  dense:{color:'#006B57',shape:'diamond',shapeLabel:'Diamond'},
  external:{color:'#56B4E9',shape:'star',shapeLabel:'Star'},
  teacher:{color:'#151515',shape:'cross',shapeLabel:'Cross'},
@@ -218,7 +219,7 @@ selectPanels();
 if(params.has('panel')&&[...byId('panel').options].some(o=>o.value===params.get('panel'))){byId('panel').value=params.get('panel');selectDose();}
 coverage();candidateRegister();comparisonTable();
 window.DendriScalePooled(DATA,{el,se,shapeMark,methodIcon,methodLabel,outcome,openComparison,onlyPass});
-window.DendriScaleBars(DATA,{el,se});
+window.DendriScaleBars(DATA,{el,se,sizeNotes});
 byId('comparisonCohort').addEventListener('change',comparisonTable);byId('comparisonGate').addEventListener('change',comparisonTable);byId('monochrome').addEventListener('change',comparisonTable);
 for(const id of ['model','level','panel']) byId(id).addEventListener('change',()=>{const q=new URLSearchParams();for(const key of ['model','level','panel'])q.set(key,byId(key).value);history.replaceState(null,'','?'+q.toString());});
 byId('loadError').hidden=true;

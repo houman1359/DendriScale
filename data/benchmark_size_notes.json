@@ -1,0 +1,41 @@
+{
+  "schema": "dendriscale/benchmark-size-notes-v1",
+  "entries": [
+    {
+      "point_id": "exp_20260908_7b_bf16_capability:5:2",
+      "alias_point_ids": [
+        "exp_20260908_7b_bf16_capability:4:2"
+      ],
+      "experiment_id": "exp_20260908_7b_bf16_capability",
+      "model": "OLMo-3-7B-Instruct",
+      "cohort": "exp_20260908_7b_bf16_capability | GSM train-dev 1,024; MC 6,144; fixed C4/copy; BF16/eager/H100",
+      "label": "teacher",
+      "source_hashes": [
+        "82fd868721016b7cfa2133f61f16f9e885c0d81f065156b4c4e0d69d59ac5fc1"
+      ],
+      "registered_bytes": 14596022784,
+      "source_metric": "teacher_registered_bytes",
+      "source_metric_index": 5,
+      "source_table": "metrics.csv",
+      "note": "Verified teacher_registered_bytes measures the complete BF16 teacher: unique registered parameters and buffers. The layer-only cost row repeats this same benchmark observation and is folded into this bar. The full register retains both cost scopes."
+    },
+    {
+      "point_id": "exp_20260908_7b_bf16_capability:5:3",
+      "alias_point_ids": [
+        "exp_20260908_7b_bf16_capability:4:3"
+      ],
+      "experiment_id": "exp_20260908_7b_bf16_capability",
+      "model": "OLMo-3-7B-Instruct",
+      "cohort": "exp_20260908_7b_bf16_capability | GSM train-dev 1,024; MC 6,144; fixed C4/copy; BF16/eager/H100",
+      "label": "teacher",
+      "source_hashes": [
+        "82fd868721016b7cfa2133f61f16f9e885c0d81f065156b4c4e0d69d59ac5fc1"
+      ],
+      "registered_bytes": 14596022784,
+      "source_metric": "teacher_registered_bytes",
+      "source_metric_index": 5,
+      "source_table": "metrics.csv",
+      "note": "Verified teacher_registered_bytes measures the complete BF16 teacher: unique registered parameters and buffers. The layer-only cost row repeats this same benchmark observation and is folded into this bar. The full register retains both cost scopes."
+    }
+  ]
+}

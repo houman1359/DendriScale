@@ -30,6 +30,27 @@ class PublicContract(unittest.TestCase):
                 self.assertIn('GSM948/1024',point['cohort']);self.assertIn('MC5292/6144',point['cohort'])
                 self.assertTrue(all(point['full_gate_checks'].values()));self.assertIn('ModelOpt',point['label'])
 
+    def test_benchmark_size_notes_are_source_bound(self):
+        notes=json.loads((ROOT/'data/benchmark_size_notes.json').read_text())['entries']
+        points={p['id']:p for panel in DATA['panels'] for p in panel['points']}
+        with (ROOT/'data/metrics.csv').open() as f:
+            metrics={(r['experiment_id'],int(r['index'])):r for r in csv.DictReader(f)}
+        for note in notes:
+            point=points[note['point_id']]
+            metric=metrics[(note['experiment_id'],note['source_metric_index'])]
+            self.assertEqual(metric['name'],'teacher_registered_bytes')
+            self.assertEqual(metric['unit'],'bytes')
+            self.assertEqual(int(metric['value']),note['registered_bytes'])
+            self.assertEqual(point['x'],note['registered_bytes'])
+            self.assertEqual(point['source_hashes'],note['source_hashes'])
+            for key in ['experiment_id','model','cohort','label']:
+                self.assertEqual(point[key],note[key])
+            for alias_id in note['alias_point_ids']:
+                alias=points[alias_id]
+                self.assertEqual(alias['xaxis'],'site_registered_bytes')
+                for key in ['model','cohort','label','ylabel','yunit','y','source_hashes']:
+                    self.assertEqual(alias[key],point[key])
+
     def test_schema_and_coverage(self):
         self.assertEqual(DATA['schema'],'dendriscale/public-v1')
         self.assertEqual(len(DATA['coverage']),DATA['summary']['experiments'])

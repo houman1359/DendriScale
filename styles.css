@@ -58,9 +58,10 @@
 .bar-protocol-list dd{margin:0;overflow-wrap:anywhere}
 .bar-method-key{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#263746}
 .bar-published-key{font-size:11px;border:1px dashed #ad925f;border-radius:4px;padding:3px 6px;background:#f7f2e8;color:#684d1c}
-.bar-swatch{height:15px;width:20px;display:inline-block;background-color:var(--method-color);border:1px solid #405160}
-.bar-swatch.diagonal{background-image:repeating-linear-gradient(135deg,transparent 0 5px,#ffffffa0 5px 6px)}
-.bar-swatch.cross{background-image:repeating-linear-gradient(45deg,transparent 0 5px,#ffffff90 5px 6px),repeating-linear-gradient(135deg,transparent 0 5px,#ffffff90 5px 6px)}
+.bar-swatch{height:20px;width:28px;display:inline-block;background-color:var(--method-color);border:1px solid #405160}
+.bar-swatch.diagonal{background-image:repeating-linear-gradient(135deg,transparent 0 11px,var(--pattern-ink) 11px 12px)}
+.bar-swatch.cross{background-image:repeating-linear-gradient(45deg,transparent 0 11px,var(--pattern-ink) 11px 12px),repeating-linear-gradient(135deg,transparent 0 11px,var(--pattern-ink) 11px 12px)}
+.bar-swatch.dots{background-image:radial-gradient(var(--pattern-ink) 1.8px,transparent 1.8px);background-size:12px 12px}
 .bar-swatch.horizontal{background-image:repeating-linear-gradient(0deg,transparent 0 5px,#ffffffa0 5px 6px)}
 .bar-dialog{border:1px solid #adbdc9;border-radius:12px;max-width:760px;width:calc(100% - 32px);max-height:85vh;overflow:auto;padding:24px;color:var(--ink)}
 .bar-dialog::backdrop{background:#102c4480}
