@@ -5080,3 +5080,23 @@ exp_20260928_qwen_allocation,Qwen3-8B and local Bonsai 8B references,10,dense_26
 exp_20260928_ifeval_full_v2,Qwen3-8B and Bonsai 8B,0,qwen3_8b IFEval strict average,84.27804891022487,percent,official full541,Full model benchmark; projected or reported byte axis
 exp_20260928_ifeval_full_v2,Qwen3-8B and Bonsai 8B,1,ternary_bonsai_8b IFEval strict average,84.43540915880973,percent,official full541,Full model benchmark; projected or reported byte axis
 exp_20260928_ifeval_full_v2,Qwen3-8B and Bonsai 8B,2,bonsai_8b IFEval strict average,82.94414376077697,percent,official full541,Full model benchmark; projected or reported byte axis
+exp_20260928_evening_native,Qwen/Qwen3-8B,0,Teacher reference MC correct / 6144,4934,items,development,Whole model; executable-format projection
+exp_20260928_evening_native,Qwen/Qwen3-8B,1,"Native-only: 18 FFNs, 25% active values MC correct / 6144",4219,items,development,Whole model; executable-format projection
+exp_20260928_evening_native,Qwen/Qwen3-8B,2,"Native-only: 18 FFNs, 25% active values C4 teacher KL",0.3257374706445771,nats/token,development,Whole model; executable-format projection
+exp_20260928_evening_native,Qwen/Qwen3-8B,3,"Native-only: 18 FFNs, 25% active values Copy2048 teacher KL",0.01456057813843968,nats/token,development,Whole model; executable-format projection
+exp_20260928_evening_native,Qwen/Qwen3-8B,4,"Native-only: 18 FFNs, 50% active values C4 teacher KL",0.14675121366764485,nats/token,development,Whole model; executable-format projection
+exp_20260928_evening_native,Qwen/Qwen3-8B,5,"Native-only: 18 FFNs, 50% active values Copy2048 teacher KL",0.006855199100070662,nats/token,development,Whole model; executable-format projection
+exp_20260928_evening_native,Qwen/Qwen3-8B,6,"Native-only: 36 FFNs, 25% active values C4 teacher KL",0.6681488239774173,nats/token,development,Whole model; executable-format projection
+exp_20260928_evening_native,Qwen/Qwen3-8B,7,"Native-only: 36 FFNs, 25% active values Copy2048 teacher KL",0.037190098821745475,nats/token,development,Whole model; executable-format projection
+exp_20260928_evening_native,Qwen/Qwen3-8B,8,"Native-only: 8 FFNs, 25% active values MC correct / 6144",4704,items,development,Whole model; executable-format projection
+exp_20260928_evening_native,Qwen/Qwen3-8B,9,"Native-only: 8 FFNs, 25% active values C4 teacher KL",0.12072704044804304,nats/token,development,Whole model; executable-format projection
+exp_20260928_evening_native,Qwen/Qwen3-8B,10,"Native-only: 8 FFNs, 25% active values Copy2048 teacher KL",0.003919662869594405,nats/token,development,Whole model; executable-format projection
+exp_20260928_evening_native,Qwen/Qwen3-8B,11,"Native-only: 8 FFNs, 50% active values MC correct / 6144",4816,items,development,Whole model; executable-format projection
+exp_20260928_evening_native,Qwen/Qwen3-8B,12,"Native-only: 8 FFNs, 50% active values C4 teacher KL",0.06101277544237322,nats/token,development,Whole model; executable-format projection
+exp_20260928_evening_native,Qwen/Qwen3-8B,13,"Native-only: 8 FFNs, 50% active values Copy2048 teacher KL",0.0023043821475528335,nats/token,development,Whole model; executable-format projection
+exp_20260928_evening_native,Qwen/Qwen3-8B,14,Staged native BF16: 6 FFNs GSM correct / 1024,913,items,development,Whole model; executable-format projection
+exp_20260928_evening_native,Qwen/Qwen3-8B,15,Staged native BF16: 6 FFNs MC correct / 6144,4798,items,development,Whole model; executable-format projection
+exp_20260928_evening_native,Qwen/Qwen3-8B,16,Staged native BF16: 9 FFNs GSM correct / 1024,893,items,development,Whole model; executable-format projection
+exp_20260928_evening_native,Qwen/Qwen3-8B,17,Staged native BF16: 9 FFNs MC correct / 6144,4716,items,development,Whole model; executable-format projection
+exp_20260928_evening_native,Qwen/Qwen3-8B,18,Staged native BF16: 12 FFNs · reduced old-cell LR GSM correct / 1024,863,items,development,Whole model; executable-format projection
+exp_20260928_evening_native,Qwen/Qwen3-8B,19,Recovered INT4 parent; no dendritic cells IFEval (%),85.56197555818561,percent,development,Whole model; executable-format projection

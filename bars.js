@@ -84,7 +84,7 @@ window.DendriScaleBars = function(DATA,{el,se}) {
  function defaultCohort(groups){
   // Deterministic presentation choice, never based on passing, quality or score.
   return [...groups].sort((a,b)=>{
-   const priority=x=>x[1].some(r=>/Qwen3-8B/.test(r.model))?0:x[1].some(r=>/OLMo.*32B/.test(r.model))?1:2;
+   const priority=x=>/Native-first BF16|staged BF16 ladder/.test(x[0])?-1:x[1].some(r=>/Qwen3-8B/.test(r.model))?0:x[1].some(r=>/OLMo.*32B/.test(r.model))?1:2;
    return priority(a)-priority(b)||b[1].length-a[1].length||a[0].localeCompare(b[0]);
   })[0]?.[0];
  }
