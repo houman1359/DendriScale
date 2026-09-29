@@ -1,104 +1,148 @@
 {
   "schema": "dendriscale/benchmark-evaluation-coverage-v1",
-  "updated_at_utc": "2026-09-29T02:38:47.188360+00:00",
-  "campaign": "Full coding and native instruction-following coverage \u00b7 2026-09-29",
+  "updated_at_utc": "2026-09-29T14:03:06.965995+00:00",
+  "campaign": "Matched Qwen3-8B benchmark coverage \u00b7 completed scores and continuing native evaluations",
   "request_sha256": "6854f6ca88677adc883f30aee9be61de894f99482c26e141058c26ae3dc00182",
   "submission_sha256": "4c1fd9bb4956d90591ac21510812fc4d897d05f9b2e0b5a6f9096866eed51d5c",
   "benchmarks": [
     {
       "benchmark": "HumanEval+",
       "status": "submitted",
-      "label": "Full evaluation wave submitted",
-      "summary": "164 problems \u00d7 9 models, including all 6 native DendriNet configurations.",
+      "label": "Full scores available \u00b7 more native models running",
+      "summary": "Teacher, quantized controls, eight-cell hybrid and the 8-FFN/50%-value native model have complete scores.",
       "items": [
-        "Native DendriNet: all six BF16 endpoints (8, 18 or 36 FFNs; 25% or 50% active-value budgets).",
-        "Controls: original Qwen3-8B, recovered INT4 parent and recovered eight-cell hybrid.",
-        "One greedy, nonthinking completion per problem on H100; matched local protocol, not exact Prism reproduction.",
-        "Results require every shard and the full augmented tests. No new scores are available from this wave yet."
+        "Full augmented EvalPlus tests: HumanEval+ 164 problems; MBPP+ 378 problems.",
+        "All six native BF16 endpoints remain scheduled; completed results, including losses, are appended.",
+        "Matched local greedy nonthinking H100 protocol; not exact Prism reproduction."
+      ],
+      "models": [
+        "Qwen/Qwen3-8B"
       ]
     },
     {
       "benchmark": "MBPP+",
       "status": "submitted",
-      "label": "Full evaluation wave submitted",
-      "summary": "378 problems \u00d7 9 models, including all 6 native DendriNet configurations.",
+      "label": "Full scores available \u00b7 more native models running",
+      "summary": "Teacher, quantized controls, eight-cell hybrid and the 8-FFN/50%-value native model have complete scores.",
       "items": [
-        "Native DendriNet: all six BF16 endpoints (8, 18 or 36 FFNs; 25% or 50% active-value budgets).",
-        "Controls: original Qwen3-8B, recovered INT4 parent and recovered eight-cell hybrid.",
-        "One greedy, nonthinking completion per problem on H100; matched local protocol, not exact Prism reproduction.",
-        "Results require every shard and the full augmented tests. No new scores are available from this wave yet."
+        "Full augmented EvalPlus tests: HumanEval+ 164 problems; MBPP+ 378 problems.",
+        "All six native BF16 endpoints remain scheduled; completed results, including losses, are appended.",
+        "Matched local greedy nonthinking H100 protocol; not exact Prism reproduction."
+      ],
+      "models": [
+        "Qwen/Qwen3-8B"
       ]
     },
     {
       "benchmark": "IFEval",
       "status": "submitted",
-      "label": "Native DendriNet coverage submitted",
-      "summary": "541 prompts for each of the 6 native BF16 models; the quantized hybrid evaluation is already running.",
+      "label": "Hybrid result complete \u00b7 native-only evaluations running",
+      "summary": "Full teacher, parent and eight-cell hybrid scores are available; six native BF16 evaluations continue.",
       "items": [
-        "Teacher and quantized-parent results are measured and shown below.",
-        "New native runs use the same strict prompt/instruction metric and explicit greedy decoding.",
-        "Previously submitted hybrid and small-model runs are reused, not duplicated."
+        "541 prompts and 834 instructions; strict prompt/instruction average.",
+        "Earlier v2 results are reused after exact prompt and source-hash checks.",
+        "No partial shard is displayed as a full benchmark score."
+      ],
+      "models": [
+        "Qwen/Qwen3-8B"
       ]
     },
     {
       "benchmark": "MMLU-Redux",
-      "status": "planned",
-      "label": "Next wave \u00b7 runner qualification needed",
-      "summary": "Our compressed-model score is not yet available; the bars are published references.",
+      "status": "submitted",
+      "label": "Full benchmark jobs running",
+      "summary": "Claude\u2019s matched teacher and compressed-model evaluation waves are submitted; full scores are pending.",
       "items": [
-        "Next evaluation wave: the same frozen native models with original and quantized controls.",
-        "Data version, prompts, scoring and generation settings must qualify before full jobs are launched."
+        "EvalScope 1.4.2 frozen requests, nonthinking generation and replay scoring on H100.",
+        "MMLU-Redux 5,700; MuSR 756; GPQA Diamond 1,980 (10 samples); IFBench 300.",
+        "Local protocol is identified separately from PrismML\u2019s published measurements."
+      ],
+      "models": [
+        "Qwen/Qwen3-8B"
       ]
     },
     {
       "benchmark": "MuSR",
-      "status": "planned",
-      "label": "Next wave \u00b7 runner qualification needed",
-      "summary": "Our compressed-model score is not yet available; the bars are published references.",
+      "status": "submitted",
+      "label": "Full benchmark jobs running",
+      "summary": "Claude\u2019s matched teacher and compressed-model evaluation waves are submitted; full scores are pending.",
       "items": [
-        "Next evaluation wave: the same frozen native models with original and quantized controls.",
-        "Data version, prompts, scoring and generation settings must qualify before full jobs are launched."
+        "EvalScope 1.4.2 frozen requests, nonthinking generation and replay scoring on H100.",
+        "MMLU-Redux 5,700; MuSR 756; GPQA Diamond 1,980 (10 samples); IFBench 300.",
+        "Local protocol is identified separately from PrismML\u2019s published measurements."
+      ],
+      "models": [
+        "Qwen/Qwen3-8B"
+      ]
+    },
+    {
+      "benchmark": "GSM8K",
+      "models": [
+        "Qwen/Qwen3-8B"
+      ],
+      "status": "submitted",
+      "label": "Official test-split scores available",
+      "summary": "Official GSM8K results are separate from the 1,024-item development cohort.",
+      "items": [
+        "1,319 official test items; EvalScope 4-shot requests, greedy nonthinking generation.",
+        "Original, quantized, hybrid and staged native variants have completed scores; more are running.",
+        "Development results remain in their own coverage column and charts."
       ]
     },
     {
       "benchmark": "MATH-500",
-      "status": "planned",
-      "label": "Next wave \u00b7 runner qualification needed",
-      "summary": "Our compressed-model score is not yet available; the bars are published references.",
+      "status": "submitted",
+      "label": "Full scores available \u00b7 additional variants running",
+      "summary": "Matched original, quantized-parent and dendritic-hybrid results are now available.",
       "items": [
-        "Next evaluation wave: the same frozen native models with original and quantized controls.",
-        "Data version, prompts, scoring and generation settings must qualify before full jobs are launched."
+        "Whole-dataset results only; no inference from GSM, coding or local reconstruction.",
+        "MATH-500: 500 problems, greedy 8,192-token cap. BFCL v3: 3,641 cases across 13 single-turn subsets.",
+        "BFCL uses the recorded sample-weighted aggregate; exact Prism reproduction is not established."
+      ],
+      "models": [
+        "Qwen/Qwen3-8B"
       ]
     },
     {
       "benchmark": "GPQA Diamond",
-      "status": "planned",
-      "label": "Next wave \u00b7 runner qualification needed",
-      "summary": "Our compressed-model score is not yet available; the bars are published references.",
+      "status": "submitted",
+      "label": "Full benchmark jobs running",
+      "summary": "Claude\u2019s matched teacher and compressed-model evaluation waves are submitted; full scores are pending.",
       "items": [
-        "Next evaluation wave: the same frozen native models with original and quantized controls.",
-        "Data version, prompts, scoring and generation settings must qualify before full jobs are launched."
+        "EvalScope 1.4.2 frozen requests, nonthinking generation and replay scoring on H100.",
+        "MMLU-Redux 5,700; MuSR 756; GPQA Diamond 1,980 (10 samples); IFBench 300.",
+        "Local protocol is identified separately from PrismML\u2019s published measurements."
+      ],
+      "models": [
+        "Qwen/Qwen3-8B"
       ]
     },
     {
       "benchmark": "IFBench",
-      "status": "planned",
-      "label": "Next wave \u00b7 runner qualification needed",
-      "summary": "Our compressed-model score is not yet available; the bars are published references.",
+      "status": "submitted",
+      "label": "Full benchmark jobs running",
+      "summary": "Claude\u2019s matched teacher and compressed-model evaluation waves are submitted; full scores are pending.",
       "items": [
-        "Next evaluation wave: the same frozen native models with original and quantized controls.",
-        "Data version, prompts, scoring and generation settings must qualify before full jobs are launched."
+        "EvalScope 1.4.2 frozen requests, nonthinking generation and replay scoring on H100.",
+        "MMLU-Redux 5,700; MuSR 756; GPQA Diamond 1,980 (10 samples); IFBench 300.",
+        "Local protocol is identified separately from PrismML\u2019s published measurements."
+      ],
+      "models": [
+        "Qwen/Qwen3-8B"
       ]
     },
     {
       "benchmark": "BFCL v3",
-      "status": "planned",
-      "label": "Next wave \u00b7 runner qualification needed",
-      "summary": "Our compressed-model score is not yet available; the bars are published references.",
+      "status": "submitted",
+      "label": "Full scores available \u00b7 additional variants running",
+      "summary": "Matched original, quantized-parent and dendritic-hybrid results are now available.",
       "items": [
-        "Next evaluation wave: the same frozen native models with original and quantized controls.",
-        "Data version, prompts, scoring and generation settings must qualify before full jobs are launched.",
-        "Requires the full 13-subset single-turn macro; ordinary coding accuracy is not a tool-use score."
+        "Whole-dataset results only; no inference from GSM, coding or local reconstruction.",
+        "MATH-500: 500 problems, greedy 8,192-token cap. BFCL v3: 3,641 cases across 13 single-turn subsets.",
+        "BFCL uses the recorded sample-weighted aggregate; exact Prism reproduction is not established."
+      ],
+      "models": [
+        "Qwen/Qwen3-8B"
       ]
     },
     {

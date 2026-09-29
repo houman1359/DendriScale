@@ -1,6 +1,6 @@
 {
  "schema": "dendriscale/variant-aliases-v1",
- "updated_at_utc": "2026-09-29T04:10:13.746020+00:00",
+ "updated_at_utc": "2026-09-29T14:03:08.909043+00:00",
  "note": "Different registrations gave some checkpoints different labels. The benchmark overview and coverage grid show each group as one model variant; the register, scatter views and downloads keep the registered labels. A group holds only registrations of one checkpoint (same run and recovery dose); published references are never merged.",
  "groups": [
   {
@@ -12,8 +12,11 @@
    ],
    "checkpoint": "Original BF16 teacher; no training",
    "id_prefixes": [
+    "coverage20260929_qwen3_8b",
     "ifeval20260928_v2_qwen3_8b",
+    "nativefirst20260928_teacher_GSM",
     "nativefirst20260928_teacher_MC",
+    "prismsuite20260929_qwen3_8b",
     "qwen8b_choice20260927_qwen3_8b"
    ]
   },
@@ -26,7 +29,9 @@
    ],
    "checkpoint": "e2e/parent_int4t @ 67,108,864 targets",
    "id_prefixes": [
+    "coverage20260929_parent_int4t",
     "ifeval20260928_v2_parent_int4t",
+    "prismsuite20260929_parent_int4t",
     "qwen8b_allocation20260928_parent_int4t",
     "qwen8b_choice20260927_parent_int4t"
    ]
