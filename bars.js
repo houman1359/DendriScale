@@ -18,7 +18,7 @@ window.DendriScaleBarFront = rows => {
   (eligible.includes(r) && !groups.get(key(r)).some(q=>dominates(q,r))));
 };
 
-window.DendriScaleBars = function(DATA,{el,se,sizeNotes=[]}) {
+window.DendriScaleBars = function(DATA,{el,se,sizeNotes=[],benchmarkCoverage=null}) {
  const UI=window.DendriScaleUI,byId=id=>document.getElementById(id);
  const styles={teacher:['Original / teacher','#222222','none'],dendritic:['Dendritic','#0072B2','diagonal'],
   hybrid:['Dendritic + quantization','#E69F00','cross'],control:['Quantization / pruning / deletion','#CC79A7','dots'],
@@ -255,7 +255,14 @@ window.DendriScaleBars = function(DATA,{el,se,sizeNotes=[]}) {
   const exportButton=button('Download chart ↓',()=>download(chart,'dendriscale-'+benchmark.replace(/[^a-z0-9]/gi,'-')));exportButton.className='quiet-button';head.append(title,exportButton);root.append(head);
   const measured=chosen.filter(r=>!r.published&&r.method!=='teacher'),published=chosen.filter(r=>r.published),teachers=chosen.filter(r=>!r.published&&r.method==='teacher');
   const note=el('p',[measured.length?measured.length+' measured Pareto '+(measured.length===1?'model':'models'):null,published.length?published.length+' published references':null,teachers.length?teachers.length+' '+(teachers.length===1?'original':'originals'):null].filter(Boolean).join(' · '));note.className='bar-summary small muted';root.append(note);
-  if(!fronts.some(r=>r.benchmark===benchmark&&!r.published&&r.method!=='teacher')) {const empty=el('p','Our compression fronts are not yet available for this benchmark.');empty.className='bar-missing small';root.append(empty);}
+  const coverage=benchmarkCoverage?.benchmarks?.find(x=>x.benchmark===benchmark);
+  if(coverage){
+   const status=el('div');status.className='bar-evaluation-status';status.dataset.status=coverage.status;
+   status.append(el('strong',coverage.label),el('span',coverage.summary));
+   const detail=el('details');detail.append(el('summary','Evaluation coverage & next work'));
+   const list=el('ul');for(const item of coverage.items||[])list.append(el('li',item));
+   detail.append(list,el('p','Status checked '+new Date(benchmarkCoverage.updated_at_utc).toLocaleString()+'. Pending evaluations are not scores.'));status.append(detail);root.append(status);
+  } else if(!fronts.some(r=>r.benchmark===benchmark&&!r.published&&r.method!=='teacher')) {const empty=el('p','Our compressed models have not yet been evaluated on this benchmark.');empty.className='bar-missing small';root.append(empty);}
   if(chosen.some(r=>!r.size.bytes)){const missing=el('p','GB not recorded: these historical references contain parameter counts or layer-only costs, not a verified whole-model byte measurement. Open a bar for the recorded detail.');missing.className='bar-missing small';root.append(missing);}
   const chart=se('svg',{role:'group','aria-label':benchmark+' benchmark bars',class:'benchmark-chart'});root.append(chart);
   const protocolKeys=[...new Map(chosen.map(r=>[code(r),r])).entries()];

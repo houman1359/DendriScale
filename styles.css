@@ -74,3 +74,10 @@
  .benchmark-jump a{font-size:11px}.benchmark-card h4{font-size:20px}.benchmark-card-heading .quiet-button{font-size:10px;max-width:105px}
  .bar-dialog .bar-facts{grid-template-columns:1fr}.bar-protocol-list{grid-template-columns:30px minmax(0,1fr)}
 }
+:root { --evaluation-blue: #0072b2; }
+.bar-evaluation-status { display: grid; gap: .35rem; padding: .65rem .8rem; margin: .65rem 0; background: #f1f7fb; border-left: 3px solid var(--evaluation-blue); font-size: .86rem; }
+.bar-evaluation-status strong { color: #124e73; }
+.bar-evaluation-status details { font-size: .82rem; }
+.bar-evaluation-status ul { padding-left: 1.3rem; margin: .6rem 0; }
+.bar-evaluation-status[data-status="planned"] { border-left-style: dashed; background: #f6f6f6; }
+.bar-evaluation-status[data-status="not_applicable"] { border-left-color: #666; background: #f6f6f6; }

@@ -1,0 +1,219 @@
+{
+  "schema": "dendriscale/benchmark-evaluation-coverage-v1",
+  "updated_at_utc": "2026-09-29T02:38:47.188360+00:00",
+  "campaign": "Full coding and native instruction-following coverage \u00b7 2026-09-29",
+  "request_sha256": "6854f6ca88677adc883f30aee9be61de894f99482c26e141058c26ae3dc00182",
+  "submission_sha256": "4c1fd9bb4956d90591ac21510812fc4d897d05f9b2e0b5a6f9096866eed51d5c",
+  "benchmarks": [
+    {
+      "benchmark": "HumanEval+",
+      "status": "submitted",
+      "label": "Full evaluation wave submitted",
+      "summary": "164 problems \u00d7 9 models, including all 6 native DendriNet configurations.",
+      "items": [
+        "Native DendriNet: all six BF16 endpoints (8, 18 or 36 FFNs; 25% or 50% active-value budgets).",
+        "Controls: original Qwen3-8B, recovered INT4 parent and recovered eight-cell hybrid.",
+        "One greedy, nonthinking completion per problem on H100; matched local protocol, not exact Prism reproduction.",
+        "Results require every shard and the full augmented tests. No new scores are available from this wave yet."
+      ]
+    },
+    {
+      "benchmark": "MBPP+",
+      "status": "submitted",
+      "label": "Full evaluation wave submitted",
+      "summary": "378 problems \u00d7 9 models, including all 6 native DendriNet configurations.",
+      "items": [
+        "Native DendriNet: all six BF16 endpoints (8, 18 or 36 FFNs; 25% or 50% active-value budgets).",
+        "Controls: original Qwen3-8B, recovered INT4 parent and recovered eight-cell hybrid.",
+        "One greedy, nonthinking completion per problem on H100; matched local protocol, not exact Prism reproduction.",
+        "Results require every shard and the full augmented tests. No new scores are available from this wave yet."
+      ]
+    },
+    {
+      "benchmark": "IFEval",
+      "status": "submitted",
+      "label": "Native DendriNet coverage submitted",
+      "summary": "541 prompts for each of the 6 native BF16 models; the quantized hybrid evaluation is already running.",
+      "items": [
+        "Teacher and quantized-parent results are measured and shown below.",
+        "New native runs use the same strict prompt/instruction metric and explicit greedy decoding.",
+        "Previously submitted hybrid and small-model runs are reused, not duplicated."
+      ]
+    },
+    {
+      "benchmark": "MMLU-Redux",
+      "status": "planned",
+      "label": "Next wave \u00b7 runner qualification needed",
+      "summary": "Our compressed-model score is not yet available; the bars are published references.",
+      "items": [
+        "Next evaluation wave: the same frozen native models with original and quantized controls.",
+        "Data version, prompts, scoring and generation settings must qualify before full jobs are launched."
+      ]
+    },
+    {
+      "benchmark": "MuSR",
+      "status": "planned",
+      "label": "Next wave \u00b7 runner qualification needed",
+      "summary": "Our compressed-model score is not yet available; the bars are published references.",
+      "items": [
+        "Next evaluation wave: the same frozen native models with original and quantized controls.",
+        "Data version, prompts, scoring and generation settings must qualify before full jobs are launched."
+      ]
+    },
+    {
+      "benchmark": "MATH-500",
+      "status": "planned",
+      "label": "Next wave \u00b7 runner qualification needed",
+      "summary": "Our compressed-model score is not yet available; the bars are published references.",
+      "items": [
+        "Next evaluation wave: the same frozen native models with original and quantized controls.",
+        "Data version, prompts, scoring and generation settings must qualify before full jobs are launched."
+      ]
+    },
+    {
+      "benchmark": "GPQA Diamond",
+      "status": "planned",
+      "label": "Next wave \u00b7 runner qualification needed",
+      "summary": "Our compressed-model score is not yet available; the bars are published references.",
+      "items": [
+        "Next evaluation wave: the same frozen native models with original and quantized controls.",
+        "Data version, prompts, scoring and generation settings must qualify before full jobs are launched."
+      ]
+    },
+    {
+      "benchmark": "IFBench",
+      "status": "planned",
+      "label": "Next wave \u00b7 runner qualification needed",
+      "summary": "Our compressed-model score is not yet available; the bars are published references.",
+      "items": [
+        "Next evaluation wave: the same frozen native models with original and quantized controls.",
+        "Data version, prompts, scoring and generation settings must qualify before full jobs are launched."
+      ]
+    },
+    {
+      "benchmark": "BFCL v3",
+      "status": "planned",
+      "label": "Next wave \u00b7 runner qualification needed",
+      "summary": "Our compressed-model score is not yet available; the bars are published references.",
+      "items": [
+        "Next evaluation wave: the same frozen native models with original and quantized controls.",
+        "Data version, prompts, scoring and generation settings must qualify before full jobs are launched.",
+        "Requires the full 13-subset single-turn macro; ordinary coding accuracy is not a tool-use score."
+      ]
+    },
+    {
+      "benchmark": "LiveCodeBench v6",
+      "status": "planned",
+      "label": "Full evaluation not yet submitted",
+      "summary": "Full coding-benchmark coverage follows HumanEval+ and MBPP+.",
+      "items": [
+        "Existing LiveCodeBench results cover only 12 problems and remain a separately labeled smoke test.",
+        "A full release needs pinned tasks, time window, sandbox, parser and adequate output budget."
+      ]
+    },
+    {
+      "benchmark": "LiveCodeBench",
+      "status": "planned",
+      "label": "Full evaluation not yet submitted",
+      "summary": "Full coding-benchmark coverage follows HumanEval+ and MBPP+.",
+      "items": [
+        "Existing LiveCodeBench results cover only 12 problems and remain a separately labeled smoke test.",
+        "A full release needs pinned tasks, time window, sandbox, parser and adequate output budget."
+      ]
+    },
+    {
+      "benchmark": "BigCodeBench",
+      "status": "planned",
+      "label": "Full evaluation not yet submitted",
+      "summary": "Full coding-benchmark coverage follows HumanEval+ and MBPP+.",
+      "items": [
+        "Existing LiveCodeBench results cover only 12 problems and remain a separately labeled smoke test.",
+        "A full release needs pinned tasks, time window, sandbox, parser and adequate output budget."
+      ]
+    },
+    {
+      "benchmark": "SWE-bench Verified",
+      "status": "planned",
+      "label": "Agent evaluation not yet submitted",
+      "summary": "Requires a fixed agent, tools and execution environment.",
+      "items": [
+        "A coding pass@1 score does not establish agentic coding ability.",
+        "Compare the same agent scaffold, tool budget and benchmark environment across original and compressed models."
+      ]
+    },
+    {
+      "benchmark": "Terminal-Bench 2.1",
+      "status": "planned",
+      "label": "Agent evaluation not yet submitted",
+      "summary": "Requires a fixed agent, tools and execution environment.",
+      "items": [
+        "A coding pass@1 score does not establish agentic coding ability.",
+        "Compare the same agent scaffold, tool budget and benchmark environment across original and compressed models."
+      ]
+    },
+    {
+      "benchmark": "\u03c4\u00b2-Bench",
+      "status": "planned",
+      "label": "Agent evaluation not yet submitted",
+      "summary": "Requires a fixed agent, tools and execution environment.",
+      "items": [
+        "A coding pass@1 score does not establish agentic coding ability.",
+        "Compare the same agent scaffold, tool budget and benchmark environment across original and compressed models."
+      ]
+    },
+    {
+      "benchmark": "CharXiv",
+      "status": "not_applicable",
+      "label": "Published multimodal references",
+      "summary": "Our current text-only compressed models have no corresponding vision evaluation.",
+      "items": [
+        "Requires a multimodal candidate and accounting for its vision components; no score is inferred from a text benchmark."
+      ]
+    },
+    {
+      "benchmark": "A-OKVQA",
+      "status": "not_applicable",
+      "label": "Published multimodal references",
+      "summary": "Our current text-only compressed models have no corresponding vision evaluation.",
+      "items": [
+        "Requires a multimodal candidate and accounting for its vision components; no score is inferred from a text benchmark."
+      ]
+    },
+    {
+      "benchmark": "OmniDocBench v1.6",
+      "status": "not_applicable",
+      "label": "Published multimodal references",
+      "summary": "Our current text-only compressed models have no corresponding vision evaluation.",
+      "items": [
+        "Requires a multimodal candidate and accounting for its vision components; no score is inferred from a text benchmark."
+      ]
+    },
+    {
+      "benchmark": "RealWorldQA",
+      "status": "not_applicable",
+      "label": "Published multimodal references",
+      "summary": "Our current text-only compressed models have no corresponding vision evaluation.",
+      "items": [
+        "Requires a multimodal candidate and accounting for its vision components; no score is inferred from a text benchmark."
+      ]
+    },
+    {
+      "benchmark": "OCR Bench v2",
+      "status": "not_applicable",
+      "label": "Published multimodal references",
+      "summary": "Our current text-only compressed models have no corresponding vision evaluation.",
+      "items": [
+        "Requires a multimodal candidate and accounting for its vision components; no score is inferred from a text benchmark."
+      ]
+    },
+    {
+      "benchmark": "MMMU-Pro",
+      "status": "not_applicable",
+      "label": "Published multimodal references",
+      "summary": "Our current text-only compressed models have no corresponding vision evaluation.",
+      "items": [
+        "Requires a multimodal candidate and accounting for its vision components; no score is inferred from a text benchmark."
+      ]
+    }
+  ]
+}

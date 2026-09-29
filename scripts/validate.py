@@ -18,6 +18,16 @@ def frontier(points,xd,yd):
 
 
 class PublicContract(unittest.TestCase):
+    def test_benchmark_work_status_is_not_a_score(self):
+        coverage=json.loads((ROOT/'data/benchmark_evaluation_coverage.json').read_text())
+        names=[r['benchmark'] for r in coverage['benchmarks']]
+        self.assertEqual(len(names),len(set(names)))
+        self.assertTrue({'HumanEval+','MBPP+','IFEval','BFCL v3','MMLU-Redux','MuSR'}<=set(names))
+        for row in coverage['benchmarks']:
+            self.assertIn(row['status'],{'submitted','planned','not_applicable','completed'})
+            self.assertTrue(row['label'] and row['summary'] and row['items'])
+            self.assertFalse({'score','y','pass_at_1'} & row.keys())
+
     def test_matched_non_dendritic_baselines(self):
         for arm,values in [('parent_both',(17127983360,918,5260)),('parent_head',(17641584896,919,5254))]:
             found=[p for panel in DATA['panels'] for p in panel['points'] if p['id'].startswith('native_wave_'+arm+'__') and p['xunit']=='bytes']

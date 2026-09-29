@@ -246,3 +246,23 @@ The older BF16 OLMo-3-7B teacher record includes 14,596,022,784 complete-model r
 The older FP32 teacher characterization reports 7,298,011,136 parameters without a verified complete-model byte ledger. Its reference bars say **GB not recorded**, with the parameter count and the reason in the detail. This is an accounting gap, not a zero-size model. We do not infer registered bytes from model names, parameter counts, or a different precision.
 
 Method colors now use charcoal for originals, blue for dendritic replacements, amber for dendritic + quantization, and rose/magenta for non-dendritic methods. Wider spacing between pattern marks preserves the base colors; diagonal lines, crosses and dots provide redundant distinctions. Group headers carry colored strips and the legend has larger swatches. Monochrome retains visible patterns. The same three method colors apply to the matched scatter view; the pooled plot retains its separate model-color convention.
+# Benchmark coverage
+
+Benchmark cards distinguish measured scores from evaluation work. The coverage
+note is a dated status snapshot, not a score or a new pass verdict. Pending
+evaluations never become zero-height bars. Published references remain labeled
+as unreproduced, and protocols remain separate.
+
+The September 29 coverage wave evaluates full HumanEval+ (164 tasks) and MBPP+
+(378 tasks), using EvalPlus 0.3.1 augmented tests, on the Qwen3-8B teacher,
+recovered INT4 parent, eight-cell hybrid, and all six native BF16 endpoints.
+Those native endpoints also receive full IFEval (541 prompts, 834 instructions).
+These are matched local H100/eager, greedy, nonthinking evaluations; they do not
+reproduce Prism's serving stack. Native whole-model sizes remain projections
+until physical exports qualify. Coding results do not establish agentic coding
+performance, and historical GSM/MC/copy gates do not imply passing these tests.
+
+Future data rebuilds must preserve `benchmark_evaluation_coverage.json` and its
+manifest digest, as well as the audited `benchmark_size_notes.json`. Update work
+status from receipts; only publish scores after complete item coverage and
+scorer verification.
