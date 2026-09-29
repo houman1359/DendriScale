@@ -101,7 +101,8 @@ window.DendriScaleBars = function(DATA,{el,se}) {
  const friendly={'Multiple choice':'Multiple choice · six tasks','arc_challenge accuracy':'ARC Challenge','arc_easy accuracy':'ARC Easy','boolq accuracy':'BoolQ','piqa accuracy':'PIQA','hellaswag accuracy':'HellaSwag','winogrande accuracy':'WinoGrande'};
  const fronts=window.DendriScaleBarFront(rows);
  const families={teacher:'Original models',dendritic:'Dendritic',hybrid:'Dendritic + quantization',control:'Non-dendritic',published:'Published · not reproduced'};
- const family=r=>r.published?'published':['teacher','dendritic','hybrid'].includes(r.method)?r.method:'control';
+ const methodKey=r=>['teacher','dendritic','hybrid'].includes(r.method)?r.method:'control';
+ const family=r=>r.published?'published':methodKey(r);
  const familyOrder=Object.keys(families);
  const metrics=[...new Set(fronts.map(r=>r.benchmark))].sort((a,b)=>{
   const ac=category(a),bc=category(b);
@@ -125,9 +126,13 @@ window.DendriScaleBars = function(DATA,{el,se}) {
  };
  let evidence='all',serial=0;
  const button=(text,fn)=>{const b=el('button',text);b.type='button';b.onclick=fn;return b;};
+ // Keep category/color together, then order by whole-model GB across model names
+ // and cohorts. Unknown sizes go last; labels only break equal-size ties.
+ const sortSize=r=>Number.isFinite(r.size.bytes)&&r.size.bytes>0?r.size.bytes:Infinity;
  const compare=(a,b)=>familyOrder.indexOf(family(a))-familyOrder.indexOf(family(b))
-  || shortModel(a).localeCompare(shortModel(b)) || a.cohort.localeCompare(b.cohort)
-  || (a.size.bytes??Infinity)-(b.size.bytes??Infinity) || a.label.localeCompare(b.label);
+  || familyOrder.indexOf(methodKey(a))-familyOrder.indexOf(methodKey(b))
+  || sortSize(a)-sortSize(b) || shortModel(a).localeCompare(shortModel(b))
+  || a.cohort.localeCompare(b.cohort) || a.label.localeCompare(b.label) || a.id.localeCompare(b.id);
  function download(svg,name){
   const copy=svg.cloneNode(true);copy.setAttribute('xmlns','http://www.w3.org/2000/svg');
   const url=URL.createObjectURL(new Blob([new XMLSerializer().serializeToString(copy)],{type:'image/svg+xml'}));
@@ -135,7 +140,7 @@ window.DendriScaleBars = function(DATA,{el,se}) {
  }
  function legend(){
   const root=byId('barsMethodLegend');root.replaceChildren();
-  for(const key of ['dendritic','hybrid','control','teacher']){
+  for(const key of ['teacher','dendritic','hybrid','control']){
    const item=el('span');item.className='bar-method-key';const swatch=el('span');swatch.className='bar-swatch '+styles[key][2];
    swatch.style.setProperty('--method-color',byId('monochrome').checked?'#222':styles[key][1]);
    item.append(swatch,el('span',families[key]));root.append(item);
@@ -190,10 +195,10 @@ window.DendriScaleBars = function(DATA,{el,se}) {
      svg.append(text(x+8,y+13,families[entry.header]+(entry.continued?' · cont.':''),{'font-size':11,'font-weight':700}));
      continue;
     }
-    const r=entry.r,[methodLabel,,pattern]=methodStyle(r),key=['teacher','dendritic','hybrid'].includes(r.method)?r.method:'control';
+    const r=entry.r,[methodLabel,,pattern]=methodStyle(r),key=methodKey(r);
     const yy=y+(compact?48:7),labelWidth=compact?colWidth:colWidth*.44-16;
     const g=se('g',{tabindex:0,role:'button','aria-label':r.label+', '+r.model+', '+scoreLabel(r)+', '+sizeLabel(r)+' · '+r.size.basis+', '+families[family(r)]+', '+code(r),
-     'data-point-id':r.id,'data-method':r.method,'data-family':family(r),'data-model':r.model,'data-provenance':r.published?'published':'measured','data-size-basis':r.size.basis,'data-cohort':r.cohort});
+     'data-point-id':r.id,'data-method':r.method,'data-family':family(r),'data-color-group':methodKey(r),'data-size-bytes':r.size.bytes??'','data-model':r.model,'data-provenance':r.published?'published':'measured','data-size-basis':r.size.basis,'data-cohort':r.cohort});
     g.append(se('title',{},r.label+' · '+r.model+'\n'+methodLabel+' · '+sizeLabel(r)+' · '+r.size.basis+'\n'+code(r)+': '+r.cohort+'\n'+(r.published?'Published · not reproduced':'Measured by DendriScale')+'\n'+r.conditions));
     g.append(se('rect',{x,y:y-4,width:colWidth,height:rowHeight-5,fill:'transparent',class:'bar-hit',rx:4}));
     const first=shortModel(r)+' · '+sizeLabel(r)+(sizeNote(r)?' '+sizeNote(r):'');
