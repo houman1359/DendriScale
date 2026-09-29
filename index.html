@@ -4,7 +4,7 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="description" content="Compare final model size and benchmark performance across dendritic networks, quantization, and hybrid compression.">
 <title>DendriScale · Model compression explorer</title>
-<link rel="stylesheet" href="styles.css?v=by-model-20260929"><link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="styles.css?v=prism-color-20260929"><link rel="icon" href="favicon.svg" type="image/svg+xml">
 </head>
 <body>
 <a class="skip" href="#benchmark-bars">Skip to benchmark results</a>
@@ -18,7 +18,7 @@
 <section class="card benchmark-overview" id="benchmark-bars" aria-labelledby="barsTitle">
 <div class="section-heading"><div><p class="eyebrow">01 / BENCHMARK RESULTS</p><h2 id="barsTitle">How well do compressed models perform?</h2><p class="section-copy">Choose an original model. Its coverage grid shows every benchmark measured, published or still missing for the original, Prism’s models and our variants; the charts below compare them one benchmark at a time. Prism’s benchmarks come first.</p></div></div>
 <div class="benchmark-toolbar"><label class="search-control">Find a model or method<input id="barsSearch" type="search" placeholder="Qwen, OLMo, dendritic, Prism…"></label><div class="evidence-buttons" role="group" aria-label="Benchmark evidence"><button type="button" data-evidence="all" aria-pressed="true">All evidence</button><button type="button" data-evidence="measured" aria-pressed="false">Our measurements</button><button type="button" data-evidence="published" aria-pressed="false">Published comparisons</button></div><label class="check"><input id="barsMonochrome" type="checkbox">Monochrome</label></div>
-<p class="small muted benchmark-reading">Accuracy is higher-is-better; loss and copy ratios are lower-is-better. Model labels include size in GB; projected and published sizes are marked. Colors, patterns and group labels identify compression methods. Within each category and color, models run from smallest to largest GB (top to bottom, then the next column). All bars are expanded—no chart scrolling or pagination. Evaluation protocols differ; open a bar for its conditions.</p>
+<p class="small muted benchmark-reading">Accuracy is higher-is-better; loss and copy ratios are lower-is-better. Model labels include size in GB; projected and published sizes are marked. PrismML / Bonsai results use purple with explicit labels; method patterns remain. Dashed outlines and P labels mark published scores, while “measured here” identifies our evaluations. Within each category and color, models run from smallest to largest GB (top to bottom, then the next column). All bars are expanded—no chart scrolling or pagination. Evaluation protocols differ; open a bar for its conditions.</p>
 <div id="barsMethodLegend" class="legend" aria-label="Bar method legend"></div>
 <nav id="barsJump" class="benchmark-jump" aria-label="Benchmark categories"></nav>
 <p id="barsCount" class="small muted" aria-live="polite"></p>
@@ -89,5 +89,5 @@
 <section class="downloads" id="downloads" aria-labelledby="downloadsTitle"><div><h2 id="downloadsTitle">Take the data with you.</h2><p class="small muted">Aggregate measurements, original verdicts, and source hashes.</p></div><div class="download-links"><a href="data/candidates.csv">Model results · CSV ↓</a><a href="data/observations.csv">Size–score points · CSV ↓</a><a href="data/metrics.csv">All metrics · CSV ↓</a><a href="data/coverage.csv">Experiment ledger · CSV ↓</a><a href="data/snapshot.json">Full snapshot · JSON ↓</a></div></section>
 </main>
 <footer><span>DendriScale · An open compression experiment record</span><p>Development results, not reserved-final certification. Model weights, training corpora, and per-item traces are not distributed here. <a href="METHODS.md">Methods &amp; limitations</a></p></footer>
-<script src="presentation.js?v=pass-filter-20260922" defer></script><script src="thresholds.js?v=pass-filter-20260922" defer></script><script src="pooled.js?v=pass-filter-20260922" defer></script><script src="bars.js?v=bfcl-mode-20260929b" defer></script><script src="app.js?v=variant-aliases-20260929" defer></script>
+<script src="presentation.js?v=pass-filter-20260922" defer></script><script src="thresholds.js?v=pass-filter-20260922" defer></script><script src="pooled.js?v=pass-filter-20260922" defer></script><script src="bars.js?v=prism-color-20260929" defer></script><script src="app.js?v=variant-aliases-20260929" defer></script>
 </body></html>

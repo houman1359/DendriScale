@@ -143,6 +143,11 @@ window.DendriScaleBars = function(DATA,{el,se,sizeNotes=[],benchmarkCoverage=nul
  const families={teacher:'Original models',dendritic:'Dendritic',hybrid:'Dendritic + quantization',control:'Non-dendritic',published:'Published · not reproduced'};
  const methodKey=r=>['teacher','dendritic','hybrid'].includes(r.method)?r.method:'control';
  const family=r=>r.published?'published':methodKey(r);
+ // Publisher identity is separate from who measured a score. Locally evaluated
+ // Bonsai checkpoints retain measured provenance; only reported scores get P.
+ const isPrism=r=>['binary','ternary'].includes(r.method)||(r.published&&/^PrismML\b/.test(r.cohort));
+ const prismColor='#6746A3';
+ const evidenceLabel=r=>isPrism(r)?'PrismML · '+(r.published?'published, not reproduced':'measured here'):(r.published?'Published · not reproduced':'Measured by DendriScale');
  const familyOrder=Object.keys(families);
  const metrics=[...new Set(fronts.map(r=>r.benchmark))].sort((a,b)=>{
   const ac=category(a),bc=category(b);
@@ -171,6 +176,7 @@ window.DendriScaleBars = function(DATA,{el,se,sizeNotes=[],benchmarkCoverage=nul
  const sortSize=r=>Number.isFinite(r.size.bytes)&&r.size.bytes>0?r.size.bytes:Infinity;
  const compare=(a,b)=>familyOrder.indexOf(family(a))-familyOrder.indexOf(family(b))
   || familyOrder.indexOf(methodKey(a))-familyOrder.indexOf(methodKey(b))
+  || Number(isPrism(a))-Number(isPrism(b))
   || sortSize(a)-sortSize(b) || shortModel(a).localeCompare(shortModel(b))
   || a.cohort.localeCompare(b.cohort) || a.variant.localeCompare(b.variant) || a.id.localeCompare(b.id);
  function download(svg,name){
@@ -186,7 +192,12 @@ window.DendriScaleBars = function(DATA,{el,se,sizeNotes=[],benchmarkCoverage=nul
    swatch.style.setProperty('--pattern-ink',byId('monochrome').checked||key==='dendritic'?'#ffffff99':'#26374699');
    item.append(swatch,el('span',families[key]));root.append(item);
   }
+  const prism=el('span');prism.className='bar-method-key';const swatch=el('span');swatch.className='bar-swatch dots';
+  swatch.style.setProperty('--method-color',byId('monochrome').checked?'#222':prismColor);
+  swatch.style.setProperty('--pattern-ink','#ffffffbb');
+  prism.append(swatch,el('span','PrismML / Bonsai · method shown on each bar'));root.append(prism);
   const published=el('span','P · Published, not reproduced');published.className='bar-published-key';root.append(published);
+  byId('benchmark-bars').dataset.monochrome=String(byId('monochrome').checked);
  }
  // A single chart per benchmark. Long charts wrap into aligned columns on wide
  // displays; every bar remains present, with one scale per benchmark and no carousel.
@@ -221,10 +232,10 @@ window.DendriScaleBars = function(DATA,{el,se,sizeNotes=[],benchmarkCoverage=nul
   svg.append(text(0,16,trim(title,width,13),{'font-size':13,'font-weight':650}));
   svg.append(text(0,34,unit+' · '+(direction==='min'?'lower':'higher')+' is better',{'font-size':11,fill:'#526476'}));
   const defs=se('defs',{});svg.append(defs);
-  for(const key of ['teacher','dendritic','hybrid','control']){
-   const [label,color,pattern]=styles[key],ink=mono?'#222222':color,pat=se('pattern',{id:id+'-'+key,width:16,height:16,patternUnits:'userSpaceOnUse'});
+  for(const key of ['teacher','dendritic','hybrid','control'])for(const prism of [false,true]){
+   const [label,color,pattern]=styles[key],ink=mono?'#222222':prism?prismColor:color,pat=se('pattern',{id:id+'-'+(prism?'prism-':'')+key,width:16,height:16,patternUnits:'userSpaceOnUse'});
    pat.append(se('rect',{width:16,height:16,fill:ink}));
-   const patternInk=key==='hybrid'||key==='control'?'#263746':'white';
+   const patternInk=!prism&&(key==='hybrid'||key==='control')?'#263746':'white';
    if(pattern==='dots')pat.append(se('circle',{cx:8,cy:8,r:1.8,fill:mono?'white':patternInk,opacity:.75}));
    else if(pattern!=='none')pat.append(se('path',{d:pattern==='cross'?'M0 0L16 16M16 0L0 16':'M-4 4L4 -4M0 16L16 0M12 20L20 12',stroke:mono?'white':patternInk,'stroke-width':1,opacity:.45}));
    defs.append(pat);
@@ -240,24 +251,24 @@ window.DendriScaleBars = function(DATA,{el,se,sizeNotes=[],benchmarkCoverage=nul
      svg.append(text(x+13,y+13,families[entry.header]+(entry.continued?' · cont.':''),{'font-size':11,'font-weight':700}));
      continue;
     }
-    const r=entry.r,[methodLabel,,pattern]=methodStyle(r),key=methodKey(r);
+    const r=entry.r,prism=isPrism(r),[methodLabel,,pattern]=prism?styles[r.method]:methodStyle(r),key=(prism?'prism-':'')+methodKey(r);
     const yy=y+(compact?48:7),labelWidth=compact?colWidth:colWidth*.44-16;
     const g=se('g',{tabindex:0,role:'button','aria-label':r.variant+', '+r.model+', '+scoreLabel(r)+', '+sizeLabel(r)+' · '+r.size.basis+', '+families[family(r)]+', '+code(r),
-     'data-point-id':r.id,'data-method':r.method,'data-family':family(r),'data-color-group':methodKey(r),'data-size-bytes':r.size.bytes??'','data-model':r.model,'data-provenance':r.published?'published':'measured','data-size-basis':r.size.basis,'data-cohort':r.cohort});
-    g.append(se('title',{},r.variant+' · '+r.model+'\n'+methodLabel+' · '+sizeLabel(r)+' · '+r.size.basis+'\n'+code(r)+': '+r.cohort+'\n'+(r.published?'Published · not reproduced':'Measured by DendriScale')+'\n'+r.conditions));
+     'data-point-id':r.id,'data-method':r.method,'data-family':family(r),'data-color-group':prism?'prism':methodKey(r),'data-provider':prism?'prism':'other','data-size-bytes':r.size.bytes??'','data-model':r.model,'data-provenance':r.published?'published':'measured','data-size-basis':r.size.basis,'data-cohort':r.cohort});
+    g.append(se('title',{},r.variant+' · '+r.model+'\n'+methodLabel+' · '+sizeLabel(r)+' · '+r.size.basis+'\n'+code(r)+': '+r.cohort+'\n'+evidenceLabel(r)+'\n'+r.conditions));
     g.append(se('rect',{x,y:y-4,width:colWidth,height:rowHeight-5,fill:'transparent',class:'bar-hit',rx:4}));
     const first=shortModel(r)+' · '+sizeLabel(r)+(sizeNote(r)?' '+sizeNote(r):'');
     g.append(text(x,y+10,trim(first,labelWidth,12),{'font-weight':650}));
     const second=UI.candidateName(r.variant)+(!r.size.bytes&&r.xunit==='parameters'?' · '+(r.x/1e9).toFixed(2)+'B parameters':'');
     g.append(text(x,y+26,trim(second,labelWidth,11),{'font-size':11,fill:'#526476'}));
     const publishedProtocol=r.published?r.cohort.replace(/^PrismML /,''):'';
-    const tags=code(r)+(publishedProtocol?' · '+publishedProtocol:'')+(r.n?' · n='+r.n.toLocaleString('en'):'')+(UI.allBenchmarksPass(r)?' · ✓ Development gates':'');
-    g.append(text(x,y+40,tags,{'font-size':10,fill:'#526476'}));
+    const tags=code(r)+(prism?' · PrismML'+(r.published?' published':' · measured here'):'')+(publishedProtocol?' · '+publishedProtocol:'')+(r.n?' · n='+r.n.toLocaleString('en'):'')+(UI.allBenchmarksPass(r)?' · ✓ Development gates':'');
+    g.append(text(x,y+40,trim(tags,labelWidth,10),{'font-size':10,fill:prism&&!mono?prismColor:'#526476'}));
     g.append(se('rect',{x:barX,y:yy,width:barWidth,height:17,rx:2,fill:'#edf1f5'}));
     for(const tick of [25,50,75])g.append(se('line',{x1:barX+barWidth*tick/100,x2:barX+barWidth*tick/100,y1:yy,y2:yy+17,stroke:'#d6dee5','stroke-width':1}));
-    g.append(se('rect',{x:barX+barWidth*fraction(Math.min(0,r.score)),y:yy,width:barWidth*Math.abs(fraction(r.score)-fraction(0)),height:17,rx:2,fill:'url(#'+id+'-'+key+')',stroke:'#263746','stroke-width':.4,class:'score-bar','data-score':r.score}));
+    g.append(se('rect',{x:barX+barWidth*fraction(Math.min(0,r.score)),y:yy,width:barWidth*Math.abs(fraction(r.score)-fraction(0)),height:17,rx:2,fill:'url(#'+id+'-'+key+')',stroke:'#263746','stroke-width':r.published?1.2:.4,'stroke-dasharray':r.published?'4 2':'none',class:'score-bar','data-score':r.score}));
     g.append(text(barX+barWidth+6,yy+13,(Math.abs(r.score)>=1e4?r.score.toExponential(1).replace('+',''):r.score.toFixed(r.scoreUnit==='nats/token'?3:2)),{'font-size':12,'font-weight':700}));
-    if(!compact)g.append(text(barX,yy+31,methodLabel+(r.published?' · published':''),{'font-size':10,fill:'#526476'}));
+    if(!compact)g.append(text(barX,yy+31,methodLabel+(r.published?' · published':''),{'font-size':10,fill:prism&&!mono?prismColor:'#526476'}));
     g.addEventListener('click',()=>details(r));g.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();details(r);}});svg.append(g);
    }
    const axisY=layout.height+7;
@@ -324,9 +335,9 @@ window.DendriScaleBars = function(DATA,{el,se,sizeNotes=[],benchmarkCoverage=nul
   const thead=el('thead');thead.append(head);table.append(thead);
   const body=el('tbody');let missing=0,filled=0;
   for(const {r,cells} of variants.values()){
-   const tr=el('tr');tr.dataset.family=family(r);
+   const tr=el('tr');tr.dataset.family=family(r);tr.dataset.provider=isPrism(r)?'prism':'other';
    const name=el('th',UI.candidateName(r.variant));name.scope='row';
-   const tag=el('span',families[family(r)]);tag.className='coverage-family';name.append(tag);
+   const tag=el('span',isPrism(r)?evidenceLabel(r):families[family(r)]);tag.className='coverage-family';name.append(tag);
    tr.append(name,el('td',sizeLabel(r)));
    for(const b of bench){
     const found=cells.get(b),td=el('td');

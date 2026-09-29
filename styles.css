@@ -103,4 +103,11 @@
 .coverage-grid tr[data-family=hybrid] th{border-left:4px solid #E69F00}
 .coverage-grid tr[data-family=control] th{border-left:4px solid #CC79A7}
 .coverage-grid tr[data-family=published] th{border-left:4px solid #9D824B}
+.coverage-grid tr[data-provider=prism] th{border-left-color:#6746A3;background:#f6f2fb}
+.coverage-grid tr[data-provider=prism] .coverage-family,.coverage-grid tr[data-provider=prism] td.coverage-published{color:#59378e}
+.coverage-grid tr[data-provider=prism] td:not(.coverage-missing){background:#faf8fd}
+#benchmark-bars[data-monochrome=true] .coverage-grid tr th{border-left-color:#222;background:#fff}
+#benchmark-bars[data-monochrome=true] .coverage-grid td:not(.coverage-missing){background:#fff;color:#222}
+#benchmark-bars[data-monochrome=true] .coverage-family,#benchmark-bars[data-monochrome=true] .bar-published-key{color:#222}
+#benchmark-bars[data-monochrome=true] .bar-published-key{background:#f5f5f5;border-color:#222}
 @media (max-width:640px){.coverage-grid tbody th{min-width:150px}.model-switcher button{font-size:11px;padding:6px}}
