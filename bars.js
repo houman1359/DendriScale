@@ -123,7 +123,7 @@ window.DendriScaleBars = function(DATA,{el,se,sizeNotes=[],benchmarkCoverage=nul
   if(primary.includes(m))return 'primary';
   if(/MATH|AIME|GPQA|LCR/i.test(m))return 'reasoning';
   if(/code|MBPP|SWE|Terminal/i.test(m) && !/smoke/i.test(m))return 'coding';
-  if(/IFBench|τ|tau/i.test(m))return 'instruction';
+  if(/IFBench|BFCL|τ|tau/i.test(m))return 'instruction';
   if(/OCR|CharXiv|VQA|DocBench|MMMU|RealWorldQA/i.test(m))return 'vision';
   if(/Average/i.test(m))return 'summary';
   if(/^C4|^Copy/i.test(m))return 'fidelity';
@@ -310,7 +310,9 @@ window.DendriScaleBars = function(DATA,{el,se,sizeNotes=[],benchmarkCoverage=nul
   const devGSM='GSM · our dev set (1,024)';
   const column=r=>r.benchmark==='GSM8K'&&!r.published&&r.n===1024?devGSM:r.benchmark;
   const extra=[...new Set(items.map(column))].filter(m=>!prismBenchmarks.includes(m));
-  const bench=[...prismBenchmarks,...extra.sort((a,b)=>(b===devGSM)-(a===devGSM)||metrics.indexOf(a)-metrics.indexOf(b))];
+  // Other protocols of a Prism benchmark (e.g. BFCL v3 · function-calling mode) go last, away from Prism's columns.
+  const variantOfPrism=m=>prismBenchmarks.some(x=>m.startsWith(x+' · '));
+  const bench=[...prismBenchmarks,...extra.sort((a,b)=>(b===devGSM)-(a===devGSM)||variantOfPrism(a)-variantOfPrism(b)||metrics.indexOf(a)-metrics.indexOf(b))];
   const variants=new Map();
   for(const r of items.slice().sort(compare)){
    const k=JSON.stringify([family(r),r.variant]);if(!variants.has(k))variants.set(k,{r,cells:new Map()});
@@ -318,7 +320,7 @@ window.DendriScaleBars = function(DATA,{el,se,sizeNotes=[],benchmarkCoverage=nul
   }
   const table=el('table');table.className='coverage-grid';
   const head=el('tr');head.append(el('th','Model variant'),el('th','Size'));
-  for(const b of bench){const th=el('th',friendly[b]||b);th.scope='col';if(prismBenchmarks.includes(b))th.className='prism-benchmark';head.append(th);}
+  for(const b of bench){const th=el('th',friendly[b]||b);th.scope='col';if(prismBenchmarks.includes(b))th.className='prism-benchmark';if(variantOfPrism(b))th.title='Not PrismML\'s protocol: compare models within this column only';head.append(th);}
   const thead=el('thead');thead.append(head);table.append(thead);
   const body=el('tbody');let missing=0,filled=0;
   for(const {r,cells} of variants.values()){

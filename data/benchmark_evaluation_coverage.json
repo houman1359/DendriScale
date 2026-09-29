@@ -1,19 +1,20 @@
 {
   "schema": "dendriscale/benchmark-evaluation-coverage-v1",
-  "updated_at_utc": "2026-09-29T14:03:06.965995+00:00",
-  "campaign": "Matched Qwen3-8B benchmark coverage \u00b7 completed scores and continuing native evaluations",
+  "updated_at_utc": "2026-09-29T15:03:39.721034+00:00",
+  "campaign": "Matched Qwen3-8B benchmark coverage · completed scores and continuing native evaluations",
   "request_sha256": "6854f6ca88677adc883f30aee9be61de894f99482c26e141058c26ae3dc00182",
   "submission_sha256": "4c1fd9bb4956d90591ac21510812fc4d897d05f9b2e0b5a6f9096866eed51d5c",
   "benchmarks": [
     {
       "benchmark": "HumanEval+",
       "status": "submitted",
-      "label": "Full scores available \u00b7 more native models running",
+      "label": "Full scores available · more native models running",
       "summary": "Teacher, quantized controls, eight-cell hybrid and the 8-FFN/50%-value native model have complete scores.",
       "items": [
         "Full augmented EvalPlus tests: HumanEval+ 164 problems; MBPP+ 378 problems.",
         "All six native BF16 endpoints remain scheduled; completed results, including losses, are appended.",
-        "Matched local greedy nonthinking H100 protocol; not exact Prism reproduction."
+        "Matched local greedy nonthinking H100 protocol; not exact Prism reproduction.",
+        "Against PrismML’s own reported scores: teacher −1.8, ternary Bonsai −4.8, 1-bit Bonsai −2.5. The ternary Bonsai’s gap exceeds our 3-point comparability test, so these are local measurements, not PrismML reproductions; new results are appended with the gaps stated."
       ],
       "models": [
         "Qwen/Qwen3-8B"
@@ -22,12 +23,13 @@
     {
       "benchmark": "MBPP+",
       "status": "submitted",
-      "label": "Full scores available \u00b7 more native models running",
+      "label": "Full scores available · more native models running",
       "summary": "Teacher, quantized controls, eight-cell hybrid and the 8-FFN/50%-value native model have complete scores.",
       "items": [
         "Full augmented EvalPlus tests: HumanEval+ 164 problems; MBPP+ 378 problems.",
         "All six native BF16 endpoints remain scheduled; completed results, including losses, are appended.",
-        "Matched local greedy nonthinking H100 protocol; not exact Prism reproduction."
+        "Matched local greedy nonthinking H100 protocol; not exact Prism reproduction.",
+        "Against PrismML’s own reported scores: teacher −2.1, ternary Bonsai −4.5, 1-bit Bonsai −2.1. The ternary Bonsai’s gap exceeds our 3-point comparability test, so these are local measurements, not PrismML reproductions; new results are appended with the gaps stated."
       ],
       "models": [
         "Qwen/Qwen3-8B"
@@ -36,12 +38,13 @@
     {
       "benchmark": "IFEval",
       "status": "submitted",
-      "label": "Hybrid result complete \u00b7 native-only evaluations running",
+      "label": "Hybrid result complete · native-only evaluations running",
       "summary": "Full teacher, parent and eight-cell hybrid scores are available; six native BF16 evaluations continue.",
       "items": [
         "541 prompts and 834 instructions; strict prompt/instruction average.",
         "Earlier v2 results are reused after exact prompt and source-hash checks.",
-        "No partial shard is displayed as a full benchmark score."
+        "No partial shard is displayed as a full benchmark score.",
+        "Against PrismML’s own reported scores: teacher +2.8, ternary Bonsai +2.6, 1-bit Bonsai +3.1. The 1-bit Bonsai’s gap exceeds our 3-point comparability test, so these are local measurements, not PrismML reproductions; new results are appended with the gaps stated."
       ],
       "models": [
         "Qwen/Qwen3-8B"
@@ -50,12 +53,12 @@
     {
       "benchmark": "MMLU-Redux",
       "status": "submitted",
-      "label": "Full benchmark jobs running",
-      "summary": "Claude\u2019s matched teacher and compressed-model evaluation waves are submitted; full scores are pending.",
+      "label": "Teacher within tolerance · waiting for both Bonsais",
+      "summary": "The teacher scores 81.6 against PrismML’s 83.0 (−1.4). Scores are published once both Bonsais are measured and also lie within 3 points of PrismML’s.",
       "items": [
         "EvalScope 1.4.2 frozen requests, nonthinking generation and replay scoring on H100.",
         "MMLU-Redux 5,700; MuSR 756; GPQA Diamond 1,980 (10 samples); IFBench 300.",
-        "Local protocol is identified separately from PrismML\u2019s published measurements."
+        "A benchmark is published once the teacher and both Bonsais are measured and each lies within 3 points of PrismML’s score."
       ],
       "models": [
         "Qwen/Qwen3-8B"
@@ -64,12 +67,12 @@
     {
       "benchmark": "MuSR",
       "status": "submitted",
-      "label": "Full benchmark jobs running",
-      "summary": "Claude\u2019s matched teacher and compressed-model evaluation waves are submitted; full scores are pending.",
+      "label": "Teacher and ternary within tolerance · waiting for 1-bit Bonsai",
+      "summary": "Teacher 57.0 against PrismML’s 55.0 (+2.0); ternary Bonsai 58.2 against 56.2 (+2.0). Scores are published once the 1-bit Bonsai is measured and also lies within 3 points.",
       "items": [
         "EvalScope 1.4.2 frozen requests, nonthinking generation and replay scoring on H100.",
         "MMLU-Redux 5,700; MuSR 756; GPQA Diamond 1,980 (10 samples); IFBench 300.",
-        "Local protocol is identified separately from PrismML\u2019s published measurements."
+        "A benchmark is published once the teacher and both Bonsais are measured and each lies within 3 points of PrismML’s score."
       ],
       "models": [
         "Qwen/Qwen3-8B"
@@ -86,18 +89,20 @@
       "items": [
         "1,319 official test items; EvalScope 4-shot requests, greedy nonthinking generation.",
         "Original, quantized, hybrid and staged native variants have completed scores; more are running.",
-        "Development results remain in their own coverage column and charts."
+        "Development results remain in their own coverage column and charts.",
+        "Against PrismML’s reported scores: teacher +0.2, ternary Bonsai −2.2, 1-bit Bonsai −2.9.",
+        "Rule-based answer extraction only (PrismML adds an LLM-judge fallback); generation is Hugging Face eager on H100, not vLLM."
       ]
     },
     {
       "benchmark": "MATH-500",
       "status": "submitted",
-      "label": "Full scores available \u00b7 additional variants running",
+      "label": "Full scores available · additional variants running",
       "summary": "Matched original, quantized-parent and dendritic-hybrid results are now available.",
       "items": [
         "Whole-dataset results only; no inference from GSM, coding or local reconstruction.",
-        "MATH-500: 500 problems, greedy 8,192-token cap. BFCL v3: 3,641 cases across 13 single-turn subsets.",
-        "BFCL uses the recorded sample-weighted aggregate; exact Prism reproduction is not established."
+        "MATH-500: 500 problems, greedy 8,192-token cap.",
+        "Rule-based answer extraction only (PrismML adds an LLM-judge fallback); generation is Hugging Face eager on H100, not vLLM."
       ],
       "models": [
         "Qwen/Qwen3-8B"
@@ -107,11 +112,11 @@
       "benchmark": "GPQA Diamond",
       "status": "submitted",
       "label": "Full benchmark jobs running",
-      "summary": "Claude\u2019s matched teacher and compressed-model evaluation waves are submitted; full scores are pending.",
+      "summary": "Claude’s matched teacher and compressed-model evaluation waves are submitted; full scores are pending.",
       "items": [
         "EvalScope 1.4.2 frozen requests, nonthinking generation and replay scoring on H100.",
         "MMLU-Redux 5,700; MuSR 756; GPQA Diamond 1,980 (10 samples); IFBench 300.",
-        "Local protocol is identified separately from PrismML\u2019s published measurements."
+        "Local protocol is identified separately from PrismML’s published measurements."
       ],
       "models": [
         "Qwen/Qwen3-8B"
@@ -120,12 +125,13 @@
     {
       "benchmark": "IFBench",
       "status": "submitted",
-      "label": "Full benchmark jobs running",
-      "summary": "Claude\u2019s matched teacher and compressed-model evaluation waves are submitted; full scores are pending.",
+      "label": "Teacher within tolerance · waiting for both Bonsais",
+      "summary": "On PrismML’s metric, the OLLM average (prompt strict + instruction strict)/2, the teacher scores 26.2 against PrismML’s 27.2 (−1.0). Scores are published once both Bonsais are measured and also lie within 3 points.",
       "items": [
         "EvalScope 1.4.2 frozen requests, nonthinking generation and replay scoring on H100.",
         "MMLU-Redux 5,700; MuSR 756; GPQA Diamond 1,980 (10 samples); IFBench 300.",
-        "Local protocol is identified separately from PrismML\u2019s published measurements."
+        "A benchmark is published once the teacher and both Bonsais are measured and each lies within 3 points of PrismML’s score.",
+        "Scored with PrismML’s OLLM average (Appendix B.5.1), not prompt-level strict alone."
       ],
       "models": [
         "Qwen/Qwen3-8B"
@@ -134,12 +140,26 @@
     {
       "benchmark": "BFCL v3",
       "status": "submitted",
-      "label": "Full scores available \u00b7 additional variants running",
-      "summary": "Matched original, quantized-parent and dendritic-hybrid results are now available.",
+      "label": "Prompting-mode evaluation being recorded",
+      "summary": "Our first BFCL run used function-calling mode, which is not PrismML’s protocol. Those scores now have their own chart, “BFCL v3 · function-calling mode”; this chart keeps PrismML-comparable prompting-mode scores.",
       "items": [
-        "Whole-dataset results only; no inference from GSM, coding or local reconstruction.",
-        "MATH-500: 500 problems, greedy 8,192-token cap. BFCL v3: 3,641 cases across 13 single-turn subsets.",
-        "BFCL uses the recorded sample-weighted aggregate; exact Prism reproduction is not established."
+        "PrismML Appendix B.5.2: prompting mode (tools in the system prompt, is_fc_model=false, underscore_to_dot=false); macro-average of the 13 single-turn subsets.",
+        "Withdrawn on 29 Sep 2026: function-calling scores published earlier that day under this name as a sample-weighted accuracy.",
+        "In function-calling mode our local 1-bit and ternary Bonsai scored 10.9 and 3.9 points above PrismML’s reported BFCL (macro-average); the teacher was 0.7 below."
+      ],
+      "models": [
+        "Qwen/Qwen3-8B"
+      ]
+    },
+    {
+      "benchmark": "BFCL v3 · function-calling mode",
+      "status": "completed",
+      "label": "Not PrismML’s protocol",
+      "summary": "BFCL v3 with tools passed through the chat template (function-calling mode). Compare models only within this chart, never with PrismML’s BFCL v3 scores.",
+      "items": [
+        "3,641 cases across the 13 single-turn subsets; macro-average of the subset accuracies.",
+        "EvalScope 1.4.2, is_fc_model=true, underscore_to_dot=true, greedy nonthinking, 4,096-token cap; frozen H100 generations.",
+        "Teacher 80.3 here; ternary Bonsai 77.8; 1-bit Bonsai 76.6."
       ],
       "models": [
         "Qwen/Qwen3-8B"
@@ -196,7 +216,7 @@
       ]
     },
     {
-      "benchmark": "\u03c4\u00b2-Bench",
+      "benchmark": "τ²-Bench",
       "status": "planned",
       "label": "Agent evaluation not yet submitted",
       "summary": "Requires a fixed agent, tools and execution environment.",
@@ -259,5 +279,7 @@
         "Requires a multimodal candidate and accounting for its vision components; no score is inferred from a text benchmark."
       ]
     }
-  ]
+  ],
+  "amended_at_utc": "2026-09-29T15:03:39.721034+00:00",
+  "amendment": "BFCL v3 notes corrected and the function-calling-mode chart added by claude_public_benchmarks_v1; suite teacher qualifications and PrismML gaps added."
 }
