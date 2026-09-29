@@ -138,7 +138,7 @@ The September 20 independent four-FFN bank (sites 16–19, INT4 native values) c
 
 ## Additional all-model plot
 
-The original matched plots remain the default. The additional benchmark selector pools recorded models on an absolute whole-model registered-byte axis, displayed in decimal GB. Percentage-axis duplicates are collapsed; failed and dominated outcomes remain available. Local cell costs and unspecified file/resident sizes are not promoted to whole-model bytes.
+The matched plots remain available below the benchmark overview. The additional benchmark selector pools recorded models on an absolute whole-model registered-byte axis, displayed in decimal GB. Percentage-axis duplicates are collapsed; failed and dominated outcomes remain available. Local cell costs and unspecified file/resident sizes are not promoted to whole-model bytes.
 
 Counts are converted to accuracy percentages only with sample sizes explicitly recorded in benchmark/cohort metadata or an unambiguous count in the same experiment and benchmark family. Unresolved counts retain a separate raw-count view. Ratios and nats/token retain their definitions. The pooled display is descriptive: it does not aggregate item-level datasets, alter gates or construct a pooled Pareto frontier across protocols. Exact cohorts and original scores remain in the point details and table.
 
@@ -218,9 +218,15 @@ harness is a separate, pending experiment.
 
 ## Benchmark bars
 
-The additional benchmark-bar view uses method colors, patterns and explicit method labels. X-axis labels show the model/candidate and decimal GB with its accounting basis: registered model, projected format, delivered weight files or provider-published size. Count scores are converted to percentages only when a sample denominator is recorded. Loss diagnostics and unresolved counts are not converted into accuracy.
+The landing page shows **one full-width chart per benchmark**, with the six primary Prism-aligned benchmarks first: MMLU-Redux, MuSR, GSM8K, HumanEval+, IFEval and BFCL v3. Additional benchmarks follow by task. Each chart combines our measured method fronts, original-model references and a labeled **Published · not reproduced** group. It is a descriptive overview of different protocols, not a matched cross-model ranking. All published observations remain, including disagreements between the whitepaper and model card.
 
-A protocol is selected by default. The explicit “All protocols” option is descriptive only: heterogeneous prompting, reasoning budgets and evaluation procedures prevent a matched ranking. Published Prism scores remain marked as unreplicated. Failed measured outcomes stay eligible; pagination changes the visible page without deleting records. Scatter-plot pass-only filters do not hide these bars. Monochrome and SVG exports preserve method patterns and labels.
+Our bars are selected on score versus size, separately for **dendritic**, **dendritic + quantization** and **non-dendritic** methods. The latter includes quantization, pruning, deletion, dense replacements and measured binary/ternary controls. Candidate A dominates B only when A is no larger and no worse, with at least one strict improvement. Accuracy is maximized; loss and perplexity ratios are minimized. Comparisons require the same original model, benchmark, exact evaluation cohort, recorded sample size and byte-accounting basis. Equal points remain; teacher references never remove compressed candidates. Published references do not compete with our measurements. This is point-score dominance, not a significance test or full-suite admission.
+
+Size is labeled in decimal GB. Registered whole-model sizes, projected formats, weight-file sizes and published packed sizes stay separate. A missing size cannot enter a size–score front; its observation remains in the register. Projected size does not mean a verified packed export. A locally measured Bonsai score may still carry provider-reported packed bytes; its quality is measured and its size basis remains published. Counts become percentages only with an explicit sample denominator. C4 loss, teacher KL and copy ratios have their own lower-is-better charts in native units. Local-only diagnostics and unresolved counts stay in the detailed explorer rather than being converted into accuracy.
+
+All selected bars are expanded without pagination, chart scrolling or a benchmark dropdown. Longer charts use aligned columns on wide displays with one shared scale per benchmark (0–100 for percentages, a native-unit range for losses/ratios); mobile layouts use a single column. Model names, GB sizes, method colors and patterns, and explicit group labels remain visible. E/P codes and published protocol names bind bars to their exact conditions. Click or keyboard-activate a bar for the full record. Search filters the already-computed fronts; it does not promote a dominated result. The evidence buttons are optional filters. Monochrome and SVG exports preserve patterns and labels.
+
+This front-only overview follows the September 28 presentation request. The full history—including dominated and failed candidates—remains in the scatter plots, register and downloads. A failed candidate can be on a benchmark front. A check mark still means all recorded development gates passed within that candidate’s original cohort, not every benchmark on the page. Existing scatter pass-only controls do not alter the overview.
 
 
 ## Native-first accounting · September 28, 2026
@@ -228,8 +234,6 @@ A protocol is selected by default. The explicit “All protocols” option is de
 New primary studies measure DendriNet replacement and whole-model recovery at the original value precision before low-bit quantization. Report original/native byte reduction, native/quantized-native reduction and original/final reduction separately, using exact artifact lineage and identical byte scopes. A hybrid’s total reduction is not labeled as DendriNet’s standalone contribution. Existing hybrid and conventional observations remain visible with their original evidence.
 
 
-## Benchmark overview · September 28 update
-
-Benchmark cards now lead the page. Task categories organize reasoning, knowledge, coding, instruction following, vision and diagnostics. Every available benchmark type is visible without a benchmark selector. Measured scores and provider-published scores occupy separate cards. Within a card, each view uses one recorded evaluation cohort; protocol buttons expose the other cohorts, and pagination retains every result. Defaults prioritize the current native-only BF16 studies, then use model identity and record count, never a pass or performance filter. Models, methods and ascending model size determine bar order. The original matched scatter plots remain below.
+## Local IFEval measurements · September 28
 
 The new local IFEval results use all 541 official prompts and 834 instructions, explicit greedy nonthinking generation with a 4,096-token output budget, and the average of prompt-strict and instruction-strict accuracy. These are our measurements, not reproductions of Prism’s serving stack. The Bonsai packed sizes remain provider-reported; evaluation uses unpacked weights. No full-suite or significance claim follows from this single benchmark.

@@ -15,16 +15,17 @@ analytics service or third-party JavaScript is needed.
 
 ## Explore the results
 
-1. **Model size vs. performance** opens first. Choose a model and benchmark;
+1. **Benchmark fronts** opens first: one full-width chart per benchmark, with Prism’s main six first. Our dendritic, hybrid and non-dendritic fronts share a chart with clearly labeled unreproduced references. All selected bars are expanded; size/protocol scopes remain separate.
+2. **Model size vs. performance** retains the full history. Choose a model and benchmark;
    use **More filters** for verdicts, training data, and the observed frontier.
    All outcomes are included by default. **Reset filters** restores them.
-2. **Dendritic and conventional compression** compares matched cohorts.
+3. **Dendritic and conventional compression** compares matched cohorts.
    The cards identify the most compressed passing models; the table retains
    unsuccessful and dominated candidates as well.
-3. **All models, one size axis** pools each benchmark against absolute GB.
+4. **All models, one size axis** pools each benchmark against absolute GB.
    Model colors and labels, method shapes, and the monochrome option remain
    available. Evaluation protocols stay attached to individual points.
-4. **Results & experiment records** keeps every candidate and experiment
+5. **Results & experiment records** keeps every candidate and experiment
    searchable, including original technical identifiers.
 
 Select a point for readable performance, size, and gate details. Expand
