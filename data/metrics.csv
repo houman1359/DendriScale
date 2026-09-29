@@ -5100,3 +5100,31 @@ exp_20260928_evening_native,Qwen/Qwen3-8B,16,Staged native BF16: 9 FFNs GSM corr
 exp_20260928_evening_native,Qwen/Qwen3-8B,17,Staged native BF16: 9 FFNs MC correct / 6144,4716,items,development,Whole model; executable-format projection
 exp_20260928_evening_native,Qwen/Qwen3-8B,18,Staged native BF16: 12 FFNs · reduced old-cell LR GSM correct / 1024,863,items,development,Whole model; executable-format projection
 exp_20260928_evening_native,Qwen/Qwen3-8B,19,Recovered INT4 parent; no dendritic cells IFEval (%),85.56197555818561,percent,development,Whole model; executable-format projection
+exp_20260929_external_prism_small,"Qwen/Qwen3-1.7B, Qwen/Qwen3-4B, Qwen/Qwen3-8B",0,Qwen3-8B original release file,16.3815,GB,Pinned Hugging Face revision,External report; not reproduced
+exp_20260929_external_prism_small,"Qwen/Qwen3-1.7B, Qwen/Qwen3-4B, Qwen/Qwen3-8B",1,"1-bit Bonsai 8B, as reported by PrismML release file",1.1587,GB,Pinned Hugging Face revision,External report; not reproduced
+exp_20260929_external_prism_small,"Qwen/Qwen3-1.7B, Qwen/Qwen3-4B, Qwen/Qwen3-8B",2,"Ternary Bonsai 8B, as reported by PrismML release file",2.1822,GB,Pinned Hugging Face revision,External report; not reproduced
+exp_20260929_external_prism_small,"Qwen/Qwen3-1.7B, Qwen/Qwen3-4B, Qwen/Qwen3-8B",3,Qwen3-4B original release file,8.045,GB,Pinned Hugging Face revision,External report; not reproduced
+exp_20260929_external_prism_small,"Qwen/Qwen3-1.7B, Qwen/Qwen3-4B, Qwen/Qwen3-8B",4,"1-bit Bonsai 4B, as reported by PrismML release file",0.5723,GB,Pinned Hugging Face revision,External report; not reproduced
+exp_20260929_external_prism_small,"Qwen/Qwen3-1.7B, Qwen/Qwen3-4B, Qwen/Qwen3-8B",5,"Ternary Bonsai 4B, as reported by PrismML release file",1.075,GB,Pinned Hugging Face revision,External report; not reproduced
+exp_20260929_external_prism_small,"Qwen/Qwen3-1.7B, Qwen/Qwen3-4B, Qwen/Qwen3-8B",6,Qwen3-1.7B original release file,4.0635,GB,Pinned Hugging Face revision,External report; not reproduced
+exp_20260929_external_prism_small,"Qwen/Qwen3-1.7B, Qwen/Qwen3-4B, Qwen/Qwen3-8B",7,"1-bit Bonsai 1.7B, as reported by PrismML release file",0.2483,GB,Pinned Hugging Face revision,External report; not reproduced
+exp_20260929_external_prism_small,"Qwen/Qwen3-1.7B, Qwen/Qwen3-4B, Qwen/Qwen3-8B",8,"Ternary Bonsai 1.7B, as reported by PrismML release file",0.4633,GB,Pinned Hugging Face revision,External report; not reproduced
+exp_20260929_int3_parent_and_ladders,Qwen/Qwen3-8B,0,"Recovered INT3 projections, INT4 tables; no cells GSM correct / 1024",907,items,development,Whole model; executable-format projection
+exp_20260929_int3_parent_and_ladders,Qwen/Qwen3-8B,1,"Recovered INT3 projections, INT4 tables; no cells C4 teacher KL",0.20315161426108833,nats/token,development,Whole model; executable-format projection
+exp_20260929_int3_parent_and_ladders,Qwen/Qwen3-8B,2,"Recovered INT3 projections, INT4 tables; no cells Copy2048 teacher KL",0.020032030390957304,nats/token,development,Whole model; executable-format projection
+exp_20260929_int3_parent_and_ladders,Qwen/Qwen3-8B,3,"Recovered INT3 projections, INT4 tables; no cells MC correct / 6144",4717,items,development,Whole model; executable-format projection
+exp_20260929_int3_parent_and_ladders,Qwen/Qwen3-8B,4,"Recovered INT3 projections, INT4 tables; no cells arc_challenge correct / 1024",633,items,development,Whole model; executable-format projection
+exp_20260929_int3_parent_and_ladders,Qwen/Qwen3-8B,5,"Recovered INT3 projections, INT4 tables; no cells arc_easy correct / 1024",854,items,development,Whole model; executable-format projection
+exp_20260929_int3_parent_and_ladders,Qwen/Qwen3-8B,6,"Recovered INT3 projections, INT4 tables; no cells boolq correct / 1024",880,items,development,Whole model; executable-format projection
+exp_20260929_int3_parent_and_ladders,Qwen/Qwen3-8B,7,"Recovered INT3 projections, INT4 tables; no cells hellaswag correct / 1024",743,items,development,Whole model; executable-format projection
+exp_20260929_int3_parent_and_ladders,Qwen/Qwen3-8B,8,"Recovered INT3 projections, INT4 tables; no cells piqa correct / 1024",773,items,development,Whole model; executable-format projection
+exp_20260929_int3_parent_and_ladders,Qwen/Qwen3-8B,9,"Recovered INT3 projections, INT4 tables; no cells winogrande correct / 1024",834,items,development,Whole model; executable-format projection
+exp_20260929_int3_parent_and_ladders,Qwen/Qwen3-8B,10,Staged native BF16: 12 FFNs · reduced old-cell LR MC correct / 6144,4598,items,development,Whole model; executable-format projection
+exp_20260929_int3_parent_and_ladders,Qwen/Qwen3-8B,11,Staged native BF16: 18 FFNs GSM correct / 1024,850,items,development,Whole model; executable-format projection
+exp_20260929_int3_parent_and_ladders,Qwen/Qwen3-8B,12,Staged native BF16: 18 FFNs MC correct / 6144,4308,items,development,Whole model; executable-format projection
+exp_20260929_int3_parent_and_ladders,Qwen/Qwen3-8B,13,Staged native BF16: 18 FFNs · reduced old-cell LR GSM correct / 1024,824,items,development,Whole model; executable-format projection
+exp_20260929_int3_parent_and_ladders,Qwen/Qwen3-8B,14,Staged native BF16: 18 FFNs · reduced old-cell LR MC correct / 6144,4305,items,development,Whole model; executable-format projection
+exp_20260929_int3_parent_and_ladders,Qwen/Qwen3-8B,15,Staged native BF16: 18 FFNs · six-FFN steps · reduced old-cell LR GSM correct / 1024,828,items,development,Whole model; executable-format projection
+exp_20260929_int3_parent_and_ladders,Qwen/Qwen3-8B,16,Staged native BF16: 18 FFNs · six-FFN steps · reduced old-cell LR MC correct / 6144,4305,items,development,Whole model; executable-format projection
+exp_20260929_int3_parent_and_ladders,Qwen/Qwen3-8B,17,Staged native BF16: 9 FFNs · 32M recovery GSM correct / 1024,898,items,development,Whole model; executable-format projection
+exp_20260929_int3_parent_and_ladders,Qwen/Qwen3-8B,18,Staged native BF16: 9 FFNs · 32M recovery MC correct / 6144,4698,items,development,Whole model; executable-format projection
