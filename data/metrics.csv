@@ -5530,3 +5530,26 @@ exp_20260930_qwen8b_waves10_11_development,Qwen/Qwen3-8B,40,order_q2_int3_jitter
 exp_20260930_qwen8b_waves10_11_development,Qwen/Qwen3-8B,41,order_d2_int3 minus order_q2_int3 GSM paired difference,0.390625,points,development,"Paired 95% interval [-1.76, 2.64] points ([-18, 27] items); 67 items solved only by order_d2_int3, 63 only by order_q2_int3"
 exp_20260930_qwen8b_waves10_11_development,Qwen/Qwen3-8B,42,order_d2_int3_jitter minus order_d2_int3 GSM paired difference,-0.1953125,points,development,"Paired 95% interval [-2.44, 2.05] points ([-25, 21] items); 64 items solved only by order_d2_int3_jitter, 66 only by order_d2_int3"
 exp_20260930_qwen8b_waves10_11_development,Qwen/Qwen3-8B,43,order_q2_int3_jitter minus order_q2_int3 GSM paired difference,1.07421875,points,development,"Paired 95% interval [-0.98, 3.32] points ([-10, 34] items); 68 items solved only by order_q2_int3_jitter, 57 only by order_q2_int3"
+exp_20260929_prism_benchmarks_local_20260930t181102z,Qwen/Qwen3-8B,0,prismsuite20260929_native4_int4t__bfcl_v3_prompting,73.64685120056103,percent,benchmark,Whole model
+exp_20260929_prism_benchmarks_local_20260930t181102z,Qwen/Qwen3-8B,1,prismsuite20260929_native4_int4t__gsm8k,91.43,percent,benchmark,Whole model
+exp_20260929_prism_benchmarks_local_20260930t181102z,Qwen/Qwen3-8B,2,prismsuite20260929_native4_int4t__ifbench,28.835,percent,benchmark,Whole model
+exp_20260929_prism_benchmarks_local_20260930t181102z,Qwen/Qwen3-8B,3,prismsuite20260929_native4_int4t__math_500,81.2,percent,benchmark,Whole model
+exp_20260929_prism_benchmarks_local_20260930t181102z,Qwen/Qwen3-8B,4,prismsuite20260929_native4_int4t__mmlu_redux,79.67999999999999,percent,benchmark,Whole model
+exp_20260929_prism_benchmarks_local_20260930t181102z,Qwen/Qwen3-8B,5,prismsuite20260929_native4_int4t__musr,57.14,percent,benchmark,Whole model
+exp_20260929_prism_benchmarks_local_20260930t181102z,Qwen/Qwen3-8B,6,prismsuite20260929_noise29_noise_structured_s404__math_500,33.6,percent,benchmark,Whole model
+exp_20260929_prism_benchmarks_local_20260930t181102z,Qwen/Qwen3-8B,7,coverage20260929_native4_int4t__humaneval,75.0,percent,benchmark,Whole model
+exp_20260929_prism_benchmarks_local_20260930t181102z,Qwen/Qwen3-8B,8,coverage20260929_native4_int4t__ifeval,84.52783060058422,percent,benchmark,Whole model
+exp_20260929_prism_benchmarks_local_20260930t181102z,Qwen/Qwen3-8B,9,coverage20260929_native4_int4t__mbpp,67.72486772486772,percent,benchmark,Whole model
+exp_20260929_prism_benchmarks_local_20260930t181102z,Qwen/Qwen3-8B,10,coverage20260929_noise29_noise_structured_s404__humaneval,1.2195121951219512,percent,benchmark,Whole model
+exp_20260929_prism_benchmarks_local_20260930t181102z,Qwen/Qwen3-8B,11,coverage20260929_noise29_noise_structured_s405__mbpp,1.8518518518518516,percent,benchmark,Whole model
+exp_20260929_prism_benchmarks_local_20260930t181102z,Qwen/Qwen3-8B,12,coverage20260929_order_d2_int3__humaneval,48.78048780487805,percent,benchmark,Whole model
+exp_20260929_prism_benchmarks_local_20260930t181102z,Qwen/Qwen3-8B,13,coverage20260929_order_d2_int3__mbpp,48.94179894179894,percent,benchmark,Whole model
+exp_20260929_prism_benchmarks_local_20260930t181102z,Qwen/Qwen3-8B,14,coverage20260929_order_d2_int3_jitter__humaneval,47.5609756097561,percent,benchmark,Whole model
+exp_20260929_prism_benchmarks_local_20260930t181102z,Qwen/Qwen3-8B,15,coverage20260929_order_d2_int3_jitter__ifeval,56.47105236328498,percent,benchmark,Whole model
+exp_20260929_prism_benchmarks_local_20260930t181102z,Qwen/Qwen3-8B,16,coverage20260929_order_d2_int3_jitter__mbpp,49.47089947089947,percent,benchmark,Whole model
+exp_20260929_prism_benchmarks_local_20260930t181102z,Qwen/Qwen3-8B,17,coverage20260929_order_q2_int3__humaneval,45.73170731707317,percent,benchmark,Whole model
+exp_20260929_prism_benchmarks_local_20260930t181102z,Qwen/Qwen3-8B,18,coverage20260929_order_q2_int3__ifeval,56.101366596187006,percent,benchmark,Whole model
+exp_20260929_prism_benchmarks_local_20260930t181102z,Qwen/Qwen3-8B,19,coverage20260929_order_q2_int3__mbpp,45.767195767195766,percent,benchmark,Whole model
+exp_20260929_prism_benchmarks_local_20260930t181102z,Qwen/Qwen3-8B,20,coverage20260929_order_q2_int3_jitter__humaneval,43.90243902439025,percent,benchmark,Whole model
+exp_20260929_prism_benchmarks_local_20260930t181102z,Qwen/Qwen3-8B,21,coverage20260929_order_q2_int3_jitter__ifeval,58.60926785373919,percent,benchmark,Whole model
+exp_20260929_prism_benchmarks_local_20260930t181102z,Qwen/Qwen3-8B,22,coverage20260929_order_q2_int3_jitter__mbpp,44.97354497354497,percent,benchmark,Whole model
