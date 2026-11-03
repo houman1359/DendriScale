@@ -1,12 +1,12 @@
 {
   "schema": "dendriscale/public-manifest-v1",
-  "updated_at_utc": "2026-11-03T05:50:43.205212+00:00",
+  "updated_at_utc": "2026-11-03T21:37:23.509902+00:00",
   "sha256": {
-    "snapshot.json": "267ebc771513040b76927b4dd2116eb7642f20efb671f9a4ed0c1b81c70344bc",
-    "candidates.csv": "b40a91c77024e8222ba7a150405bd1afd15358c3142e12f86a6c777bc7fc47c8",
-    "coverage.csv": "c3377d66b64b793a46e34e4f9e7fa223a9066c700472bd4421231c30cda44359",
-    "metrics.csv": "1effbf3536bfdf54d0653b341b3525fd677ff3e07f17d40a514c0a27fc858c66",
-    "observations.csv": "f08f7ccdce014c6844b47d3e035c01e6951a79c92cab2b1fbd781ec72d1de37d",
+    "snapshot.json": "5b13363ac532db4e6161e4714c3b5167fbc2b6bdb28f82875c235d0bfc8c7e52",
+    "candidates.csv": "98e3557e18e4cc7d842d5fc8cd98257ac5da9c7d2452ef1e064102e1c8bc9597",
+    "coverage.csv": "0a7726222fce1010eacf4008cbf2f8bfa8147b2193f687fd6d0410694d37abbb",
+    "metrics.csv": "dab04d51b862298bc6cb41a8c7834d88b6fbc57551b938bf803c9f7da1af2173",
+    "observations.csv": "ecc3145ee6174b394a7662ba015afe2fc2235c59cefce73c61a26c8a074132fe",
     "variant_aliases.json": "6f0dfb95dad342da8701e6ccb334e8d681d708b26a070f00988359321e9c2eba",
     "benchmark_size_notes.json": "7f1501ead0f046241ecd4525d6230e9f8ee40edb41b7927ac13b6863bfc22f4a",
     "benchmark_evaluation_coverage.json": "7a81dad3d60e178add14fa1d79e9d591f28bbd681028952ab89e4ef4dbd239cc",

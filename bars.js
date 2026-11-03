@@ -94,6 +94,8 @@ window.DendriScaleBars = function(DATA,{el,se,sizeNotes=[],benchmarkCoverage=nul
   const bytes=p.whole_model_size?.registered_bytes;
   if(p.source_level==='external-reported')return {bytes:bytes??(p.xunit==='bytes'?p.x:null),basis:'published size'};
   if((p.size_basis==='published packed size'||/publisher-reported packed size/i.test(p.label))&&p.xunit==='bytes')return {bytes:p.x,basis:'published packed size'};
+  // A qualified package export's every file, bound to the exported checkpoint; never pooled with ledger or registered bytes.
+  if(p.xaxis==='artifact_file_bytes'&&p.xunit==='bytes')return {bytes:p.x,basis:'measured artifact'};
   if(p.xaxis==='projected_format_bytes')return {bytes:p.x,basis:'projected format'};
   if(p.xaxis==='weight_file_bytes')return {bytes:p.x,basis:'weight files'};
   if(bytes>0)return {bytes,basis:'registered model'};
@@ -196,7 +198,7 @@ window.DendriScaleBars = function(DATA,{el,se,sizeNotes=[],benchmarkCoverage=nul
  const code=r=>cohortCodes.get(JSON.stringify([r.published,r.model,r.cohort]));
  const shortModel=r=>UI.modelName(r.model).replace(/^Qwen\//,'').replace(/-Instruct$/,'').replace(/OLMo-2-(?:0325|1124|0425)-/,'OLMo 2 ');
  const sizeLabel=r=>r.size.bytes>0?(r.size.bytes/1e9).toFixed(2)+' GB':'GB not recorded';
- const sizeNote=r=>({'registered model':'','projected format':'projected','published size':'published','published packed size':'published size','weight files':'weight files','size not measured':'','GB not recorded':''}[r.size.basis]??r.size.basis);
+ const sizeNote=r=>({'registered model':'','projected format':'projected','published size':'published','published packed size':'published size','weight files':'weight files','measured artifact':'artifact','size not measured':'','GB not recorded':''}[r.size.basis]??r.size.basis);
  const methodStyle=r=>{
   // One stable color/pattern for each requested compression family.
   if(r.method==='teacher')return styles.teacher;
@@ -333,8 +335,8 @@ window.DendriScaleBars = function(DATA,{el,se,sizeNotes=[],benchmarkCoverage=nul
  const shortName=r=>String(r.variant).split(' · ').slice(0,2).join(' · ');
  const niceStep=span=>{const p=10**Math.floor(Math.log10(span||1)),f=span/p;return (f<=1?1:f<=2?2:f<=2.5?2.5:f<=5?5:10)*p;};
  // Byte conventions by name, so a projected ledger is never read as a measured file.
- const bytesName=b=>({'projected format':'projected ledger bytes, not a measured file','registered model':'registered bytes of the built model','weight files':'measured weight-file bytes'}[b]||b);
- const bytesShort=b=>({'projected format':'ledger bytes','registered model':'registered bytes','weight files':'file bytes'}[b]||b);
+ const bytesName=b=>({'projected format':'projected ledger bytes, not a measured file','registered model':'registered bytes of the built model','weight files':'measured weight-file bytes','measured artifact':'measured complete-model storage, every file of a qualified export'}[b]||b);
+ const bytesShort=b=>({'projected format':'ledger bytes','registered model':'registered bytes','weight files':'file bytes','measured artifact':'artifact bytes'}[b]||b);
  const metricName=b=>friendly[b]||b;
  const regimeText=r=>window.DendriScaleRegime(r)||'regime not recorded';
  const frontName=r=>'cohort '+code(r)+', '+regimeText(r);

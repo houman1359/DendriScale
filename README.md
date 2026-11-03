@@ -169,3 +169,24 @@ unchanged.
   reason and source hash, plus a ledger of every record as published before.
   `scripts/validate.py` rejects any changed value, removed record or unlisted
   metadata change ([Methods](METHODS.md)).
+
+<!-- update-20261103:begin -->
+## Qwen3-8B 10x program · November 3, 2026 update
+
+Three new cohorts (71 points in 16 panels) extend the 10x program; nothing published changes.
+
+- **Held-out reassessment under KL caps v1:** pool K of the frozen held-out set v1 for nine checkpoints,
+  with two separate statuses per checkpoint: the levels met by point estimates and those established by
+  five one-sided 95% bounds. Historical checkpoints, so not a prospective confirmation.
+- **Long-dose milestones:** the 17.4 MB/FFN dense twins at 268M (GSM 679) and 671M (GSM 719) and the 19.5 MB/FFN cells at 268M (GSM 717), each with its
+  checkpoint hash, exact cumulative targets and recipe. Teacher reasoning traces were added as training
+  lengthened, so the change is not a dose effect alone.
+- **Measured complete-model storage:** every file of the four qualified package exports, on its own axis and
+  bound to the exported checkpoint: Dense SwiGLU 17.4 MB/FFN at 67M, 1,595,183,536 bytes; Dendritic sparse cells 19.5 MB/FFN at 67M, 1,628,789,072 bytes; Dense SwiGLU 19.5 MB/FFN at 67M, 1,670,128,144 bytes; Dense SwiGLU 17.4 MB/FFN at 671M +traces, 1,595,183,756 bytes.
+  The 16-bit ledger sizes keep their own axis.
+- **Reading:** the cells are selectively connected sparse gated units with linear compartments, not evidence
+  of an E/I or shunting advantage; their copy KL is slightly worse than their dense twins'. No model is
+  called better across the whole capability vector. External models' training exposure is unknown.
+- **Pending:** the cells' 671M milestone (due 4 November), the 671M nine-benchmark suites and the registered
+  671M decision. Pending results have no value and no level ([Methods](METHODS.md)).
+<!-- update-20261103:end -->

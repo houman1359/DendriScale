@@ -378,6 +378,114 @@ from the original beyond the listed corrections. `metrics.csv` keeps each
 registry's original metric names, because they are registry records, not
 model labels.
 
+<!-- update-20261103:begin -->
+## Qwen3-8B 10x program · November 3, 2026 update
+
+Approved by Houman Safaai: the clean held-out results, the completed long-dose milestones and the measured
+artifact sizes. Three new cohorts hold 71 new points in 16 panels; every published point, panel and row is
+unchanged. Labels follow the scheme above; run identifiers stay in point IDs.
+
+**1. Pool K under KL caps v1.** Nine checkpoints scored on pool K of the frozen held-out set v1 (manifest
+SHA-256 `56fa9b87a6b69a46917191226e18a7ded81b243ef0b7c1d83a5228477585531a`; 64 C4 windows, 64 packed chat rows and 64 copy windows, mean per-token KL to the
+teacher). Five historical checkpoints were scored once, after the caps were frozen, from frozen states whose
+hashes were checked before scoring. Two results of the 17.4 MB/FFN dense twins (at 67.1M and 268M targets)
+reuse the earlier pool-K evaluation, read before the levels and caps were chosen, so they are informative
+rather than untouched tests. The last two are new long-dose milestones. These are historical checkpoints:
+their development GSM and probe entered the program's decisions, and seven of them calibrated the caps on
+pool M. The reassessment is retrospective and descriptive, not a prospective confirmation of a frontier.
+
+| Model | GSM (of 1,024) | Probe | K C4 / chat / copy KL | Point estimates | Five one-sided 95% bounds |
+| --- | ---: | ---: | --- | --- | --- |
+| Dendritic sparse cells · 30 MB/FFN · INT4 parent · 67M · 2.52 GB | 645 | 0.6226 | 0.5277 / 0.5926 / 0.0336 | τ3; next τ2: GSM 645 against 663 (violation); probe 0.6226 against 0.6435 (violation); C4 KL 0.5277 against 0.502 (violation); chat KL 0.5926 against 0.552 (violation) | τ3; next τ2: GSM 645 against 663 (violation); probe 0.6226 against 0.6435 (violation); C4 KL 0.5277 against 0.502 (violation); chat KL 0.5926 against 0.552 (violation) |
+| Dense SwiGLU · 30 MB/FFN · INT4 parent · 67M · 2.52 GB | 608 | 0.5939 | 0.5788 / 0.6332 / 0.0307 | τ3; next τ2: GSM 608 against 663 (violation); probe 0.5939 against 0.6435 (violation); C4 KL 0.5788 against 0.502 (violation); chat KL 0.6332 against 0.552 (violation) | τ3; next τ2: GSM 608 against 663 (violation); probe 0.5939 against 0.6435 (violation); C4 KL 0.5788 against 0.502 (violation); chat KL 0.6332 against 0.552 (violation) |
+| Dendritic sparse cells · 19.5 MB/FFN · low-bit parent · 67M · 1.64 GB | 495 | 0.5505 | 0.7631 / 0.8182 / 0.0526 | τ4; next τ3: probe 0.5505 against 0.5631 (violation); C4 KL 0.7631 against 0.749 (violation) | τ4; next τ3: GSM 469 against 473 (bound crosses); probe 0.5505 against 0.5631 (violation); C4 KL 0.7631 against 0.749 (violation); chat KL 0.8887 against 0.838 (bound crosses) |
+| Dense SwiGLU · 19.5 MB/FFN · low-bit parent · 67M · 1.64 GB | 394 | 0.5312 | 0.8111 / 0.8485 / 0.0495 | τ4; next τ3: GSM 394 against 473 (violation); probe 0.5312 against 0.5631 (violation); C4 KL 0.8111 against 0.749 (violation); chat KL 0.8485 against 0.838 (violation) | none; next τ4: probe 0.5218 against 0.5228 (bound crosses) |
+| Dense SwiGLU · 17.4 MB/FFN · low-bit parent · 67M · 1.56 GB | 352 | 0.5231 | 0.8578 / 0.8927 / 0.0516 | τ4; next τ3: GSM 352 against 473 (violation); probe 0.5231 against 0.5631 (violation); C4 KL 0.8578 against 0.749 (violation); chat KL 0.8927 against 0.838 (violation) | none; next τ4: GSM 327 against 332 (bound crosses); probe 0.5127 against 0.5228 (bound crosses) |
+| Dendritic sparse cells · 30 MB/FFN · INT4 parent · 134M (2-stage) · 2.52 GB | 678 | 0.6294 | 0.4873 / 0.5265 / 0.0304 | τ3; next τ2: probe 0.6294 against 0.6435 (violation) | τ3; next τ2: GSM 654 against 663 (bound crosses); probe 0.6294 against 0.6435 (violation); C4 KL 0.512 against 0.502 (bound crosses); chat KL 0.573 against 0.552 (bound crosses) |
+| Dense SwiGLU · 17.4 MB/FFN · low-bit parent · 268M +traces · 1.56 GB | 679 | 0.5488 | 0.7513 / 0.7691 / 0.0446 | τ4; next τ3: probe 0.5488 against 0.5631 (violation); C4 KL 0.7513 against 0.749 (violation) | τ4; next τ3: probe 0.5488 against 0.5631 (violation); C4 KL 0.7513 against 0.749 (violation) |
+| Dendritic sparse cells · 19.5 MB/FFN · low-bit parent · 268M +traces · 1.64 GB | 717 | 0.5661 | 0.6799 / 0.7163 / 0.0452 | τ3; next τ2: probe 0.5661 against 0.6435 (violation); C4 KL 0.6799 against 0.502 (violation); chat KL 0.7163 against 0.552 (violation) | τ4; next τ3: probe 0.5558 against 0.5631 (bound crosses) |
+| Dense SwiGLU · 17.4 MB/FFN · low-bit parent · 671M +traces · 1.56 GB | 719 | 0.5588 | 0.6523 / 0.7018 / 0.0362 | τ4; next τ3: probe 0.5588 against 0.5631 (violation) | τ4; next τ3: probe 0.5588 against 0.5631 (violation) |
+
+The two statuses are kept apart: “point estimates” names the strictest level whose five requirements (GSM,
+probe, and C4, chat and copy KL on pool K) all hold at their measured values; “five one-sided 95% bounds”
+names the strictest level whose GSM and probe lower bounds and three KL upper bounds all hold. “Violation”
+means the measured value misses the requirement; “bound crosses” means the value meets it but its bound
+does not. A level is a statement about the thresholds above, never about broad teacher quality.
+
+**2. The long dose's completed milestones.** Each milestone is its own checkpoint observation, bound to its
+STATE SHA-256, with its exact cumulative exposure. The 67.1M wave-1 state (67,109,249 targets of C4, teacher
+chat and copy; no reasoning traces) continued on four GPUs with C4, teacher chat, teacher reasoning traces on
+GSM8K and MATH training problems, and copy:
+
+| Milestone | Cumulative targets | Of which long-dose C4 / chat / traces / copy | GSM | Probe | M C4 / chat / copy KL |
+| --- | ---: | --- | ---: | ---: | --- |
+| Dense SwiGLU · 17.4 MB/FFN · low-bit parent · 268M +traces · 1.56 GB | 268,437,127 | 35,158,464 / 53,858,130 / 41,959,988 / 70,351,296 | 679 | 0.5488 | 0.7886 / 0.8898 / 0.0448 |
+| Dendritic sparse cells · 19.5 MB/FFN · low-bit parent · 268M +traces · 1.64 GB | 268,437,127 | 35,158,464 / 53,858,130 / 41,959,988 / 70,351,296 | 717 | 0.5661 | 0.7234 / 0.8263 / 0.0455 |
+| Dense SwiGLU · 17.4 MB/FFN · low-bit parent · 671M +traces · 1.56 GB | 671,100,034 | 105,459,024 / 161,626,525 / 125,884,100 / 211,021,136 | 719 | 0.5588 | 0.6813 / 0.8198 / 0.0372 |
+
+The long dose lengthened training and added the teacher traces at the same time, so a change from the
+67.1M state is not a training-length effect alone; no trace row matches a development or few-shot GSM item,
+but the traces come from the GSM8K training distribution. The 268M milestones are mid-schedule and
+undecayed; 671M ends the registered schedule. The 671M state's milestone record gives 982,073,555
+cumulative targets, double-counting a resumed stretch; the run's accounting gives 671,100,034, used here.
+Paired comparisons (development GSM over items; pool K over rows):
+- the 19.5 MB/FFN cells against the 17.4 MB/FFN dense twins at 268M: GSM +3.71 points [+0.88, +6.54]; K C4 ×0.905 [0.897, 0.913], chat ×0.931 [0.923, 0.940], copy ×1.015 [1.007, 1.022] (at 67.1M: C4 ×0.890 [0.882, 0.897], chat ×0.917 [0.908, 0.925], copy ×1.020 [1.015, 1.025]). These
+  finalists are not byte-matched: the cells are larger by 75,068,316 B on the 16-bit ledger and by
+  33,605,536 B as measured artifacts at their qualified 67.1M exports;
+- the dense twins from 268M to 671M: GSM +3.91 points [+1.27, +6.64]; K C4 ×0.868 [0.861, 0.875], chat ×0.913 [0.900, 0.925], copy ×0.811 [0.806, 0.816];
+- outside the registered rules, the cells at 268M against the dense twins at 671M: GSM -0.20
+  [-2.83, +2.54]; K C4 ×1.042 [1.031, 1.054], chat ×1.021 [1.005, 1.036], copy ×1.252 [1.242, 1.262].
+
+**3. Measured complete-model storage.** Four checkpoints have qualified package exports: the package's
+loader, its training form and the evaluated model agree bit for bit on every tensor and on the logits, and
+the artifact reloads with no teacher, run or data file. Their every-file sizes form their own byte
+convention (x axis “Measured complete-model storage”), each bound to the exported checkpoint by its STATE
+SHA-256. The 16-bit ledger sizes stay on their own axis and are never replaced by these.
+
+| Model | Every file (bytes) | ×BF16 teacher | 16-bit ledger (bytes) | Resident after loading | Peak, 2,048-token prefill |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Dense SwiGLU · 17.4 MB/FFN · low-bit parent · 67M · 1.56 GB | 1,595,183,536 | 10.27× | 1,562,901,504 | 10.40 GB | 10.91 GB |
+| Dendritic sparse cells · 19.5 MB/FFN · low-bit parent · 67M · 1.64 GB | 1,628,789,072 | 10.06× | 1,637,969,820 | 11.85 GB | 16.49 GB |
+| Dense SwiGLU · 19.5 MB/FFN · low-bit parent · 67M · 1.64 GB | 1,670,128,144 | 9.81× | 1,637,846,016 | 10.98 GB | 11.50 GB |
+| Dense SwiGLU · 17.4 MB/FFN · low-bit parent · 671M +traces · 1.56 GB | 1,595,183,756 | 10.27× | 1,562,901,504 | 10.40 GB | 10.91 GB |
+
+Memory is measured after the package loader expands the codes (a BF16 parent and FP32 FFN values), so it
+is not a low-bit runtime's. The 19.5 MB/FFN cells' 268M state has no qualified export: no artifact size is
+attached to it, and the export of its 67.1M state does not stand in for it.
+
+**Reading the cells.** The successful cells are selectively connected sparse gated units with linear
+compartments. A difference from the dense twins is therefore a selective-wiring result, not evidence of an
+E/I or shunting advantage. Their copy KL is slightly worse than their byte-matched twins' on pool K:
+×1.095 [1.084, 1.106] at 30 MB/FFN and ×1.062 [1.057, 1.067] at 19.5 MB/FFN
+(67.1M), while their C4 and chat KL are lower (×0.912 [0.903, 0.921] and ×0.936 [0.924, 0.948]; ×0.941 [0.933, 0.948] and ×0.964 [0.956, 0.972]).
+
+**One capability vector.** Fronts are drawn per metric. No model here is described as better across the
+whole vector: the metrics and their protocols differ, and every comparison above has a metric that goes
+the other way or a size that differs.
+
+**External models.** Where external releases appear on this site (PrismML's Bonsai models, GGUF files),
+their training data are unknown, and so is their exposure to these evaluation sets. Scores we measured on
+them are measurements of the released files, not evidence about how they were trained.
+
+**Pending** (no value is inferred and no level is assigned until measured): the 19.5 MB/FFN cells' 671M
+milestone (training; due near 10:00 on 4 November 2026); the nine-benchmark suites at 671M (the dense
+twins' generations on their qualified artifact are running; the cells' follow their milestone); the
+program's registered 671M decision between the two finalists; exports of the cells' 268M and 671M states.
+These appear in the experiment ledger as running or planned.
+
+**Correction history (exposure and records).**
+- 2 November: the long dose's training stream was found to pass the stream positions of the old fresh
+  confirmation set's C4 and chat sequences. Those values of the long-dose milestones are exposed and are
+  in no clean comparison; a frozen held-out set (v1, above) was built from sources outside every training
+  stream. The 2 November publication already left them out.
+- 2 November, night: H7q (two 67.1M stages) was found exposed in the same way; its old-set C4 and chat values
+  are excluded as well.
+- 3 November: the 671M milestone record's derived cumulative-target total double-counts a resumed stretch;
+  the run's accounting is used (item 2).
+- 3 November: sizes of the two finalists are stated in both conventions, the 16-bit ledger difference and
+  the measured artifact difference at matched 67.1M checkpoints (item 2), never one for the other.
+<!-- update-20261103:end -->
+
 # Benchmark coverage
 
 Benchmark cards distinguish measured scores from evaluation work. The coverage

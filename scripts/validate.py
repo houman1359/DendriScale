@@ -17,6 +17,10 @@ DATA=json.loads((ROOT/'data/snapshot.json').read_text())
 sys.path.insert(0,str(ROOT/'scripts'))
 import corrections  # noqa: E402  (versioned metadata corrections)
 CORRECTIONS=sorted((ROOT/'data').glob('metadata_corrections_v*.json'))
+# Per-file cap on public data files. Raised from 10,000,000 bytes on 2026-11-03: the append-only snapshot reached
+# 9,794,957 bytes before the update of that day added 71 points; GitHub Pages serves it gzip-compressed (under 1 MB).
+# The cap still bounds the page's single fetch; reaching it again calls for slimming the snapshot, not silent growth.
+MAX_DATA_FILE_BYTES=12_000_000
 
 
 def frontier(points,xd,yd):
@@ -96,7 +100,7 @@ class PublicContract(unittest.TestCase):
         forbidden=r'/n/|/tmp/|/home/|/Users/|file://|BEGIN .*PRIVATE KEY|gh[pousr]_[A-Za-z0-9]{20}|github_pat_[A-Za-z0-9_]+'
         for p in (ROOT/'data').iterdir():
             self.assertFalse(re.search(forbidden,p.read_text()),p.name)
-            self.assertLess(p.stat().st_size,10_000_000)
+            self.assertLess(p.stat().st_size,MAX_DATA_FILE_BYTES,p.name)
 
     def test_panels_and_fronts(self):
         ids=set()
@@ -229,6 +233,25 @@ class PublicContract(unittest.TestCase):
         def change_source(doc):point(doc,first)['source_hashes']=['0'*64]
         for change in (set_y,set_x,drop,relabel_unlisted,undo_listed,change_source):
             self.assertTrue(mutated(change),change.__name__)
+
+    def test_measured_artifacts_are_bound_to_their_checkpoint(self):
+        # Measured complete-model storage (every file of a qualified package export) sits on its own axis: the size
+        # equals the point's whole-model bytes, an artifact panel holds no other byte convention, and the exported
+        # checkpoint's STATE SHA-256 named in the conditions is one of the point's source hashes.
+        found=0
+        for panel in DATA['panels']:
+            axes={p['xaxis'] for p in panel['points']}
+            if 'artifact_file_bytes' not in axes:continue
+            self.assertEqual(axes,{'artifact_file_bytes'},panel['id'])
+            for p in panel['points']:
+                found+=1
+                self.assertEqual(p['xunit'],'bytes');self.assertEqual(p['x'],p['whole_model_size']['registered_bytes'])
+                self.assertRegex(p['conditions'],r'STATE SHA-256 [0-9a-f]{64}')
+        self.assertGreater(found,0)
+        for panel in DATA['panels']:
+            for p in panel['points']:
+                for sha in re.findall(r'STATE SHA-256 ([0-9a-f]{64})',p.get('conditions') or ''):
+                    self.assertIn(sha,p['source_hashes'],p['id'])
 
     def test_bar_chart_cross_method_fronts(self):
         # The benchmark bars' cross-method fronts, as bars.js draws them (front tags, filled panel markers, one
