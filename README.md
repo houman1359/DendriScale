@@ -189,4 +189,6 @@ Three new cohorts (71 points in 16 panels) extend the 10x program; nothing publi
   called better across the whole capability vector. External models' training exposure is unknown.
 - **Pending:** the cells' 671M milestone (due 4 November), the 671M nine-benchmark suites and the registered
   671M decision. Pending results have no value and no level ([Methods](METHODS.md)).
+- **Display:** cohorts published earlier keep their bar codes, and the new cohorts take the next ones; on
+  the new panels the explorer draws one front per training regime, as the bars do.
 <!-- update-20261103:end -->

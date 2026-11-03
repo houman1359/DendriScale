@@ -137,7 +137,7 @@ window.DendriScaleBars = function(DATA,{el,se,sizeNotes=[],benchmarkCoverage=nul
   if(!rawLoss&&(y<0||y>100))continue;
   const key=JSON.stringify([p.id.replace(/__whole_percent$/,''),p.model,p.cohort,p.ylabel,p.y]);
   if(seen.has(key))continue;seen.add(key);
-  rows.push({...p,variant:variantOf(p),score:y,scoreUnit,direction:p.ydirection,n,benchmark:metric(p),size:size(p),method:method(p),published:p.source_level==='external-reported'});
+  rows.push({...p,variant:variantOf(p),score:y,scoreUnit,direction:p.ydirection,n,benchmark:metric(p),size:size(p),method:method(p),published:p.source_level==='external-reported',panel_id:panel.id});
  }
  const scoreLabel=r=>r.score.toFixed(r.scoreUnit==='nats/token'?3:2)+(r.scoreUnit==='%'?'%':r.scoreUnit==='ratio'?'×':' nats/token');
  function details(r){
@@ -192,9 +192,15 @@ window.DendriScaleBars = function(DATA,{el,se,sizeNotes=[],benchmarkCoverage=nul
    || (ac==='primary'?primary.indexOf(a)-primary.indexOf(b):a.localeCompare(b));
  });
  // Evidence labels refer to exact cohorts, including distinct published protocols.
- const cohortKeys=[...new Set(rows.map(r=>JSON.stringify([r.published,r.model,r.cohort])))].sort();
+ // Codes of the cohorts published by 2 November 2026 (panels up to panel_462) stay as published: alphabetical over
+ // those cohorts. A cohort first published later takes the next code, in the order of its first panel.
+ const firstPanel=new Map();
+ for(const r of rows){const k=JSON.stringify([r.published,r.model,r.cohort]),n=UI.panelNumber(r.panel_id);if(!firstPanel.has(k)||n<firstPanel.get(k))firstPanel.set(k,n);}
+ const later=k=>firstPanel.get(k)>UI.LAST_PANEL_OF_2_NOVEMBER;
+ const cohortKeys=[...firstPanel.keys()].sort((a,b)=>(later(a)-later(b))||(later(a)?firstPanel.get(a)-firstPanel.get(b):0)||(a<b?-1:a>b?1:0));
  const cohortCodes=new Map();let measuredCode=0,publishedCode=0;
  for(const k of cohortKeys)cohortCodes.set(k,JSON.parse(k)[0]?'P'+(++publishedCode):'E'+(++measuredCode));
+ window.DendriScaleBarData.codes=cohortCodes; // read-only handle for tests
  const code=r=>cohortCodes.get(JSON.stringify([r.published,r.model,r.cohort]));
  const shortModel=r=>UI.modelName(r.model).replace(/^Qwen\//,'').replace(/-Instruct$/,'').replace(/OLMo-2-(?:0325|1124|0425)-/,'OLMo 2 ');
  const sizeLabel=r=>r.size.bytes>0?(r.size.bytes/1e9).toFixed(2)+' GB':'GB not recorded';

@@ -57,6 +57,12 @@ window.DendriScaleUI = (() => {
     element.title = original || verdictName(state);
     return element;
   }
+  // Panels are numbered in the order they were first published; panel_462 is the last one published by
+  // 2 November 2026. Later panels opt in to one explorer front per training regime, and their cohorts take the
+  // bar codes after the last code published by then, so no published panel, front or code changes.
+  const LAST_PANEL_OF_2_NOVEMBER = 462;
+  const panelNumber = id => { const m = String(id ?? '').match(/^panel_(\d+)/); return m ? Number(m[1]) : NaN; };
+  const publishedAfter2November = id => panelNumber(id) > LAST_PANEL_OF_2_NOVEMBER;
   // Teachers are recognized by their recorded role (metadata correction v1), not by a label string.
   const isTeacher = point => point?.reference_role === 'teacher' || point?.method_style?.key === 'teacher'
     || point?.label === 'Teacher reference';
@@ -206,6 +212,7 @@ window.DendriScaleUI = (() => {
     target.addEventListener('keydown', event => {if (event.key === 'Escape') tip.hidden = true;});
   }
   return {canonicalModelId, historicalProtocol, modelName, candidateName, metricName, axisName, number, tick, tickCost, ticks, badge, result, empty, tooltip,
+    LAST_PANEL_OF_2_NOVEMBER, panelNumber, publishedAfter2November,
     allBenchmarksPass, candidatePoint, sizeAccounting, countDenominator, passBadge, passMark, passLabel, passScope, chartZoom,
     isTeacher, artifactText};
 })();

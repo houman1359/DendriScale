@@ -473,6 +473,21 @@ twins' generations on their qualified artifact are running; the cells' follow th
 program's registered 671M decision between the two finalists; exports of the cells' 268M and 671M states.
 These appear in the experiment ledger as running or planned.
 
+**Display changes in this update.**
+- Cohort codes on the benchmark bars: every cohort published by 2 November 2026 (panels up to panel_462)
+  keeps its published E or P code, assigned alphabetically over those cohorts as before. A cohort first
+  published later takes the next code after the last one published by then, in the order of its first
+  panel, so earlier references to codes still resolve and the three new cohorts' codes follow them.
+- Explorer fronts: panels first published from 3 November 2026 (panel_463 onward) draw one front per
+  training regime, the regime their labels record, told apart by line style and a text tag, as the
+  benchmark bars do; a one-member front has a tag and no line. Panels published earlier keep their single
+  front, unchanged.
+- Axis text: in the size-vs-quality explorer, every panel sized by a projected ledger, including the 48
+  published before this update, now explains its axis as “projected complete-model storage from a byte
+  ledger or format projection; the axis title and Conditions state the convention. Not a measured file.”
+  It replaces the generic sentence about a recorded local resource; for those panels only this display
+  text changed.
+
 **Correction history (exposure and records).**
 - 2 November: the long dose's training stream was found to pass the stream positions of the old fresh
   confirmation set's C4 and chat sequences. Those values of the long-dose milestones are exposed and are
