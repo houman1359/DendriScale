@@ -2,9 +2,20 @@
 // Benchmark overview; archived observations and gate decisions remain unchanged.
 // Point-score fronts are local to a model, evaluation protocol and byte basis.
 // Published scores are references, never competitors in our measured fronts.
+// The training regime a record's label carries: its training exposure (a count such as 67M or 4.19M, with
+// "(N-stage)" when the label states stages) or "untrained"; null when the label records neither. Read from the label
+// only, never inferred; fronts never join different regimes, and unrecorded regimes form their own group.
+window.DendriScaleRegime = r => {
+ const segments=String(r.label??'').split(' · ').filter(s=>!/^\s*[\d.]+ GB\s*$/.test(s));
+ for(const s of segments){
+  const m=s.match(/(?:^|[\s,(])(\d+(?:\.\d+)?M)(?=$|[\s,)+])/);
+  if(m){const stage=s.match(/\b(\d+)-stage\b/);return m[1]+(stage?' ('+stage[1]+'-stage)':'');}
+ }
+ return segments.some(s=>/\buntrained\b/i.test(s))?'untrained':null;
+};
 window.DendriScaleBarFront = rows => {
  const family = r => ['teacher','dendritic','hybrid'].includes(r.method) ? r.method : 'control';
- const key = r => JSON.stringify([r.model,r.cohort,r.benchmark,r.direction||'max',r.scoreUnit||'%',r.size.basis,r.n,family(r)]);
+ const key = r => JSON.stringify([r.model,r.cohort,r.benchmark,r.direction||'max',r.scoreUnit||'%',r.size.basis,r.n,window.DendriScaleRegime(r),family(r)]);
  const eligible = rows.filter(r => Number.isFinite(r.size.bytes) && r.size.bytes > 0);
  const groups = new Map();
  for(const r of eligible.filter(r=>!r.published && family(r)!=='teacher')){
@@ -19,14 +30,14 @@ window.DendriScaleBarFront = rows => {
 };
 
 // The empirical front of one chart across methods: our measured models of every method family together, within
-// one cohort (evaluation set and protocol) and one byte convention, so projected ledgers never meet registered
-// bytes, on one metric. A dominates B when it is no larger and at least as good, with one of the two strict, on
+// one cohort (evaluation set and protocol), one training regime and one byte convention, so projected ledgers never
+// meet registered bytes, on one metric. A dominates B when it is no larger and at least as good, with one of the two strict, on
 // unrounded bytes and scores. Original models, published references, external releases measured here (PrismML
 // Bonsai, GGUF files) and models without whole-model bytes are never on it; ties stay.
 window.DendriScaleExternal = r => ['ternary','binary','external'].includes(r.method) || /^External · /.test(String(r.label));
 window.DendriScaleCrossFront = rows => {
  const family = r => ['teacher','dendritic','hybrid'].includes(r.method) ? r.method : 'control';
- const key = r => JSON.stringify([r.model,r.benchmark,r.cohort,r.direction||'max',r.scoreUnit||'%',r.size.basis,r.n]);
+ const key = r => JSON.stringify([r.model,r.benchmark,r.cohort,r.direction||'max',r.scoreUnit||'%',r.size.basis,r.n,window.DendriScaleRegime(r)]);
  const dominates = (a,b) => {
   const gain=(a.score-b.score)*(b.direction==='min'?-1:1);
   return a.size.bytes<=b.size.bytes && gain>=0 && (a.size.bytes<b.size.bytes || gain>0);
@@ -132,7 +143,7 @@ window.DendriScaleBars = function(DATA,{el,se,sizeNotes=[],benchmarkCoverage=nul
   const dl=el('dl');dl.className='bar-facts';
   for(const [k,v] of [['Benchmark',r.benchmark+' · '+scoreLabel(r)],['Method',styles[r.method][0]],
    ['Model size',r.size.bytes>0?(r.size.bytes/1e9).toFixed(3)+' GB · '+r.size.basis:r.size.basis],['Measured artifact',UI.artifactText(r)],
-   ['Size accounting',r.size.note],['Empirical front',r.published||r.method==='teacher'||window.DendriScaleExternal(r)?'Comparison only; never on our fronts':!(r.size.bytes>0)?'No whole-model size; cannot be on a front':cross.member.has(r)?'On the empirical '+metricName(r.benchmark)+'–size front in cohort '+code(r)+' ('+bytesShort(r.size.basis)+'), all our methods together; descriptive, from point estimates':'Not on the empirical '+metricName(r.benchmark)+'–size front of cohort '+code(r)],['Evidence',r.published?'Published result · not reproduced':'DendriScale measurement'],['Protocol',r.cohort],
+   ['Size accounting',r.size.note],['Empirical front',r.published||r.method==='teacher'||window.DendriScaleExternal(r)?'Comparison only; never on our fronts':!(r.size.bytes>0)?'No whole-model size; cannot be on a front':cross.member.has(r)?'On the empirical '+metricName(r.benchmark)+'–size front in '+frontName(r)+' ('+bytesShort(r.size.basis)+'), all our methods together; descriptive, from point estimates':'Not on the empirical '+metricName(r.benchmark)+'–size front in '+frontName(r)],['Training regime',r.published||r.method==='teacher'?'':regimeText(r)],['Evidence',r.published?'Published result · not reproduced':'DendriScale measurement'],['Protocol',r.cohort],
    ['Sample size',r.n||'See benchmark protocol'],['Registered label',r.variant===r.label?'':r.label],['Original verdict',r.gate_status],['Conditions',r.conditions],['Limitations',r.limitations],['Source hashes',(r.source_hashes||[]).join(', ')]]){
    if((k==='Size accounting'||k==='Registered label'||k==='Measured artifact')&&!v)continue;
    dl.append(el('dt',k),el('dd',String(v||'Not recorded')));
@@ -277,7 +288,7 @@ window.DendriScaleBars = function(DATA,{el,se,sizeNotes=[],benchmarkCoverage=nul
     }
     const r=entry.r,prism=isPrism(r),[methodLabel,,pattern]=prism?styles[r.method]:methodStyle(r),key=(prism?'prism-':'')+methodKey(r),onFront=cross.member.has(r);
     const extra=onFront?13:0,yy=y+(compact?48+extra:7),labelWidth=compact?colWidth:colWidth*.44-16;
-    const g=se('g',{tabindex:0,role:'button','aria-label':r.variant+', '+r.model+', '+scoreLabel(r)+', '+sizeLabel(r)+' · '+r.size.basis+', '+families[family(r)]+', '+code(r)+(onFront?', on the empirical '+metricName(r.benchmark)+'–size front in cohort '+code(r)+' ('+bytesShort(r.size.basis)+')':''),'data-front':String(onFront),
+    const g=se('g',{tabindex:0,role:'button','aria-label':r.variant+', '+r.model+', '+scoreLabel(r)+', '+sizeLabel(r)+' · '+r.size.basis+', '+families[family(r)]+', '+code(r)+(onFront?', on the empirical '+metricName(r.benchmark)+'–size front in '+frontName(r)+' ('+bytesShort(r.size.basis)+')':''),'data-front':String(onFront),
      'data-point-id':r.id,'data-method':r.method,'data-family':family(r),'data-color-group':prism?'prism':methodKey(r),'data-provider':prism?'prism':'other','data-size-bytes':r.size.bytes??'','data-model':r.model,'data-provenance':r.published?'published':'measured','data-size-basis':r.size.basis,'data-cohort':r.cohort});
     g.append(se('title',{},r.variant+' · '+r.model+'\n'+methodLabel+' · '+sizeLabel(r)+' · '+r.size.basis+'\n'+code(r)+': '+r.cohort+'\n'+evidenceLabel(r)+'\n'+r.conditions));
     g.append(se('rect',{x,y:y-4,width:colWidth,height:rowHeight-5+extra,fill:'transparent',class:'bar-hit',rx:4}));
@@ -301,12 +312,14 @@ window.DendriScaleBars = function(DATA,{el,se,sizeNotes=[],benchmarkCoverage=nul
    for(const v of [0,25,50,75,100])svg.append(text(barX+barWidth*v/100,axisY,axisValue(axisMin+(axisMax-axisMin)*v/100),{'font-size':10,'text-anchor':v===0?'start':v===100?'end':'middle',fill:'#647585'}));
   }
  }
- // Size-score view of one chart: every measured model of ours for this original model and benchmark, with the
- // original model, published references and external releases measured here for context, on whole-model GB (log
- // scale). Each cohort and byte convention has its own empirical front, drawn as a bold staircase through its
- // members (filled and labelled) and told apart by line style and a text label; dominated and unsuccessful models
- // stay as hollow markers. Byte conventions get separate plots, so projected ledger bytes never share an axis with
- // registered bytes. Shapes, line styles and text carry every distinction; colour only repeats them.
+ // Size-score view of one chart: every measured result of the selected original model on whole-model GB (log scale),
+ // as small multiples, one plot per cohort (evaluation set and protocol) and byte convention, so different
+ // evaluation sets and projected ledgers versus registered bytes never share a plot. Within a plot each training
+ // regime of our measured models has its own empirical front, drawn as a bold staircase through its members (filled
+ // and labelled) and told apart by line style and a text label; dominated and unsuccessful models stay as hollow
+ // markers, external releases measured in the cohort as context, the cohort's original model as a reference line.
+ // Published references get a plot of their own. Shapes, line styles and text carry every distinction; colour only
+ // repeats them.
  const MARK={dendritic:'circle',hybrid:'square',control:'triangle',dense:'diamond',ternary:'star',binary:'star',external:'star',teacher:'cross',unknown:'hexagon'};
  function mark(shape,x,y,s,attrs){
   if(shape==='circle')return se('circle',{cx:x,cy:y,r:s,...attrs});
@@ -323,11 +336,13 @@ window.DendriScaleBars = function(DATA,{el,se,sizeNotes=[],benchmarkCoverage=nul
  const bytesName=b=>({'projected format':'projected ledger bytes, not a measured file','registered model':'registered bytes of the built model','weight files':'measured weight-file bytes'}[b]||b);
  const bytesShort=b=>({'projected format':'ledger bytes','registered model':'registered bytes','weight files':'file bytes'}[b]||b);
  const metricName=b=>friendly[b]||b;
+ const regimeText=r=>window.DendriScaleRegime(r)||'regime not recorded';
+ const frontName=r=>'cohort '+code(r)+', '+regimeText(r);
  const oursSized=r=>!r.published&&r.method!=='teacher'&&!window.DendriScaleExternal(r)&&r.size.bytes>0;
  // What a front tag says: the metric and the cohort, in as many words as the space allows.
  const frontTag=(r,chars)=>{
-  const m=metricName(r.benchmark),c=code(r);
-  return ['◆ On the empirical '+m+'–size front in cohort '+c,'◆ Empirical '+m+'–size front · cohort '+c,'◆ Empirical size front · cohort '+c].find(s=>s.length<=chars)||'◆ Front · '+c;
+  const m=metricName(r.benchmark),c=code(r)+', '+regimeText(r);
+  return ['◆ On the empirical '+m+'–size front in cohort '+c,'◆ Empirical '+m+'–size front · '+c,'◆ Empirical size front · '+c].find(s=>s.length<=chars)||'◆ Front · '+c;
  };
  // Greedy word wrap with the truncation's width estimate; at most `max` lines, the last one cut with "…".
  const wrapText=(s,pixels,fs,max=Infinity)=>{
@@ -343,67 +358,89 @@ window.DendriScaleBars = function(DATA,{el,se,sizeNotes=[],benchmarkCoverage=nul
   svg.replaceChildren();
   if(!items.some(r=>(r.method!=='teacher'||r.published)&&r.size.bytes>0)){svg.setAttribute('width',0);svg.setAttribute('height',0);svg.setAttribute('aria-hidden','true');svg.style.display='none';return;}
   svg.style.display='';svg.removeAttribute('aria-hidden');
-  const bases=[...new Set(items.filter(oursSized).map(r=>r.size.basis))].sort();
-  const title=se('title',{},metricName(benchmark)+' · size versus score · empirical fronts'),desc=se('desc',{},''),background=se('rect',{width,height:0,fill:'white'});
+  const name=metricName(benchmark),title=se('title',{},name+' · size versus score · empirical fronts'),desc=se('desc',{},''),background=se('rect',{width,height:0,fill:'white'});
   svg.append(title,desc,background);
-  // One plot per byte convention of our models; context markers (original, published, external) appear in each.
-  const parts=bases.length>1?bases.map(b=>({basis:b,items:items.filter(r=>!oursSized(r)||r.size.basis===b)})):[{basis:bases[0]||null,items}];
-  let top=0;const summaries=[];
-  parts.forEach((part,i)=>{
-   const g=se('g',{class:'front-plot',transform:'translate(0 '+top+')','data-size-basis':part.basis||''});svg.append(g);
-   const out=frontPlot(g,part.items,benchmark,width,part.basis,parts.length>1?[i+1,parts.length]:null);
-   summaries.push(out.summary);top+=out.height+(i<parts.length-1?26:0);
-  });
+  const text=(x,y,value,extra={})=>se('text',{x,y,'font-family':'system-ui, sans-serif','font-size':11,fill:'#263746',...extra},value);
+  const unsized=items.filter(r=>!r.published&&r.method!=='teacher'&&!(r.size.bytes>0)).length;
+  // Header: what the plots and fronts are and how not to read them, wrapped to the card's width.
+  const header=[
+   ['Size vs. score · '+name+' · empirical fronts',12.5,650,'#263746'],
+   ['One plot per cohort (one evaluation set and protocol) and byte convention: cohorts are never joined. In each plot, filled ◆ markers on a bold staircase form the empirical '+name+'–size front of our measured models, all methods together, for one training regime (the exposure and stages its labels record); regimes are told apart by line style and label.',10.5],
+   ['Fronts use point estimates: descriptive, not a confidence-certified dominance relation. A staircase joins observed points only; it does not mean that sizes and scores between them are attainable, and it is not a fitted compression law.',10.5],
+   ['Hollow: dominated or unsuccessful, kept visible. ext: external release measured in that cohort. P: published references, in a plot of their own. Neither is ever on our fronts. Dashed line: the original model in that cohort. '+(items[0].direction==='min'?'Lower':'Higher')+' is better.'+(unsized?' '+unsized+' of our results have no recorded whole-model size and are not drawn.':''),10.5]];
+  let top=0;
+  for(const [s,fs,weight=400,fill='#526476'] of header)for(const line of wrapText(s,width,fs)){top+=fs+(top?4:2);svg.append(text(0,top,line,{'font-size':fs,'font-weight':weight,fill}));}
+  top+=16;
+  // Plots: one per cohort and byte convention of our sized results. External releases measured in a cohort are
+  // context in its first plot; the cohort's original model is its reference line; published references get a plot
+  // of their own.
+  const byCohort=new Map();
+  for(const r of items){if(r.published)continue;const c=code(r);if(!byCohort.has(c))byCohort.set(c,[]);byCohort.get(c).push(r);}
+  const plots=[];
+  for(const [c,rs] of [...byCohort].sort((a,b)=>Number(a[0].slice(1))-Number(b[0].slice(1)))){
+   const ours=rs.filter(oursSized),context=rs.filter(r=>r.method!=='teacher'&&!oursSized(r)&&r.size.bytes>0),teachers=rs.filter(r=>r.method==='teacher');
+   const bases=[...new Set(ours.map(r=>r.size.basis))].sort();
+   if(!bases.length&&!context.length)continue;
+   (bases.length?bases:[null]).forEach((b,i)=>plots.push({code:c,cohort:rs[0].cohort,basis:b,rows:[...ours.filter(r=>r.size.basis===b),...(i?[]:context)],teachers}));
+  }
+  const published=items.filter(r=>r.published&&r.size.bytes>0);
+  if(published.length)plots.push({code:null,cohort:null,basis:null,rows:published,teachers:[],published:true});
+  const cols=width>=1000&&plots.length>1?2:1,gap=28,cellW=Math.floor((width-gap*(cols-1))/cols),summaries=[];
+  for(let i=0;i<plots.length;i+=cols){
+   let rowH=0;
+   plots.slice(i,i+cols).forEach((p,j)=>{
+    const g=se('g',{class:'front-plot',transform:'translate('+j*(cellW+gap)+' '+top+')','data-cohort':p.published?'published':p.code,'data-size-basis':p.basis||''});svg.append(g);
+    const out=frontPlot(g,p,benchmark,cellW);summaries.push(out.summary);rowH=Math.max(rowH,out.height);
+   });
+   top+=rowH+(i+cols<plots.length?26:6);
+  }
   desc.textContent=summaries.join(' ');
-  svg.setAttribute('aria-label',metricName(benchmark)+' · size versus score. '+summaries.join(' '));
+  svg.setAttribute('aria-label',name+' · size versus score. '+summaries.join(' '));
   svg.setAttribute('viewBox',`0 0 ${width} ${top}`);svg.setAttribute('width',width);svg.setAttribute('height',top);background.setAttribute('height',top);
  }
- function frontPlot(svg,items,benchmark,W,basis,part){
+ // One plot of the panel: one cohort and byte convention (or the published references). Each training regime of our
+ // measured models has its own staircase; members are numbered when there are more than four and listed in a key.
+ function frontPlot(svg,p,benchmark,W){
   const mono=byId('monochrome').checked,ink=mono?'#222222':'#263746',name=metricName(benchmark);
-  // A published report of the original model is a published reference (hollow, P), not the reference line.
-  const plotted=items.filter(r=>(r.method!=='teacher'||r.published)&&r.size.bytes>0),teachers=items.filter(r=>!r.published&&r.method==='teacher');
-  const unsized=!part||part[0]===1?items.filter(r=>!r.published&&r.method!=='teacher'&&!(r.size.bytes>0)).length:0;
+  const plotted=p.rows,teachers=p.teachers,ref=plotted[0]||teachers[0];
   const text=(x,y,value,extra={})=>se('text',{x,y,'font-family':'system-ui, sans-serif','font-size':11,fill:'#263746',...extra},value);
   const fit=(s,pixels,fs)=>{const n=Math.max(8,Math.floor(pixels/(fs*.56)));return s.length>n?s.slice(0,n-1)+'…':s;};
-  // Header: what the fronts are and how not to read them, wrapped to the card's width.
-  const header=[
-   ['Size vs. score · '+name+' · empirical fronts'+(part?' · plot '+part[0]+' of '+part[1]+': '+bytesName(basis):''),12.5,650,'#263746'],
-   ['Filled ◆ markers on a bold staircase: the empirical '+name+'–size front of our measured models, all methods together, within one cohort (one evaluation set and protocol) and one byte convention.'+(basis?' Our sizes here: '+bytesName(basis)+'.':''),10.5],
-   ['Fronts use point estimates: descriptive, not a confidence-certified dominance relation. A staircase joins observed points only; it does not mean that sizes and scores between them are attainable, and it is not a fitted compression law.',10.5],
-   ['Hollow: dominated or unsuccessful, kept visible. P (dashed outline): published. ext: external release measured here. Neither is ever on our fronts; both keep their own size basis. Dashed line: original model. '+(items[0].direction==='min'?'Lower':'Higher')+' is better.'+(unsized?' '+unsized+' of our results have no recorded whole-model size and are not drawn.':''),10.5]];
   let hy=0;
-  for(const [s,fs,weight=400,fill='#526476'] of header)for(const line of wrapText(s,W,fs)){hy+=fs+(hy?4:2);svg.append(text(0,hy,line,{'font-size':fs,'font-weight':weight,fill}));}
-  // The plot grows with the card's width (aspect about 3:1, at most 420 px tall) so that wide charts do not flatten
-  // nearby staircases into one band.
-  const compact=W<620,L=compact?44:60,R=14,T=hy+22,B=42,plotH=compact?222:Math.round(Math.min(420,Math.max(250,W*.3))),H=T+plotH+B;
+  const heading=p.published?'Published references (P) · their own protocols, not reproduced · never on our fronts':p.code+' · '+(p.basis?bytesName(p.basis):'external releases measured here; no sized model of ours');
+  for(const line of wrapText(heading,W,11.5,2)){hy+=hy?14:12;svg.append(text(0,hy,line,{'font-size':11.5,'font-weight':700,fill:ink,class:'front-plot-title'}));}
+  if(!p.published)for(const line of wrapText('Cohort '+p.code+': '+p.cohort,W,10,2)){hy+=13;svg.append(text(0,hy,line,{'font-size':10,'font-style':'italic',fill:'#526476'}));}
+  const compact=W<520,L=compact?42:54,R=12,T=hy+18,B=40,plotH=compact?200:Math.round(Math.min(300,Math.max(210,W*.42))),H=T+plotH+B;
   const sized=[...plotted,...teachers.filter(r=>r.size.bytes>0)].map(r=>r.size.bytes/1e9);
   let lo=Math.log10(Math.min(...sized)),hi=Math.log10(Math.max(...sized));
   if(hi-lo<.2){const mid=(hi+lo)/2;lo=mid-.1;hi=mid+.1;}
-  const padX=(hi-lo)*.07;lo-=padX;hi+=padX;
-  const percent=items[0].scoreUnit==='%',scores=[...plotted,...teachers].map(r=>r.score);
+  const padX=(hi-lo)*.08;lo-=padX;hi+=padX;
+  const percent=ref.scoreUnit==='%',scores=[...plotted,...teachers].map(r=>r.score);
   let ylo=Math.min(...scores),yhi=Math.max(...scores);
   if(yhi-ylo<(percent?2:1e-9)){const pad=percent?1:Math.max(Math.abs(yhi)*.05,1e-3);ylo-=pad;yhi+=pad;}
   // Extra headroom on the better side keeps room for the staircase tags above the best points.
-  const padY=(yhi-ylo)*.08,up=items[0].direction==='min'?1:1.8;ylo-=padY*(2.8-up);yhi+=padY*up;if(percent){ylo=Math.max(0,ylo);yhi=Math.min(100,yhi);}
+  const padY=(yhi-ylo)*.08,up=ref.direction==='min'?1:1.8;ylo-=padY*(2.8-up);yhi+=padY*up;if(percent){ylo=Math.max(0,ylo);yhi=Math.min(100,yhi);}
   const X=b=>L+(Math.log10(b/1e9)-lo)/(hi-lo)*(W-L-R),Y=v=>T+(1-(v-ylo)/(yhi-ylo))*(H-T-B);
   const keys=[...new Set(plotted.filter(r=>oursSized(r)&&cross.member.has(r)).sort((a,b)=>a.size.bytes-b.size.bytes).map(r=>cross.member.get(r)))];
-  const dashes=['none','9 4','2.5 3','11 3 2.5 3','4.5 2.5','13 3 2.5 3 2.5 3'],lineNames=['solid','dashed','dotted','dash-dot','short-dashed','dash-dot-dot'];
+  const dashes=['none','9 4','2.5 3','11 3 2.5 3','4.5 2.5','13 3 2.5 3 2.5 3','18 5','1.5 6','18 4 2.5 4','2.5 3 9 3 9 3'],lineNames=['solid','dashed','dotted','dash-dot','short-dashed','dash-dot-dot','long-dashed','sparse-dotted','long-dash-dot','dot-dash-dash'];
   const members=k=>plotted.filter(r=>oursSized(r)&&cross.member.get(r)===k).sort((a,b)=>a.size.bytes-b.size.bytes||(a.direction==='min'?b.score-a.score:a.score-b.score));
   const lineName=i=>keys.length>1?lineNames[i%dashes.length]+' line':'';
-  const summary=(part?'Plot '+part[0]+' of '+part[1]+', '+bytesName(basis)+'. ':'')+(keys.length?keys.map((k,i)=>{const m=members(k);
-   return 'Empirical '+name+'–size front in cohort '+code(m[0])+' ('+bytesShort(m[0].size.basis)+(keys.length>1?', '+lineName(i):'')+'): '+m.map(r=>UI.candidateName(r.variant)+', '+sizeLabel(r)+', '+scoreLabel(r)).join('; ');}).join('. ')+'.'
-   :'No measured model of ours with a whole-model size'+(part?' in '+bytesName(basis):'')+'.');
-  const gbTicks=[.05,.1,.2,.3,.5,1,2,3,5,10,20,30,50,100,200,300].filter(v=>Math.log10(v)>=lo&&Math.log10(v)<=hi);
-  for(const v of gbTicks){const x=X(v*1e9);svg.append(se('line',{x1:x,x2:x,y1:T,y2:H-B,stroke:'#e6ecf1'}),text(x,H-B+14,String(v)+' GB',{'font-size':10,'text-anchor':'middle',fill:'#647585'}));}
-  const step=niceStep((yhi-ylo)/(compact?4:6));
+  const summary=p.published?'Published references, never on our fronts: '+plotted.map(r=>UI.candidateName(r.variant)+', '+sizeLabel(r)+', '+scoreLabel(r)).join('; ')+'.'
+   :'Cohort '+p.code+(p.basis?' ('+bytesShort(p.basis)+')':'')+': '+(keys.length?keys.map((k,i)=>{const m=members(k);
+    return 'empirical '+name+'–size front for '+regimeText(m[0])+(keys.length>1?' ('+lineName(i)+')':'')+': '+m.map(r=>UI.candidateName(r.variant)+', '+sizeLabel(r)+', '+scoreLabel(r)).join('; ');}).join('. ')
+    :'no sized model of ours')+'.';
+  // GB ticks: the finest of these mantissa sets that gives at most seven ticks across the plot.
+  const ticksFor=set=>{const out=[];for(let e=-2;e<=3;e++)for(const m of set){const v=+(m*10**e).toPrecision(3);if(Math.log10(v)>=lo&&Math.log10(v)<=hi)out.push(v);}return out;};
+  const shownTicks=[[1,1.25,1.5,1.75,2,2.5,3,4,5,6,7,8,9],[1,1.5,2,3,5,7],[1,2,5],[1,3],[1]].map(ticksFor).find(t=>t.length<=7)||[];
+  for(const v of shownTicks){const x=X(v*1e9);svg.append(se('line',{x1:x,x2:x,y1:T,y2:H-B,stroke:'#e6ecf1'}),text(x,H-B+14,String(v)+' GB',{'font-size':10,'text-anchor':'middle',fill:'#647585'}));}
+  const step=niceStep((yhi-ylo)/(compact?4:5));
   for(let v=Math.ceil(ylo/step)*step;v<=yhi+1e-9;v+=step){const y=Y(v);svg.append(se('line',{x1:L,x2:W-R,y1:y,y2:y,stroke:'#e6ecf1'}),text(L-6,y+3,Number(v.toPrecision(4)).toString()+(percent?'%':''),{'font-size':10,'text-anchor':'end',fill:'#647585'}));}
   svg.append(se('rect',{x:L,y:T,width:W-L-R,height:H-T-B,fill:'none',stroke:'#c9d3dc'}));
-  svg.append(text((L+W-R)/2,H-6,'Whole-model size (GB, log scale) · '+(percent?'score (%)':items[0].scoreUnit),{'font-size':10.5,'text-anchor':'middle',fill:'#526476'}));
+  svg.append(text((L+W-R)/2,H-6,'Whole-model size (GB, log scale) · '+(percent?'score (%)':ref.scoreUnit),{'font-size':10.5,'text-anchor':'middle',fill:'#526476'}));
   // Labels avoid one another, every marker and the original-model labels, so no white label halo hides a point.
   const boxes=plotted.flatMap(r=>{const x=X(r.size.bytes),y=Y(r.score),tag=r.published?8:window.DendriScaleExternal(r)?18:0;
    return [[x-7,y-7,x+7,y+7],...(tag?[[x+6,y-15,x+8+tag,y-3]]:[])];});
   teachers.forEach((r,i)=>{
-   const y=Y(r.score),value=fit('Original · '+shortModel(r)+(r.size.bytes>0?' · '+sizeLabel(r):'')+' · '+scoreLabel(r)+(teachers.length>1?' · '+code(r):''),W-L-R-10,10),ty=y-4-12*(i%2);
+   const y=Y(r.score),value=fit('Original · '+shortModel(r)+(r.size.bytes>0?' · '+sizeLabel(r):'')+' · '+scoreLabel(r),W-L-R-10,10),ty=y-4-12*(i%2);
    svg.append(se('line',{x1:L,x2:W-R,y1:y,y2:y,stroke:ink,'stroke-width':1.3,'stroke-dasharray':'6 3',class:'front-reference'}));
    svg.append(text(L+5,ty,value,{'font-size':10,fill:ink,stroke:'white','stroke-width':3,'paint-order':'stroke'}));
    boxes.push([L+3,ty-10,L+9+value.length*5.9,ty+2],[L,y-1.5,W-R,y+1.5]);
@@ -435,15 +472,15 @@ window.DendriScaleBars = function(DATA,{el,se,sizeNotes=[],benchmarkCoverage=nul
    const m=members(k);let d='M'+X(m[0].size.bytes).toFixed(1)+' '+Y(m[0].score).toFixed(1);
    m.slice(1).forEach((r,j)=>{const x0=X(m[j].size.bytes),y0=Y(m[j].score),x1=X(r.size.bytes),y1=Y(r.score);
     d+=' H'+x1.toFixed(1)+' V'+y1.toFixed(1);boxes.push([x0,y0-3,x1,y0+3],[x1-3,Math.min(y0,y1),x1+3,Math.max(y0,y1)]);});
-   svg.append(se('path',{d,fill:'none',stroke:ink,'stroke-width':2.8,'stroke-dasharray':dashes[i%dashes.length],'stroke-linejoin':'round','stroke-linecap':'round',class:'front-staircase','data-group':i,'data-cohort':code(m[0]),'data-size-basis':m[0].size.basis,'data-members':JSON.stringify(m.map(r=>r.id))}));
+   svg.append(se('path',{d,fill:'none',stroke:ink,'stroke-width':2.8,'stroke-dasharray':dashes[i%dashes.length],'stroke-linejoin':'round','stroke-linecap':'round',class:'front-staircase','data-group':i,'data-cohort':code(m[0]),'data-regime':regimeText(m[0]),'data-size-basis':m[0].size.basis,'data-members':JSON.stringify(m.map(r=>r.id))}));
   });
   const order=plotted.slice().sort((a,b)=>Number(cross.member.has(a))-Number(cross.member.has(b))||b.size.bytes-a.size.bytes);
   for(const r of order){
    const onFront=oursSized(r)&&cross.member.has(r),x=X(r.size.bytes),y=Y(r.score);
    const color=mono?'#222222':isPrism(r)?prismColor:(styles[r.method]||styles.unknown)[1];
    const attrs=onFront?{fill:color,stroke:'#111111','stroke-width':1.7}:r.published?{fill:'white',stroke:color,'stroke-width':1.4,'stroke-dasharray':'2 1.5'}:{fill:'white',stroke:mono?'#7a7a7a':color,'stroke-width':1.3,'stroke-opacity':.75};
-   const status=onFront?'◆ On the empirical '+name+'–size front in cohort '+code(r)+' ('+bytesShort(r.size.basis)+')':r.published?'Published reference · never on our fronts':window.DendriScaleExternal(r)?'External release measured here · never on our fronts'
-    :'Not on the front: another model of ours in this cohort and byte convention is no larger and at least as good, and strictly better in one';
+   const status=onFront?'◆ On the empirical '+name+'–size front in '+frontName(r)+' ('+bytesShort(r.size.basis)+')':r.published?'Published reference · never on our fronts':window.DendriScaleExternal(r)?'External release measured here · never on our fronts'
+    :'Not on the front: another model of ours in this cohort, regime ('+regimeText(r)+') and byte convention is no larger and at least as good, and strictly better in one';
    const g=se('g',{class:'front-point','data-point-id':r.id,'data-front':String(onFront),'data-published':String(r.published),'data-method':r.method,'data-size-basis':r.size.basis});
    g.append(se('title',{},r.variant+'\n'+sizeLabel(r)+' · '+r.size.basis+' · '+scoreLabel(r)+'\n'+code(r)+': '+r.cohort+'\n'+status+(r.gate_status?'\nVerdict: '+r.gate_status:'')));
    g.append(mark(MARK[r.method]||'hexagon',x,y,onFront?6.5:5,attrs));
@@ -451,26 +488,28 @@ window.DendriScaleBars = function(DATA,{el,se,sizeNotes=[],benchmarkCoverage=nul
    else if(window.DendriScaleExternal(r))g.append(text(x+7,y-6,'ext',{'font-size':9.5,'font-weight':700,fill:mono?'#222222':color}));
    g.addEventListener('click',()=>details(r));svg.append(g);
   }
-  // Few front members: label each with its short name and GB. Many: number them. Either way the key under the
-  // plot lists every member with its GB, score and full name (training dose included).
+  // Published references: each named next to its marker (they are few and never on a front).
+  if(p.published)for(const r of plotted.slice().sort((a,b)=>a.size.bytes-b.size.bytes))svg.append(label(X(r.size.bytes)+8,Y(r.score),fit(sizeLabel(r)+' · '+scoreLabel(r)+' · '+UI.candidateName(r.variant),Math.max(150,(W-L-R)*.55),10),{fill:mono?'#222222':isPrism(r)?prismColor:ink,class:'front-published-label'},[X(r.size.bytes),Y(r.score)],20));
+  // At most four front members: label each with its GB and short name. More: number them. Either way the key under
+  // the plot lists every member with its GB, score and full name (training dose included).
   const listed=keys.flatMap((k,i)=>members(k).map(r=>({r,k,i})));
-  const direct=listed.length<=8;
+  const direct=listed.length<=4;
   // Staircase tags first, beside each staircase's largest member, then the member labels.
   keys.forEach((k,i)=>{
    const m=members(k),last=m[m.length-1],x=X(last.size.bytes),y=Y(last.score);
-   const tag=direct?code(last)+' · empirical '+name+'–size front'+(keys.length>1?' · '+lineNames[i%dashes.length]:''):code(last)+' front'+(keys.length>1?' · '+lineNames[i%dashes.length]:'');
+   const tag=code(last)+' · '+regimeText(last)+' front'+(keys.length>1?' · '+lineNames[i%dashes.length]:'');
    svg.append(label(x,y-14,fit(tag,260,10),{'font-style':'italic',fill:ink,class:'front-group-label'},[x,y],16,[0,-13,-26,-39,-52,-65,13,26,39,52,65]));
   });
-  // Numbered members whose markers coincide (one model under two cohorts, say) share one label, "◆5, 10".
+  // Numbered members whose markers coincide share one label, "◆5, 10".
   listed.forEach((e,j)=>{e.n=j+1;e.x=X(e.r.size.bytes);e.y=Y(e.r.score);});
   const spots=[];
   for(const e of listed){const s=!direct&&spots.find(s=>Math.abs(s.x-e.x)<5&&Math.abs(s.y-e.y)<5);if(s)s.all.push(e);else spots.push({x:e.x,y:e.y,all:[e]});}
   for(const {x,y,all} of spots){
-   const e=all[0],value=direct?fit('◆ '+(keys.length>1?code(e.r)+' · ':'')+sizeLabel(e.r)+' · '+shortName(e.r),Math.max(150,(W-L-R)*.6),10):'◆'+all.map(e=>e.n).join(', ');
+   const e=all[0],value=direct?fit('◆ '+sizeLabel(e.r)+' · '+shortName(e.r),Math.max(140,(W-L-R)*.55),10):'◆'+all.map(e=>e.n).join(', ');
    svg.append(label(x,y,value,{'font-weight':direct?650:750,fill:ink,class:'front-label'},[x,y],11));
   }
-  // Key under the plot: per staircase, a sample of its line style, what the front is, the cohort it belongs to,
-  // then each member's GB, score and full name, wrapped to at most two lines.
+  // Key under the plot: per staircase, a sample of its line style and what the front is (regime, metric, byte
+  // convention), then each member's GB, score and full name, wrapped to at most two lines.
   let height=H;
   const blocks=[];
   // Sizes are compared unrounded: members whose GB rounds alike get enough digits to show their difference.
@@ -479,25 +518,19 @@ window.DendriScaleBars = function(DATA,{el,se,sizeNotes=[],benchmarkCoverage=nul
    return r.size.bytes.toLocaleString('en')+' bytes';
   };
   keys.forEach((k,i)=>{
-   const m=members(k),c=code(m[0]);
-   blocks.push({head:true,i,text:c+' · empirical '+name+'–size front in this cohort · '+bytesShort(m[0].size.basis)+(keys.length>1?' · '+lineName(i):''),max:2});
-   blocks.push({cohort:true,text:'Cohort '+c+': '+m[0].cohort,max:2});
+   const m=members(k);
+   blocks.push({head:true,i,text:code(m[0])+' · '+regimeText(m[0])+' · empirical '+name+'–size front in this cohort and regime · '+bytesShort(m[0].size.basis)+(keys.length>1?' · '+lineName(i):''),max:2});
    for(const e of listed.filter(e=>e.k===k))blocks.push({text:(direct?'◆ ':'◆'+e.n+'  ')+preciseSize(e.r,m)+' · '+scoreLabel(e.r)+' · '+UI.candidateName(e.r.variant),max:2});
   });
   if(blocks.length){
-   const cols=W>=900&&blocks.length>6?2:1,colW=W/cols,indent=36,top=H+12;
-   for(const b of blocks)b.lines=wrapText(b.text,colW-14-indent,10,b.max);
-   const total=blocks.reduce((s,b)=>s+b.lines.length,0),per=Math.ceil(total/cols);
-   let c=0,row=0,rowsUsed=0;
+   const indent=36,top=H+10;let row=0;
    for(const b of blocks){
-    if(c<cols-1&&row>0&&row+b.lines.length>per){rowsUsed=Math.max(rowsUsed,row);c++;row=0;}
-    const x=c*colW,y0=top+row*13+10;
-    if(b.head)svg.append(se('line',{x1:x+2,x2:x+30,y1:y0-3.5,y2:y0-3.5,stroke:ink,'stroke-width':2.8,'stroke-dasharray':dashes[b.i%dashes.length],'stroke-linecap':'round',class:'front-key-swatch'}));
-    b.lines.forEach((line,j)=>svg.append(text(x+indent+(j?10:0),y0+j*13,line,{'font-size':10,'font-weight':b.head?700:400,'font-style':b.cohort?'italic':'normal',fill:b.head?ink:b.cohort?'#526476':'#3a4c5c',class:'front-key'})));
-    row+=b.lines.length;
+    const lines=wrapText(b.text,W-14-indent,10,b.max),y0=top+row*13+10;
+    if(b.head)svg.append(se('line',{x1:2,x2:30,y1:y0-3.5,y2:y0-3.5,stroke:ink,'stroke-width':2.8,'stroke-dasharray':dashes[b.i%dashes.length],'stroke-linecap':'round',class:'front-key-swatch'}));
+    lines.forEach((line,j)=>svg.append(text(indent+(j?10:0),y0+j*13,line,{'font-size':10,'font-weight':b.head?700:400,fill:b.head?ink:'#3a4c5c',class:'front-key'})));
+    row+=lines.length;
    }
-   rowsUsed=Math.max(rowsUsed,row);
-   height=top+rowsUsed*13+8;
+   height=top+row*13+6;
   }
   return {height,summary};
  }
