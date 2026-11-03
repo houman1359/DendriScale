@@ -519,7 +519,7 @@ window.DendriScaleBars = function(DATA,{el,se,sizeNotes=[],benchmarkCoverage=nul
   };
   keys.forEach((k,i)=>{
    const m=members(k);
-   blocks.push({head:true,i,text:code(m[0])+' · '+regimeText(m[0])+' · empirical '+name+'–size front in this cohort and regime · '+bytesShort(m[0].size.basis)+(keys.length>1?' · '+lineName(i):''),max:2});
+   blocks.push({head:true,i,text:code(m[0])+' · '+regimeText(m[0])+(keys.length>1?' · '+lineName(i):'')+' · empirical '+name+'–size front in this cohort and regime · '+bytesShort(m[0].size.basis),max:2});
    for(const e of listed.filter(e=>e.k===k))blocks.push({text:(direct?'◆ ':'◆'+e.n+'  ')+preciseSize(e.r,m)+' · '+scoreLabel(e.r)+' · '+UI.candidateName(e.r.variant),max:2});
   });
   if(blocks.length){
