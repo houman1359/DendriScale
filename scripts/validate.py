@@ -3,9 +3,12 @@ import csv
 import hashlib
 import json
 import math
+import os
 from pathlib import Path
 import copy
 import re
+import shutil
+import subprocess
 import sys
 import unittest
 
@@ -226,5 +229,19 @@ class PublicContract(unittest.TestCase):
         def change_source(doc):point(doc,first)['source_hashes']=['0'*64]
         for change in (set_y,set_x,drop,relabel_unlisted,undo_listed,change_source):
             self.assertTrue(mutated(change),change.__name__)
+
+    def test_bar_chart_cross_method_fronts(self):
+        # The benchmark bars' cross-method fronts, as bars.js draws them (front tags, filled panel markers, one
+        # staircase per protocol and size basis), equal an independent nondominated-set computation on every chart,
+        # in colour and in monochrome. Runs the site's JavaScript with Node (on GitHub's runners); set NODE=<path>
+        # where node is not on PATH.
+        node=os.environ.get('NODE') or shutil.which('node')
+        if not node:self.skipTest('Node.js not found; set NODE=<path to node>')
+        for extra in ([],['--monochrome']):
+            run=subprocess.run([node,str(ROOT/'scripts/check_bars_front.js'),*extra],capture_output=True,text=True,timeout=900)
+            self.assertEqual(run.returncode,0,run.stdout[-3000:]+run.stderr[-3000:])
+            report=json.loads(run.stdout)
+            self.assertEqual(report['problems'],[])
+            self.assertGreater(report['charts'],0);self.assertGreater(report['front_members'],0)
 
 if __name__=='__main__':unittest.main(verbosity=2)

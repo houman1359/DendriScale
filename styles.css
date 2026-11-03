@@ -49,6 +49,9 @@
 .bar-summary{margin:7px 0 10px;font-size:12px}
 .bar-missing{border-left:3px solid #c2ced7;padding:3px 10px;color:#526476;font-size:12px;margin:10px 0}
 .benchmark-chart{width:100%;height:auto;max-width:100%;display:block;font-family:inherit;overflow:visible}
+.benchmark-front-panel{width:100%;height:auto;max-width:100%;display:block;margin:4px 0 16px;font-family:inherit;overflow:visible}
+.benchmark-front-panel .front-point{cursor:pointer}
+.benchmark-downloads{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:2px}
 .benchmark-chart [role=button]{cursor:pointer;outline:none}
 .benchmark-chart [role=button]:focus-visible .bar-hit,.benchmark-chart [role=button]:hover .bar-hit{fill:#edf3f870;stroke:#9bafbf;stroke-width:1}
 .bar-protocols{margin-top:9px;border-top:1px solid #e7edf2;padding-top:12px}

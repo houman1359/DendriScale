@@ -15,7 +15,7 @@ analytics service or third-party JavaScript is needed.
 
 ## Explore the results
 
-1. **Benchmark fronts** opens first: one full-width chart per benchmark, with Prism’s main six first. Our dendritic, hybrid and non-dendritic fronts share a chart with clearly labeled unreproduced references. All selected bars are expanded; size/protocol scopes remain separate.
+1. **Benchmark fronts** opens first: one full-width chart per benchmark, with Prism’s main six first. Our dendritic, hybrid and non-dendritic fronts share a chart with clearly labeled unreproduced references. All selected bars are expanded; size/protocol scopes remain separate. Each chart opens with a size–score panel of every measured result on a log GB axis. A bold staircase per cohort and byte convention marks the empirical front of our measured models, all methods together, through filled and labelled markers; a key lists each member with its GB, score and full label. Dominated and unsuccessful models stay as hollow markers, published references are hollow and marked P, and the original model is a dashed reference line. Bars on a front carry “◆ On the empirical <benchmark>–size front in cohort E…” and a heavy outline. Fronts are descriptive point estimates on one metric; a staircase joins observed points only and is not a fitted compression law.
 2. **Model size vs. performance** retains the full history. Choose a model and benchmark;
    use **More filters** for verdicts, training data, and the observed frontier.
    All outcomes are included by default. **Reset filters** restores them.
