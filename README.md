@@ -100,6 +100,10 @@ is enabled, pushes to `main` update the website automatically.
 
 Update the aggregate files and hash manifest in `data/` together from a verified export.
 Keep the original gate verdicts, provenance hashes and snapshot timestamp.
+The publishing pipeline rebuilds the aggregate files from the original registries.
+Before validating a rebuild, apply the metadata corrections:
+`python3 scripts/corrections.py apply data/metadata_corrections_v1.json`.
+The correction file and its ledger travel with every later export.
 Run validation and inspect the page before committing. Do not copy private
 research directories or their Git history into this repository.
 
@@ -138,6 +142,30 @@ Run identifiers stay in the point IDs.
   Cells with seeded instead of selected wiring fail (GSM 35–56). The 268M
   milestone reaches GSM 679 (352 at 67.1M) and 12–14% lower pool-K KL; traces
   were added, so this is not a pure dose effect.
-- **Quality levels** τ1–τ4 have frozen GSM and probe cutoffs
-  ([Methods](METHODS.md)). Their KL caps are pending, so no model is assigned
-  a level.
+- **Quality levels** τ1–τ4 have frozen GSM and probe cutoffs and, since
+  November 3, frozen KL caps (version 1; [Methods](METHODS.md)). A level needs
+  all five requirements, so no model is assigned a complete level.
+
+## Metadata correction v1 · November 3, 2026
+
+Model names now follow one descriptive scheme, for example
+“Dendritic sparse cells · 24.1 MB/FFN · 18 of 36 FFNs · INT4 parent, INT8 tables
+· 67M gold math · 3.89 GB”. References read “Reference · …” and external
+models “External · …”. Point ids, measurements, sizes and verdicts are
+unchanged.
+
+- **Names:** 4,073 points under 497 former labels, with the 1,059 candidate
+  records and 3,031 observation rows that carry them. Qwen3-8B labels come
+  from the frontier inventory. Other models' labels use only fields each point
+  records, and name the teacher.
+- **Decoding:** one Qwen3-8B development-GSM cohort said “greedy”, but its job
+  logs show one sampled answer at Qwen3's defaults (temperature 0.6, top-k 20,
+  top-p 0.95). Its three panels now say so.
+- **Size axis:** the 21 Qwen3-8B panels sized by the projected 16-bit ledger
+  are titled “Projected complete-model storage, 16-bit auxiliary ledger (GB)”.
+  The measured task-17 artifact (1,628,789,072 bytes, every file, 10.06×) is a
+  separate “Measured artifact” field.
+- **Record:** `data/metadata_corrections_v1.json` keeps every original value,
+  reason and source hash, plus a ledger of every record as published before.
+  `scripts/validate.py` rejects any changed value, removed record or unlisted
+  metadata change ([Methods](METHODS.md)).

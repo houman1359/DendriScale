@@ -4,11 +4,16 @@ import hashlib
 import json
 import math
 from pathlib import Path
+import copy
 import re
+import sys
 import unittest
 
 ROOT=Path(__file__).resolve().parents[1]
 DATA=json.loads((ROOT/'data/snapshot.json').read_text())
+sys.path.insert(0,str(ROOT/'scripts'))
+import corrections  # noqa: E402  (versioned metadata corrections)
+CORRECTIONS=sorted((ROOT/'data').glob('metadata_corrections_v*.json'))
 
 
 def frontier(points,xd,yd):
@@ -33,7 +38,10 @@ class PublicContract(unittest.TestCase):
         measured=[p for panel in DATA['panels'] if panel['source_level']!='external-reported' for p in panel['points']]
         seen=set()
         for group in groups:
-            self.assertTrue(group['variant'] and group['checkpoint'] and len(group['labels'])>=2)
+            # A group records registrations of one checkpoint; after a label correction they share one label
+            # and the group keeps the registrations' original labels.
+            self.assertTrue(group['variant'] and group['checkpoint'] and group['labels'])
+            self.assertGreaterEqual(len(group.get('original_labels',group['labels'])),2)
             keys={(group['model'],label) for label in group['labels']}
             self.assertFalse(keys&seen);seen|=keys
             for label in group['labels']:
@@ -190,5 +198,33 @@ class PublicContract(unittest.TestCase):
             return set()
         self.assertFalse(keys(DATA)&forbidden)
 
+
+    def test_metadata_corrections_change_only_listed_metadata(self):
+        # Every corrected field holds its corrected value; reverting the listed edits reproduces each ledgered
+        # point, panel, candidate and alias/size-note file exactly; the CSV downloads agree with the snapshot.
+        self.assertTrue(CORRECTIONS)
+        for path in CORRECTIONS:
+            self.assertEqual(corrections.check(ROOT/'data',path),[],path.name)
+            corr=json.loads(path.read_text())
+            self.assertEqual(set(corr['ledger']['points'])-{p['id'] for panel in DATA['panels'] for p in panel['points']},set())
+
+    def test_metadata_guard_rejects_value_changes_and_removals(self):
+        corr=json.loads(CORRECTIONS[-1].read_text())
+        self.assertEqual(corrections.check_snapshot(copy.deepcopy(DATA),corr),[])
+        listed={pid for e in corr['labels'] for pid in e['points']}
+        def mutated(change):
+            doc=copy.deepcopy(DATA);change(doc);return corrections.check_snapshot(doc,corr)
+        first=DATA['panels'][0]['points'][0]['id']
+        unlisted=next(p['id'] for panel in DATA['panels'] for p in panel['points'] if p['id'] not in listed)
+        relabelled=next(iter(sorted(listed)))
+        def point(doc,pid):return next(p for panel in doc['panels'] for p in panel['points'] if p['id']==pid)
+        def set_y(doc):point(doc,first)['y']+=1
+        def set_x(doc):point(doc,first)['x']*=1.5
+        def drop(doc):doc['panels'][0]['points']=doc['panels'][0]['points'][1:]
+        def relabel_unlisted(doc):point(doc,unlisted)['label']+=' (edited)'
+        def undo_listed(doc):point(doc,relabelled)['label']=next(e['from'] for e in corr['labels'] if relabelled in e['points'])
+        def change_source(doc):point(doc,first)['source_hashes']=['0'*64]
+        for change in (set_y,set_x,drop,relabel_unlisted,undo_listed,change_source):
+            self.assertTrue(mutated(change),change.__name__)
 
 if __name__=='__main__':unittest.main(verbosity=2)

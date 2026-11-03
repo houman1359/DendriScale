@@ -267,13 +267,15 @@ states its provenance: study-built (the study's own trainer and dense twin),
 with cells built by the DendriNet package where cells are used; the package
 also rebuilds and exports the 19.5 MB/FFN cell model bit for bit.
 
-**Sizes.** The x axis is the projected low-bit byte ledger: every stored value,
-scale and connectivity mask at its recorded format, with adapters and norms at
-16 bits. It is not a packed file. Factors divide the BF16 teacher's
+**Sizes.** The x axis, titled “Projected complete-model storage, 16-bit
+auxiliary ledger (GB)”, is the projected low-bit byte ledger: every stored
+value, scale and connectivity mask at its recorded format, with adapters and
+norms at 16 bits. It is not a packed file. Factors divide the BF16 teacher's
 16,381,470,720 bytes by it. Stored as trained, adapters and norms are FP32,
 about 16 MB more. The 19.5 MB/FFN cell model's qualified export measures
 1,628,789,072 bytes for every file (10.06×) with FP32 adapters and norms and a
-more compact connectivity code; it appears in that point's conditions, not on
+more compact connectivity code. It is a separate field of that model's points
+(“Measured artifact” in the result details and bar details), not a position on
 the axis.
 
 **Instruments.** Development GSM: 1,024 frozen items, 5-shot, 512-token cap,
@@ -311,11 +313,68 @@ cutoffs apply to the unrounded aggregate.
 | τ3 | Intermediate milestone | 473 (0.50) | 0.563053 · 3,460 |
 | τ4 | Low-quality diagnostic boundary | 332 (0.35) | 0.522835 · 3,213 |
 
-Each level also needs KL caps on the held-out set. The caps are pending: they
-are proposed from pool M only and are not frozen. Until they are, this page
-assigns no level, and threshold shading stays off for these panels (it covers
-only the curated OLMo cohort). Passing τ4 is never described as preserving
-broad teacher quality.
+KL caps, version 1, were frozen on November 3 from pool M only, as declared
+operational tolerances rather than natural boundaries implied by the teacher
+or by theory:
+
+| Level | C4 KL ≤ | Chat KL ≤ | Copy KL ≤ |
+| --- | --- | --- | --- |
+| τ1 | 0.131 | 0.151 | 0.0984 |
+| τ2 | 0.502 | 0.552 | 0.0984 |
+| τ3 | 0.749 | 0.838 | 0.0984 |
+| τ4 | 0.951 | 1.030 | 0.0984 |
+
+A KL requirement holds when the measured value is at most the cap; a confirmed
+pass uses the one-sided 95% upper bound on pool K. The copy cap is one
+permissive guard at every level: the untrained INT4 RTN parent's pool-M copy KL
+plus a tolerance of ln 1.10 nats per copied token. A level needs all five
+requirements (GSM, probe, and C4, chat and copy KL on the common held-out set,
+with their uncertainty checks), so this page assigns no complete level to any
+model. A model that meets only a level's GSM and probe cutoffs is described as
+meeting that level's GSM/probe point thresholds, never as reaching the level.
+Threshold shading stays off for these panels; it covers only the curated OLMo
+cohort. Passing τ4 is never described as preserving broad teacher quality.
+
+
+## Metadata correction v1 · November 3, 2026
+
+Approved by Houman Safaai: raw measurements are preserved; known false or
+uninformative metadata is not. No id, value, size, source hash or verdict
+changes, and no record is removed.
+
+**Model names.** Every label follows one scheme: “family · FFN storage/FFN ·
+parent · training · size GB”. References read “Reference · …” and external
+models “External · …”. Qwen3-8B labels are the frontier inventory's labels for
+the same runs. An earlier checkpoint of a run keeps that label with its own
+cumulative training targets. Labels of other models use only fields the point
+itself records: the method family, the original arm name kept as the variant,
+parent formats stated in the record, recorded training positions and
+whole-model bytes. They also name the teacher. A slot with no recorded value
+is left out. Point ids still carry the original run identifiers, and no panel
+gives two different models one label.
+
+**Development-GSM decoding.** One Qwen3-8B cohort (three panels) said
+“greedy”. Each of its 72 student shards and the teacher's 8 reference shards
+is bound, by path and hash, to the job log that wrote it. Every one of those
+logs records the merge of Qwen3's generation defaults: one sampled answer at
+temperature 0.6, top-k 20, top-p 0.95. The cohort now says so. No cohort needed
+the label “decoding unknown”. Greedy labels of other benchmarks (EvalScope,
+EvalPlus, IFEval, coding smoke) were out of scope and are unchanged.
+
+**Size axis and artifact.** In 21 Qwen3-8B panels, every size equals the
+model's projected 16-bit ledger. These panels now title the axis “Projected
+complete-model storage, 16-bit auxiliary ledger (GB)”. The measured task-17
+artifact (1,628,789,072 bytes, every file, 10.06×) is a separate field.
+
+**Correction layer.** `data/metadata_corrections_v1.json` lists every corrected
+field with its original value, its reason and the record that establishes it.
+Records are cited by hash, never by path. A ledger hashes every point, panel
+and candidate as published at commit f876667. `scripts/corrections.py apply`
+migrates data rebuilt from the original registries. `scripts/validate.py`
+fails if any value changes, a ledgered record is removed, or metadata differs
+from the original beyond the listed corrections. `metrics.csv` keeps each
+registry's original metric names, because they are registry records, not
+model labels.
 
 # Benchmark coverage
 

@@ -18,7 +18,7 @@ window.DendriScaleThresholds = (() => {
   const spec=specs[panel.ylabel];
   if(!spec || panel.yunit!==spec.unit || panel.ydirection!==spec.direction)
    return unavailable('No separate gate for this readout. The recorded suite gates GSM, MC macro, C4 and the two copy lengths.');
-  const teachers=panel.points.filter(p=>p.label==='Teacher reference');
+  const teachers=panel.points.filter(p=>p.reference_role==='teacher'||p.method_style?.key==='teacher'||p.label==='Teacher reference');
   if(!teachers.length || teachers.some(p=>p.y!==spec.teacher))
    return unavailable('A matching teacher score is required to draw this threshold.');
   if(![1,1.25,1.5].includes(multiplier))return unavailable('Unknown exploratory tolerance.');

@@ -57,11 +57,14 @@ window.DendriScaleUI = (() => {
     element.title = original || verdictName(state);
     return element;
   }
+  // Teachers are recognized by their recorded role (metadata correction v1), not by a label string.
+  const isTeacher = point => point?.reference_role === 'teacher' || point?.method_style?.key === 'teacher'
+    || point?.label === 'Teacher reference';
   const passLabel = 'Passes all benchmarks';
   const passScope = 'All five recorded development gates pass: GSM8K, multiple choice, C4, copy 512 and copy 2048. Within the recorded tolerances and evaluation cohort.';
   function allBenchmarksPass(point) {
     if (!point || point.source_level !== 'curated' || point.execution !== 'completed'
-      || point.label === 'Teacher reference' || point.method_style?.key === 'teacher'
+      || isTeacher(point)
       || point.failed_gates?.length || /fail|reject|gate.stop/i.test(point.gate_status || '')) return false;
     const checks = point.full_gate_checks;
     if (checks != null) return ['gsm', 'mc', 'c4', 'copy512', 'copy2048'].every(key => checks[key] === true)
@@ -107,6 +110,12 @@ window.DendriScaleUI = (() => {
       originalBytes: !conflict && bytes.value && factor.value ? bytes.value*factor.value : null,
       referenceBasis: 'Implied by the same recorded byte size and compression ratio',
       basis: conflict ? 'Conflicting size records; ratio withheld' : 'Recorded whole-model tensor bytes and ratio, linked within the same candidate, model, cohort and source hashes'};
+  }
+  // A measured complete artifact of the same model, recorded beside its projected ledger size.
+  function artifactText(point) {
+    const a = point?.measured_artifact;
+    if (!a || !(a.bytes > 0)) return null;
+    return (a.bytes / 1e9).toFixed(4) + ' GB · ' + a.scope + (a.factor_vs_bf16_teacher ? ' · ' + a.factor_vs_bf16_teacher.toFixed(2) + '× vs BF16 teacher' : '');
   }
   function countDenominator(point, label = point.ylabel) {
     if (!/^(GSM|MC) correct\b/i.test(label || '')) return null;
@@ -197,5 +206,6 @@ window.DendriScaleUI = (() => {
     target.addEventListener('keydown', event => {if (event.key === 'Escape') tip.hidden = true;});
   }
   return {canonicalModelId, historicalProtocol, modelName, candidateName, metricName, axisName, number, tick, tickCost, ticks, badge, result, empty, tooltip,
-    allBenchmarksPass, candidatePoint, sizeAccounting, countDenominator, passBadge, passMark, passLabel, passScope, chartZoom};
+    allBenchmarksPass, candidatePoint, sizeAccounting, countDenominator, passBadge, passMark, passLabel, passScope, chartZoom,
+    isTeacher, artifactText};
 })();

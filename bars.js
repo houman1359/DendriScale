@@ -25,7 +25,7 @@ window.DendriScaleBars = function(DATA,{el,se,sizeNotes=[],benchmarkCoverage=nul
   dense:['Dense / low-rank replacement','#006B57','dots'],ternary:['Ternary (Prism)','#007B83','vertical'],
   binary:['Binary (Prism)','#A32972','diagonal'],external:['Other published method','#595959','dots'],unknown:['Method unspecified','#595959','dots']};
  function method(p){
-  if(p.method_style?.key==='teacher'||p.label==='Teacher reference'||p.method_style?.label==='Uncompressed teacher reference')return 'teacher';
+  if(p.reference_role==='teacher'||p.method_style?.key==='teacher'||p.label==='Teacher reference'||p.method_style?.label==='Uncompressed teacher reference')return 'teacher';
   if(/ternary/i.test(p.label))return 'ternary';
   if(/binary|(?:1|one).bit.*bonsai|bonsai.*(?:1|one).bit/i.test(p.label))return 'binary';
   if(p.method_style?.key==='external'&&/IQ\d|Q\d_|GPTQ|AWQ|quantiz/i.test(p.label))return 'control';
@@ -60,7 +60,7 @@ window.DendriScaleBars = function(DATA,{el,se,sizeNotes=[],benchmarkCoverage=nul
   if(verifiedSizes.has(p.id))return verifiedSizes.get(p.id);
   const bytes=p.whole_model_size?.registered_bytes;
   if(p.source_level==='external-reported')return {bytes:bytes??(p.xunit==='bytes'?p.x:null),basis:'published size'};
-  if(/publisher-reported packed size/i.test(p.label)&&p.xunit==='bytes')return {bytes:p.x,basis:'published packed size'};
+  if((p.size_basis==='published packed size'||/publisher-reported packed size/i.test(p.label))&&p.xunit==='bytes')return {bytes:p.x,basis:'published packed size'};
   if(p.xaxis==='projected_format_bytes')return {bytes:p.x,basis:'projected format'};
   if(p.xaxis==='weight_file_bytes')return {bytes:p.x,basis:'weight files'};
   if(bytes>0)return {bytes,basis:'registered model'};
@@ -109,10 +109,10 @@ window.DendriScaleBars = function(DATA,{el,se,sizeNotes=[],benchmarkCoverage=nul
   const target=byId('barsDetail');target.replaceChildren(el('h3',UI.candidateName(r.variant)),el('p',UI.modelName(r.model)));
   const dl=el('dl');dl.className='bar-facts';
   for(const [k,v] of [['Benchmark',r.benchmark+' · '+scoreLabel(r)],['Method',styles[r.method][0]],
-   ['Model size',r.size.bytes>0?(r.size.bytes/1e9).toFixed(3)+' GB · '+r.size.basis:r.size.basis],
+   ['Model size',r.size.bytes>0?(r.size.bytes/1e9).toFixed(3)+' GB · '+r.size.basis:r.size.basis],['Measured artifact',UI.artifactText(r)],
    ['Size accounting',r.size.note],['Evidence',r.published?'Published result · not reproduced':'DendriScale measurement'],['Protocol',r.cohort],
    ['Sample size',r.n||'See benchmark protocol'],['Registered label',r.variant===r.label?'':r.label],['Original verdict',r.gate_status],['Conditions',r.conditions],['Limitations',r.limitations],['Source hashes',(r.source_hashes||[]).join(', ')]]){
-   if((k==='Size accounting'||k==='Registered label')&&!v)continue;
+   if((k==='Size accounting'||k==='Registered label'||k==='Measured artifact')&&!v)continue;
    dl.append(el('dt',k),el('dd',String(v||'Not recorded')));
   }
   target.append(dl);byId('barsDetails').showModal();

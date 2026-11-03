@@ -9,7 +9,7 @@
       "experiment_id": "exp_20260908_7b_bf16_capability",
       "model": "OLMo-3-7B-Instruct",
       "cohort": "exp_20260908_7b_bf16_capability | GSM train-dev 1,024; MC 6,144; fixed C4/copy; BF16/eager/H100",
-      "label": "teacher",
+      "label": "Reference · OLMo-3 7B Instruct BF16 teacher",
       "source_hashes": [
         "82fd868721016b7cfa2133f61f16f9e885c0d81f065156b4c4e0d69d59ac5fc1"
       ],
@@ -27,7 +27,7 @@
       "experiment_id": "exp_20260908_7b_bf16_capability",
       "model": "OLMo-3-7B-Instruct",
       "cohort": "exp_20260908_7b_bf16_capability | GSM train-dev 1,024; MC 6,144; fixed C4/copy; BF16/eager/H100",
-      "label": "teacher",
+      "label": "Reference · OLMo-3 7B Instruct BF16 teacher",
       "source_hashes": [
         "82fd868721016b7cfa2133f61f16f9e885c0d81f065156b4c4e0d69d59ac5fc1"
       ],
