@@ -104,3 +104,40 @@ Run validation and inspect the page before committing. Do not copy private
 research directories or their Git history into this repository.
 
 The matched comparison table now places dendritic hybrids beside quantization-only, pruning and layer-removal controls. Largest-passing cards are cohort-specific; all measured failures remain visible. ModelOpt-based controls describe this project's actual pipeline rather than claiming vendor benchmark performance.
+
+## Qwen3-8B 10x program · November 2, 2026
+
+Thirteen new Qwen3-8B panels (163 points, three experiments) hold the 10x
+program of 31 October–2 November 2026. Every model replaces all 36 FFNs of
+Qwen3-8B on a low-bit parent, either with dendritic sparse cells (square,
+dendritic + quantization) or with dense SwiGLU twins, the dense control
+(diamond). Labels give the FFN family, FFN storage, parent, training and
+whole-model size, for example
+“Dendritic sparse cells · 19.5 MB/FFN · low-bit parent · 67M · 1.64 GB”.
+Run identifiers stay in the point IDs.
+
+- **Models:** 18 wave-1 arms at 67.1M training targets; the 268M milestone of
+  the 17.4 MB/FFN dense arm, with teacher reasoning traces added after 67.1M;
+  and H7q, 30 MB/FFN cells in INT4 after two 67.1M stages.
+- **Sizes:** one axis convention, the projected low-bit byte ledger with
+  adapters and norms at 16 bits: 1.56–2.52 GB, 6.5–10.5× smaller than the
+  16,381,470,720-byte BF16 teacher. Only the 19.5 MB/FFN cell model has a
+  measured file: its qualified export is 1,628,789,072 bytes for every file
+  (10.06×), stated in its conditions.
+- **Scores:** development GSM (of 1,024; teacher 946), the six-task choice
+  probe (of 6,144; teacher 4,942), and teacher KL (lower is better) on the old
+  fresh confirmation set, on the frozen held-out pools M (seven models) and
+  K (two models), and on the trainer gates.
+- **Exposure:** the old set's C4 and chat sequences lie in training streams
+  that the 268M milestone and H7q passed, so those two values are left out for
+  both models. Every value shown is clean.
+- **At equal FFN bytes,** selected-wiring cells beat the dense twins at
+  30 MB/FFN (GSM 645 vs 608; paired difference +3.6 percentage points, 95%
+  interval +0.6 to +6.7) and at 19.5 MB/FFN, the 10x FFN budget (495 vs 394; +9.9
+  percentage points, +6.6 to +13.1; old-set C4 KL 0.80 vs 0.85, copy KL 6% higher).
+  Cells with seeded instead of selected wiring fail (GSM 35–56). The 268M
+  milestone reaches GSM 679 (352 at 67.1M) and 12–14% lower pool-K KL; traces
+  were added, so this is not a pure dose effect.
+- **Quality levels** τ1–τ4 have frozen GSM and probe cutoffs
+  ([Methods](METHODS.md)). Their KL caps are pending, so no model is assigned
+  a level.

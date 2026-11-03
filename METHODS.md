@@ -246,6 +246,77 @@ The older BF16 OLMo-3-7B teacher record includes 14,596,022,784 complete-model r
 The older FP32 teacher characterization reports 7,298,011,136 parameters without a verified complete-model byte ledger. Its reference bars say **GB not recorded**, with the parameter count and the reason in the detail. This is an accounting gap, not a zero-size model. We do not infer registered bytes from model names, parameter counts, or a different precision.
 
 Method colors now use charcoal for originals, blue for dendritic replacements, amber for dendritic + quantization, and rose/magenta for non-dendritic methods. Wider spacing between pattern marks preserves the base colors; diagonal lines, crosses and dots provide redundant distinctions. Group headers carry colored strips and the legend has larger swatches. Monochrome retains visible patterns. The same three method colors apply to the matched scatter view; the pooled plot retains its separate model-color convention.
+
+
+## Qwen3-8B 10x program · November 2, 2026
+
+**Models.** Each model replaces all 36 FFNs of Qwen3-8B. Dendritic sparse
+cells keep a selected subset of input connections per cell (seeded in three
+arms that failed). Their compartments are linear, so each cell computes a
+sparse gated unit: the differences between cells and twins are a
+selective-wiring result, not evidence for nonlinear dendritic integration.
+Dense SwiGLU twins are the dense control, sized to a cell model's FFN bytes;
+one narrower set is not matched to any cell. “INT4 parent” means INT4
+attention and embedding/head tables; “low-bit parent” means INT3 attention and
+tables with a binary input embedding; other labels name their formats.
+Training: 67.1M targets of C4 text, teacher chat replies and synthetic copy
+sequences (wave 1); two 67.1M stages (H7q); 268.4M targets with teacher
+reasoning traces on GSM8K and MATH training problems added after 67.1M (the
+milestone, taken mid-schedule from a longer run). One seed each. Each point
+states its provenance: study-built (the study's own trainer and dense twin),
+with cells built by the DendriNet package where cells are used; the package
+also rebuilds and exports the 19.5 MB/FFN cell model bit for bit.
+
+**Sizes.** The x axis is the projected low-bit byte ledger: every stored value,
+scale and connectivity mask at its recorded format, with adapters and norms at
+16 bits. It is not a packed file. Factors divide the BF16 teacher's
+16,381,470,720 bytes by it. Stored as trained, adapters and norms are FP32,
+about 16 MB more. The 19.5 MB/FFN cell model's qualified export measures
+1,628,789,072 bytes for every file (10.06×) with FP32 adapters and norms and a
+more compact connectivity code; it appears in that point's conditions, not on
+the axis.
+
+**Instruments.** Development GSM: 1,024 frozen items, 5-shot, 512-token cap,
+one sampled answer per item at Qwen3's default decoding (temperature 0.6,
+top-k 20, top-p 0.95), H100; the teacher scores 946 on the same items and
+prompts. Six-task probe: the same 6,144 items and scorer as the earlier six-task
+H100 probe panels, here run on H200; the teacher's 4,942 is the H100 value. KL is KL(teacher ‖ model) over
+the full vocabulary at every next-token position, averaged per sequence or
+row and then over the set. The old fresh confirmation set has 64 sequences per
+family (C4, chat, copy). The frozen held-out set was built afterwards from
+sources outside every training stream (C4 validation shard 1, new chat prompts
+with teacher replies, copy windows from a separate index range), screened by
+document hash, 13-word shingles and near-duplicates, and frozen by manifest
+hash before use. Pool M (32 rows per family) calibrates the KL caps. Pool K
+(64 rows per family) is the confirmation pool; its only two results (the
+17.4 MB/FFN dense arm at 67.1M and at 268M) were scored before the caps were
+chosen, so they are informative rather than untouched tests. Trainer gates are
+each run's fixed C4 validation windows and copy gate at the evaluated dose.
+
+**Exposure.** A value appears only when its sequences lie outside the model's
+training streams. The 268M milestone and H7q trained past the stream positions
+of the old set's C4 and chat sequences, so those values are left out. Their
+copy values, held-out pools, GSM and probe are clean. No trace row of the
+milestone matches a development or few-shot GSM item, but the traces come from
+the same GSM8K training distribution.
+
+**Quality levels.** Frozen on November 2 as fractions of the teacher's
+full-precision scores (GSM 946/1,024; probe 4,942/6,144 = 0.804362). Probe
+cutoffs apply to the unrounded aggregate.
+
+| Level | Role | GSM ≥ (of 1,024) | Probe ≥ (accuracy · of 6,144) |
+| --- | --- | --- | --- |
+| τ1 | High-fidelity target | 899 (0.95 × 946) | 0.764144 · 4,695 |
+| τ2 | Main development target | 663 (0.70) | 0.643490 · 3,954 |
+| τ3 | Intermediate milestone | 473 (0.50) | 0.563053 · 3,460 |
+| τ4 | Low-quality diagnostic boundary | 332 (0.35) | 0.522835 · 3,213 |
+
+Each level also needs KL caps on the held-out set. The caps are pending: they
+are proposed from pool M only and are not frozen. Until they are, this page
+assigns no level, and threshold shading stays off for these panels (it covers
+only the curated OLMo cohort). Passing τ4 is never described as preserving
+broad teacher quality.
+
 # Benchmark coverage
 
 Benchmark cards distinguish measured scores from evaluation work. The coverage
